@@ -228,15 +228,18 @@ namespace SONO {
 			std::stringstream result;
 			std::map<sono_uid_t, size_t>::iterator iter;
 
-			result << SONO_UID_HEADER << " -- " << (m_initialized ? "INIT" : "UNINIT")
-				<< ", PTR. 0x" << SCALAR_AS_HEX(sono_uid_factory *, this) << ", CAP. " << capacity()
+			result << SONO_UID_HEADER << " -- " << (m_initialized ? "INIT" : "UNINIT");
+
+			if(m_initialized) {
+				result << ", PTR. 0x" << SCALAR_AS_HEX(sono_uid_factory *, this) << ", CAP. " << capacity()
 				<< ", SZ. " << size();
 
-			if(verbose) {
-
 				for(iter = m_map.begin(); iter != m_map.end(); ++iter) {
-					result << std::endl << "--- {" << SCALAR_AS_HEX(sono_uid_t, iter->first) << "}" 
-						<< ", REF. " << iter->second;
+					result << std::endl << "--- {" << SCALAR_AS_HEX(sono_uid_t, iter->first) << "}";
+
+					if(verbose) {
+						result << ", REF. " << iter->second;
+					}
 				}
 			}
 

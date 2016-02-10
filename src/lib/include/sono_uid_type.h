@@ -43,11 +43,11 @@ namespace SONO {
 		#define SONO_UID_EXCEPTION_MAX SONO_UID_EXCEPTION_UNINITIALIZED
 
 		static const std::string SONO_UID_EXCEPTION_STR[] = {
-			SONO_UID_EXCEPTION_HEADER "Failed to allocate component",
+			SONO_UID_EXCEPTION_HEADER "Failed to allocate uid manager",
 			SONO_UID_EXCEPTION_HEADER "Uid exceeded capacity",
-			SONO_UID_EXCEPTION_HEADER "Component is initialized",
+			SONO_UID_EXCEPTION_HEADER "Uid manager is initialized",
 			SONO_UID_EXCEPTION_HEADER "Uid does not exist",
-			SONO_UID_EXCEPTION_HEADER "Component is uninitialized",
+			SONO_UID_EXCEPTION_HEADER "Uid manager is uninitialized",
 			};
 
 		#define SONO_UID_EXCEPTION_STRING(_TYPE_) \

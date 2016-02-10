@@ -24,8 +24,10 @@ namespace SONO {
 
 	namespace COMP {
 
+		typedef std::map<std::string, std::pair<std::string, std::string>> sono_device_list;
+
 		typedef class _sono_device :
-				sono_uid_base {
+				public sono_socket_base {
 
 			public:
 
@@ -44,19 +46,9 @@ namespace SONO {
 					__in const _sono_device &other
 					);
 
-				std::string address(void);
-
-				uint16_t port(void);
-
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					);
-
-			protected:
-
-				std::string m_address;
-
-				uint16_t m_port;
 
 		} sono_device;
 
@@ -78,6 +70,11 @@ namespace SONO {
 
 				size_t decrement_reference(
 					__in sono_uid_t id
+					);
+
+				sono_device &generate(
+					__in const std::string &address,
+					__in uint16_t port
 					);
 
 				size_t increment_reference(

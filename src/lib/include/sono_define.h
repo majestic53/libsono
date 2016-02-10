@@ -60,7 +60,8 @@ namespace SONO {
 
 	#define SCALAR_INVALID(_TYPE_) ((_TYPE_) -1)
 
-	#define STRING_EMPTY "<EMPTY>"
+	#define STRING_EMPTY "EMPTY"
+	#define STRING_UNKNOWN "UNKNOWN"
 
 	#define STRING_CHECK(_STR_) (_STR_.empty() ? STRING_EMPTY : _STR_.c_str())
 
@@ -71,7 +72,7 @@ namespace SONO {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 1
+	#define VERSION_REVISION 2
 	#define VERSION_WEEK 1606
 
 	#define VERSION_STRING \

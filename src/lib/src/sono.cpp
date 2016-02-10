@@ -26,6 +26,7 @@ namespace SONO {
 
 	_sono_manager::_sono_manager(void) :
 		m_factory_device(sono_device_factory::acquire()),
+		m_factory_socket(sono_socket_factory::acquire()),
 		m_factory_uid(sono_uid_factory::acquire()),
 		m_initialized(false)
 	{
@@ -58,7 +59,7 @@ namespace SONO {
 
 			sono_manager::m_instance = new sono_manager;
 			if(!sono_manager::m_instance) {
-				THROW_SONO_EXCEPTION(SONO_EXCEPTION_ALLOCATION);
+				THROW_SONO_EXCEPTION(SONO_EXCEPTION_ALLOCATED);
 			}
 		}
 
@@ -76,6 +77,19 @@ namespace SONO {
 		return m_factory_device;
 	}
 
+	sono_device_list 
+	_sono_manager::discover(void)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		// TODO
+
+		return list();
+	}
+
 	void 
 	_sono_manager::initialize(void)
 	{
@@ -85,6 +99,7 @@ namespace SONO {
 		}
 
 		m_factory_uid->initialize();
+		m_factory_socket->initialize();
 		m_factory_device->initialize();
 		m_initialized = true;
 	}
@@ -99,6 +114,42 @@ namespace SONO {
 	_sono_manager::is_initialized(void)
 	{
 		return m_initialized;
+	}
+
+	sono_device_list 
+	_sono_manager::list(void)
+	{
+		sono_device_list result;
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		// TODO
+
+		return result;
+	}
+
+	size_t 
+	_sono_manager::size(void)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return list().size();
+	}
+
+	sono_socket_factory *
+	_sono_manager::socket(void)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_socket;
 	}
 
 	std::string 
@@ -136,6 +187,7 @@ namespace SONO {
 		}
 
 		m_factory_device->uninitialize();
+		m_factory_socket->uninitialize();
 		m_factory_uid->uninitialize();
 		m_initialized = false;
 	}

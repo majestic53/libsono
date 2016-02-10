@@ -28,6 +28,7 @@
 
 #include "sono_define.h"
 #include "sono_exception.h"
+#include "sono_xml.h"
 
 using namespace SONO;
 
@@ -36,6 +37,7 @@ using namespace SONO;
 #endif // COMP
 
 #include "sono_uid.h"
+#include "sono_socket.h"
 #include "sono_device.h"
 
 using namespace SONO::COMP;
@@ -50,7 +52,7 @@ namespace SONO {
 
 			static _sono_manager *acquire(void);
 
-			sono_device_factory *device(void);
+			sono_device_list discover(void);
 
 			void initialize(void);
 
@@ -58,11 +60,13 @@ namespace SONO {
 
 			bool is_initialized(void);
 
+			sono_device_list list(void);
+
+			size_t size(void);
+
 			std::string to_string(
 				__in_opt bool verbose = false
 				);
-
-			sono_uid_factory *uid(void);
 
 			void uninitialize(void);
 
@@ -82,7 +86,15 @@ namespace SONO {
 
 			static void _delete(void);
 
+			sono_device_factory *device(void);
+
+			sono_socket_factory *socket(void);
+
+			sono_uid_factory *uid(void);
+
 			sono_device_factory *m_factory_device;
+
+			sono_socket_factory *m_factory_socket;
 
 			sono_uid_factory *m_factory_uid;
 

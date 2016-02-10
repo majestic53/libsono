@@ -33,7 +33,7 @@ namespace SONO {
 #endif // NDEBUG
 
 		enum {
-			SONO_DEVICE_EXCEPTION_ALLOCATION = 0,
+			SONO_DEVICE_EXCEPTION_ALLOCATED = 0,
 			SONO_DEVICE_EXCEPTION_INITIALIZED,
 			SONO_DEVICE_EXCEPTION_NOT_FOUND,
 			SONO_DEVICE_EXCEPTION_UNINITIALIZED,
@@ -42,10 +42,10 @@ namespace SONO {
 		#define SONO_DEVICE_EXCEPTION_MAX SONO_DEVICE_EXCEPTION_UNINITIALIZED
 
 		static const std::string SONO_DEVICE_EXCEPTION_STR[] = {
-			SONO_DEVICE_EXCEPTION_HEADER "Failed to allocate component",
-			SONO_DEVICE_EXCEPTION_HEADER "Component is initialized",
+			SONO_DEVICE_EXCEPTION_HEADER "Failed to allocate device manager",
+			SONO_DEVICE_EXCEPTION_HEADER "Device manager is initialized",
 			SONO_DEVICE_EXCEPTION_HEADER "Device does not exist",
-			SONO_DEVICE_EXCEPTION_HEADER "Component is uninitialized",
+			SONO_DEVICE_EXCEPTION_HEADER "Device manager is uninitialized",
 			};
 
 		#define SONO_DEVICE_EXCEPTION_STRING(_TYPE_) \

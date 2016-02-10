@@ -28,8 +28,7 @@ namespace SONO {
 			__in const std::string &address,
 			__in uint16_t port
 			) :
-				m_address(address),
-				m_port(port)
+				sono_socket_base(SONO_SOCKET_UDP, address, port)
 		{
 			return;
 		}
@@ -37,9 +36,7 @@ namespace SONO {
 		_sono_device::_sono_device(
 			__in const _sono_device &other
 			) :
-				sono_uid_base(other),
-				m_address(other.m_address),
-				m_port(other.m_port)
+				sono_socket_base(other)
 		{
 			return;
 		}
@@ -56,24 +53,10 @@ namespace SONO {
 		{
 
 			if(this != &other) {
-				sono_uid_base::operator=(other);
-				m_address = other.m_address;
-				m_port = other.m_port;
+				sono_socket_base::operator=(other);
 			}
 
 			return *this;
-		}
-
-		std::string 
-		_sono_device::address(void)
-		{
-			return m_address;
-		}
-
-		uint16_t 
-		_sono_device::port(void)
-		{
-			return m_port;
 		}
 
 		std::string 
@@ -81,15 +64,7 @@ namespace SONO {
 			__in_opt bool verbose
 			)
 		{
-			std::stringstream result;
-
-			if(verbose) {
-				result << sono_uid_base::to_string() << " ";
-			}
-
-			result << STRING_CHECK(m_address) << ":" << m_port;
-
-			return result.str();
+			return sono_socket_base::to_string(verbose);
 		}
 
 		_sono_device_factory *_sono_device_factory::m_instance = NULL;
@@ -126,7 +101,7 @@ namespace SONO {
 
 				sono_device_factory::m_instance = new sono_device_factory;
 				if(!sono_device_factory::m_instance) {
-					THROW_SONO_DEVICE_EXCEPTION(SONO_DEVICE_EXCEPTION_ALLOCATION);
+					THROW_SONO_DEVICE_EXCEPTION(SONO_DEVICE_EXCEPTION_ALLOCATED);
 				}
 			}
 
@@ -200,6 +175,24 @@ namespace SONO {
 			return result;
 		}
 
+		sono_device &
+		_sono_device_factory::generate(
+			__in const std::string &address,
+			__in uint16_t port
+			)
+		{
+
+			if(!m_initialized) {
+				THROW_SONO_DEVICE_EXCEPTION(SONO_DEVICE_EXCEPTION_UNINITIALIZED);
+			}
+
+			sono_device dev(address, port);
+			m_map.insert(std::pair<sono_uid_t, std::pair<sono_device, size_t>>(dev.id(), 
+				std::pair<sono_device, size_t>(dev, REF_INIT)));
+
+			return at(dev.id());
+		}
+
 		size_t 
 		_sono_device_factory::increment_reference(
 			__in sono_uid_t id
@@ -269,14 +262,17 @@ namespace SONO {
 			std::stringstream result;
 			std::map<sono_uid_t, std::pair<sono_device, size_t>>::iterator iter;
 
-			result << SONO_DEVICE_HEADER << " -- " << (m_initialized ? "INIT" : "UNINIT")
-				<< ", PTR. 0x" << SCALAR_AS_HEX(sono_device_factory *, this) << ", SZ. " << size();
+			result << SONO_DEVICE_HEADER << " -- " << (m_initialized ? "INIT" : "UNINIT");
 
-			if(verbose) {
+			if(m_initialized) {
+				result << ", PTR. 0x" << SCALAR_AS_HEX(sono_device_factory *, this) << ", SZ. " << size();
 
 				for(iter = m_map.begin(); iter != m_map.end(); ++iter) {
-					result << std::endl << "--- " << iter->second.first.to_string(true) 
-					<< ", REF. " << iter->second.second;
+					result << std::endl << "--- " << iter->second.first.to_string(true);
+
+					if(verbose) {
+						result << ", REF. " << iter->second.second;
+					}
 				}
 			}
 

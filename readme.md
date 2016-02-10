@@ -15,7 +15,7 @@ Usage
 
 ###Build
 
-__Prereq__: Building this project requires the GNU and/or Clang c++ compilers (g++/clang++).
+__Prereq__: Building this project requires the GNU and/or Clang c++ compilers (g++/clang++) and the Boost library.
 
 To build the entire project, simply run the command below in the projects root directory.
 
@@ -38,11 +38,20 @@ sonoctl [-h|-v]
 ###Examples
 
 * sonoctl --help
+* sonoctl --list
+
+*More to come...*
 
 Changelog
 =========
 
 ###Version 0.1.1606
+*Updated: 2/9/2016*
+
+* Added socket classes
+* Added xml class (incomplete)
+* Added discovery/list routines (incomplete)
+
 *Updated: 2/8/2016*
 
 * Initial commit
