@@ -46,6 +46,10 @@ Changelog
 =========
 
 ###Version 0.1.1606
+*Updated: 2/10/2016*
+
+* Finished SSDP discovery/list routines
+
 *Updated: 2/9/2016*
 
 * Added socket classes

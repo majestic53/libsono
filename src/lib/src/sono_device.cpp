@@ -25,10 +25,16 @@ namespace SONO {
 	namespace COMP {
 
 		_sono_device::_sono_device(
+			__in const std::string &uuid,					
+			__in const std::string &household,
+			__in const std::string &configuration,
 			__in const std::string &address,
 			__in uint16_t port
 			) :
-				sono_socket_base(SONO_SOCKET_UDP, address, port)
+				sono_socket_base(SONO_SOCKET_UDP, address, port),
+				m_configuration(configuration),
+				m_household(household),
+				m_uuid(uuid)
 		{
 			return;
 		}
@@ -36,7 +42,10 @@ namespace SONO {
 		_sono_device::_sono_device(
 			__in const _sono_device &other
 			) :
-				sono_socket_base(other)
+				sono_socket_base(other),
+				m_configuration(other.m_configuration),
+				m_household(other.m_household),
+				m_uuid(other.m_uuid)
 		{
 			return;
 		}
@@ -54,9 +63,18 @@ namespace SONO {
 
 			if(this != &other) {
 				sono_socket_base::operator=(other);
+				m_configuration = other.m_configuration;
+				m_household = other.m_household;
+				m_uuid = other.m_uuid;
 			}
 
 			return *this;
+		}
+
+		std::string 
+		_sono_device::household(void)
+		{
+			return m_household;
 		}
 
 		std::string 
@@ -64,7 +82,18 @@ namespace SONO {
 			__in_opt bool verbose
 			)
 		{
-			return sono_socket_base::to_string(verbose);
+			std::stringstream result;
+
+			result << "{" << STRING_CHECK(m_household) << ":" << STRING_CHECK(m_uuid) << "}, "
+				<< sono_socket_base::to_string(verbose);
+
+			return result.str();
+		}
+
+		std::string 
+		_sono_device::uuid(void)
+		{
+			return m_uuid;
 		}
 
 		_sono_device_factory *_sono_device_factory::m_instance = NULL;
@@ -119,6 +148,17 @@ namespace SONO {
 			}
 
 			return find(id)->second.first;
+		}
+
+		void 
+		_sono_device_factory::clear(void)
+		{
+
+			if(!m_initialized) {
+				THROW_SONO_DEVICE_EXCEPTION(SONO_DEVICE_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_map.clear();
 		}
 
 		bool 
@@ -177,6 +217,9 @@ namespace SONO {
 
 		sono_device &
 		_sono_device_factory::generate(
+			__in const std::string &uuid,					
+			__in const std::string &household,
+			__in const std::string &configuration,
 			__in const std::string &address,
 			__in uint16_t port
 			)
@@ -186,7 +229,7 @@ namespace SONO {
 				THROW_SONO_DEVICE_EXCEPTION(SONO_DEVICE_EXCEPTION_UNINITIALIZED);
 			}
 
-			sono_device dev(address, port);
+			sono_device dev(uuid, household, configuration, address, port);
 			m_map.insert(std::pair<sono_uid_t, std::pair<sono_device, size_t>>(dev.id(), 
 				std::pair<sono_device, size_t>(dev, REF_INIT)));
 
@@ -228,6 +271,21 @@ namespace SONO {
 		_sono_device_factory::is_initialized(void)
 		{
 			return m_initialized;
+		}
+
+		sono_device_list 
+		_sono_device_factory::list(void)
+		{
+			sono_device_list result;
+			std::map<sono_uid_t, std::pair<sono_device, size_t>>::iterator iter;
+			
+			for(iter = m_map.begin(); iter != m_map.end(); ++iter) {
+				result.insert(std::pair<std::string, std::pair<std::string, uint16_t>>(
+					iter->second.first.uuid(), std::pair<std::string, uint16_t>(
+					iter->second.first.socket().address(), iter->second.first.socket().port())));
+			}
+
+			return result;
 		}
 
 		size_t 

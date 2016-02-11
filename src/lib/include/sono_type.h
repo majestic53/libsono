@@ -32,6 +32,8 @@ namespace SONO {
 
 	enum {
 		SONO_EXCEPTION_ALLOCATED = 0,
+		SONO_EXCEPTION_DEVICE_DISCOVERY,
+		SONO_EXCEPTION_DEVICE_MALFORMED,
 		SONO_EXCEPTION_INITIALIZED,
 		SONO_EXCEPTION_UNINITIALIZED,
 	};
@@ -40,6 +42,8 @@ namespace SONO {
 
 	static const std::string SONO_EXCEPTION_STR[] = {
 		SONO_EXCEPTION_HEADER "Failed to allocate library",
+		SONO_EXCEPTION_HEADER "Device discovery failed",
+		SONO_EXCEPTION_HEADER "Device malformed",
 		SONO_EXCEPTION_HEADER "Library is initialized",
 		SONO_EXCEPTION_HEADER "Library is uninitialized",
 		};

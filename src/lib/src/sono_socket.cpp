@@ -18,6 +18,7 @@
  */
 
 #include <cstring>
+#include <ctime>
 #include <netdb.h>
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -29,19 +30,28 @@ namespace SONO {
 
 	namespace COMP {
 
-		#define SONO_SOCKET_DATA_LEN 4096
-		#define SONO_SOCKET_INVALID SCALAR_INVALID(int)
+		#define SONO_SOCKET_FRAGMENT_LENGTH 1024
+		#define SONO_SOCKET_SSDP_IF "127.0.0.1"
+		#define SONO_SOCKET_SSDP_TTL 4
 
 		static const int SONO_SOCKET_DOM[] = {
-			AF_INET, AF_INET
+			AF_INET, AF_INET, AF_INET,
 			};
 
 		#define SONO_SOCKET_DOMAIN(_TYPE_) \
 			((_TYPE_) > SONO_SOCKET_MAX ? SONO_SOCKET_INVALID : \
 			SONO_SOCKET_DOM[_TYPE_])
 
+		static const int SONO_SOCKET_PR[] = {
+			IPPROTO_TCP, IPPROTO_UDP, IPPROTO_UDP,
+			};
+	
+		#define SONO_SOCKET_PROTOCOL(_TYPE_) \
+			((_TYPE_) > SONO_SOCKET_MAX ? SONO_SOCKET_INVALID : \
+			SONO_SOCKET_PR[_TYPE_])
+
 		static const int SONO_SOCKET_TY[] = {
-			SOCK_STREAM, SOCK_DGRAM
+			SOCK_STREAM, SOCK_DGRAM, SOCK_DGRAM,
 			};
 
 		#define SONO_SOCKET_TYPE(_TYPE_) \
@@ -49,7 +59,7 @@ namespace SONO {
 			SONO_SOCKET_TY[_TYPE_])
 
 		static const std::string SONO_SOCKET_STR[] = {
-			"TCP", "UDP",
+			"TCP", "UDP", "SSDP",
 			};
 
 		#define SONO_SOCKET_STRING(_TYPE_) \
@@ -65,7 +75,7 @@ namespace SONO {
 				m_port(0),
 				m_socket(0),
 				m_socket_address({ 0 }),
-				m_socket_host(NULL),
+				m_socket_address_length(0),
 				m_type(SONO_SOCKET_TCP)
 		{
 			set(type, address, port);
@@ -80,7 +90,7 @@ namespace SONO {
 				m_port(other.m_port),
 				m_socket(0),
 				m_socket_address({ 0 }),
-				m_socket_host(NULL),
+				m_socket_address_length(0),
 				m_type(other.m_type)
 		{
 			return;
@@ -107,7 +117,7 @@ namespace SONO {
 				m_port = other.m_port;
 				m_socket = 0;
 				m_socket_address = { 0 };
-				m_socket_host = NULL;
+				m_socket_address_length = 0;
 				m_type = other.m_type;
 			}
 
@@ -121,9 +131,14 @@ namespace SONO {
 		}
 
 		void 
-		_sono_socket::connect(void)
-		{
-			int domain = SONO_SOCKET_DOMAIN(m_type), protocol = 0, 
+		_sono_socket::connect(
+			__in_opt uint32_t timeout
+			)
+		{			
+			struct timeval tm = { 0 };
+			struct in_addr inter = { 0 };
+			uint8_t ttl = SONO_SOCKET_SSDP_TTL;
+			int domain = SONO_SOCKET_DOMAIN(m_type), protocol = SONO_SOCKET_PROTOCOL(m_type), 
 				type = SONO_SOCKET_TYPE(m_type);
 
 			if(m_connected) {
@@ -133,33 +148,60 @@ namespace SONO {
 			}
 
 			m_connected = true;
-			std::memset(&m_socket_address, 0, sizeof(m_socket_address));
 
-			m_socket_address.sin_addr.s_addr = ::inet_addr(STRING_CHECK(m_address));
-			if(m_socket_address.sin_addr.s_addr == SONO_SOCKET_INVALID) {
-				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-					"[%s] %s:%u --> ::inet_addr failed: 0x%x", SONO_SOCKET_STRING(m_type), STRING_CHECK(m_address),
-					m_port, errno);
-			}
-			
-			m_socket_host = ::gethostbyaddr((char *) &m_socket_address.sin_addr.s_addr, sizeof(m_socket_address.sin_addr.s_addr),
-				domain);
-
-			if(!m_socket_host) {
-				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-					"[%s] %s:%u --> ::gethostbyaddr failed: 0x%x", SONO_SOCKET_STRING(m_type), STRING_CHECK(m_address),
-					m_port, errno);
-			}
-
-			::bcopy(m_socket_host->h_addr, &m_socket_address.sin_addr, m_socket_host->h_length);
-			m_socket_address.sin_family = domain;
-			m_socket_address.sin_port = htons(m_port);
-
-			m_socket = ::socket(domain, type, protocol);
+			m_socket = socket(domain, type, protocol);
 			if(m_socket == SONO_SOCKET_INVALID) {
 				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-					"[%s] %s:%u --> ::socket failed: 0x%x", SONO_SOCKET_STRING(m_type), STRING_CHECK(m_address),
-					m_port, errno);
+					"[%s] %s:%u --> socket failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+					STRING_CHECK(m_address), m_port, errno);
+			}
+
+			if(timeout != SONO_SOCKET_NO_TIMEOUT) {
+				tm.tv_sec = timeout;
+
+				if(setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, &tm, sizeof(tm)) == SONO_SOCKET_INVALID) {
+					THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
+						"[%s] %s:%u --> setsockopt(timeout) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+						STRING_CHECK(m_address), m_port, errno);
+				}
+			}
+
+			switch(m_type) {
+				case SONO_SOCKET_TCP:
+				case SONO_SOCKET_UDP:
+					break;
+				case SONO_SOCKET_SSDP:
+
+					if(!inet_aton(SONO_SOCKET_SSDP_IF, &inter)) {
+
+						if(setsockopt(m_socket, IPPROTO_IP, IP_MULTICAST_IF, &inter, sizeof(inter)) 
+								== SONO_SOCKET_INVALID) {
+							THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
+								"[%s] %s:%u --> setsockopt(multicast_if) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+								STRING_CHECK(m_address), m_port, errno);
+						}
+					}
+
+					if(setsockopt(m_socket, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) == SONO_SOCKET_INVALID) {
+						THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
+							"[%s] %s:%u --> setsockopt(multicast_ttl) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+							STRING_CHECK(m_address), m_port, errno);
+					}
+					break;
+				default:
+					THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_TYPE_INVALID,
+						"0x%x", m_type);
+			}
+
+			std::memset(&m_socket_address, 0, sizeof(m_socket_address));
+			m_socket_address.sin_family = domain;
+			m_socket_address.sin_port = htons(m_port);
+			m_socket_address_length = sizeof(struct sockaddr_in);
+
+			if(!inet_aton(STRING_CHECK(m_address), &m_socket_address.sin_addr)) {
+				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
+					"[%s] %s:%u --> inet_aton(remote) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+					STRING_CHECK(m_address), m_port, errno);
 			}
 
 			switch(m_type) {
@@ -168,11 +210,12 @@ namespace SONO {
 					if(::connect(m_socket, (struct sockaddr *) &m_socket_address, sizeof(m_socket_address)) 
 							== SONO_SOCKET_INVALID) {
 						THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-							"[%s] %s:%u --> ::connect failed: 0x%x", SONO_SOCKET_STRING(m_type), STRING_CHECK(m_address),
-							m_port, errno);
+							"[%s] %s:%u --> connect failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+							STRING_CHECK(m_address), m_port, errno);
 					}
 					break;
 				case SONO_SOCKET_UDP:
+				case SONO_SOCKET_SSDP:
 					break;
 				default:
 					THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_TYPE_INVALID,
@@ -190,15 +233,15 @@ namespace SONO {
 					m_port);
 			}
 
-			if(m_socket && (::close(m_socket) == SONO_SOCKET_INVALID)) {
+			if(m_socket && (close(m_socket) == SONO_SOCKET_INVALID)) {
 				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-					"[%s] %s:%u --> ::close failed: 0x%x", SONO_SOCKET_STRING(m_type), STRING_CHECK(m_address),
+					"[%s] %s:%u --> close failed: 0x%x", SONO_SOCKET_STRING(m_type), STRING_CHECK(m_address),
 					m_port, errno);
 			}
 
 			m_socket = 0;
 			m_socket_address = { 0 };
-			m_socket_host = NULL;
+			m_socket_address_length = 0;
 			m_connected = false;
 		}
 
@@ -221,8 +264,6 @@ namespace SONO {
 		{
 			int flag = 0;
 			size_t result = 0;
-			struct sockaddr from;
-			uint32_t from_length;
 
 			if(!m_connected) {
 				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_DISCONNECTED, 
@@ -231,28 +272,16 @@ namespace SONO {
 			}
 
 			data.clear();
-			data.resize(SONO_SOCKET_DATA_LEN);
+			data.resize(SONO_SOCKET_FRAGMENT_LENGTH);
 
 			switch(m_type) {
 				case SONO_SOCKET_TCP:
-
-					result = ::recv(m_socket, (char *) &data[0], data.size(), flag);
-					if(result == SONO_SOCKET_INVALID) {
-						THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-							"[%s] %s:%u --> ::recv failed: 0x%x", SONO_SOCKET_STRING(m_type), 
-							STRING_CHECK(m_address), m_port, errno);
-					}
+					result = recv(m_socket, (char *) &data[0], data.size(), flag);
 					break;
 				case SONO_SOCKET_UDP:
-					from = { 0 };
-					from_length = sizeof(from);
-
-					result = ::recvfrom(m_socket, (char *) &data[0], data.size(), flag, &from, &from_length);
-					if(result == SONO_SOCKET_INVALID) {
-						THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-							"[%s] %s:%u --> ::recvfrom failed: 0x%x", SONO_SOCKET_STRING(m_type), 
-							STRING_CHECK(m_address), m_port, errno);
-					}
+				case SONO_SOCKET_SSDP:
+					result = recvfrom(m_socket, (char *) &data[0], data.size(), flag, 
+						(struct sockaddr *) &m_socket_address, &m_socket_address_length);
 					break;
 				default:
 					THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_TYPE_INVALID,
@@ -331,24 +360,14 @@ namespace SONO {
 
 				switch(m_type) {
 					case SONO_SOCKET_TCP:
-
-						result = ::send(m_socket, (char *) &data[0], data.size(), flag);
-						if(result == SONO_SOCKET_INVALID) {
-							THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-								"[%s] %s:%u --> ::send failed: 0x%x", SONO_SOCKET_STRING(m_type), 
-								STRING_CHECK(m_address), m_port, errno);
-						}
+						result = send(m_socket, (char *) &data[0], std::strlen(data.c_str()), flag);
 						break;
 					case SONO_SOCKET_UDP:
-						result = ::sendto(m_socket, (char *) &data[0], data.size(), flag, 
-							(struct sockaddr *) &m_socket_address, sizeof(m_socket_address));
-
-						if(result == SONO_SOCKET_INVALID) {
-							THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-								"[%s] %s:%u --> ::sendto failed: 0x%x", SONO_SOCKET_STRING(m_type), 
-								STRING_CHECK(m_address), m_port, errno);
-						}
+					case SONO_SOCKET_SSDP:
+						result = sendto(m_socket, (char *) &data[0], std::strlen(data.c_str()), flag, 
+							(struct sockaddr *) &m_socket_address, m_socket_address_length);
 						break;
+					
 					default:
 						THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_TYPE_INVALID,
 							"0x%x", m_type);

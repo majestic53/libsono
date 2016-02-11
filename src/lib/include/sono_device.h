@@ -24,7 +24,7 @@ namespace SONO {
 
 	namespace COMP {
 
-		typedef std::map<std::string, std::pair<std::string, std::string>> sono_device_list;
+		typedef std::map<std::string, std::pair<std::string, uint16_t>> sono_device_list;
 
 		typedef class _sono_device :
 				public sono_socket_base {
@@ -32,6 +32,9 @@ namespace SONO {
 			public:
 
 				_sono_device(
+					__in const std::string &uuid,					
+					__in const std::string &household,
+					__in const std::string &configuration,
 					__in const std::string &address,
 					__in uint16_t port
 					);
@@ -46,9 +49,21 @@ namespace SONO {
 					__in const _sono_device &other
 					);
 
+				std::string household(void);
+
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					);
+
+				std::string uuid(void);
+
+			protected:
+
+				std::string m_configuration;
+
+				std::string m_household;
+
+				std::string m_uuid;
 
 		} sono_device;
 
@@ -64,6 +79,8 @@ namespace SONO {
 					__in sono_uid_t id
 					);
 
+				void clear(void);
+
 				bool contains(
 					__in sono_uid_t id
 					);
@@ -73,6 +90,9 @@ namespace SONO {
 					);
 
 				sono_device &generate(
+					__in const std::string &uuid,					
+					__in const std::string &household,
+					__in const std::string &configuration,
 					__in const std::string &address,
 					__in uint16_t port
 					);
@@ -86,6 +106,8 @@ namespace SONO {
 				static bool is_allocated(void);
 
 				bool is_initialized(void);
+
+				sono_device_list list(void);
 
 				size_t reference_count(
 					__in sono_uid_t id

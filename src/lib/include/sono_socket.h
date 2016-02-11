@@ -29,9 +29,13 @@ namespace SONO {
 		typedef enum {
 			SONO_SOCKET_TCP = 0,
 			SONO_SOCKET_UDP,
+			SONO_SOCKET_SSDP,
 		} sono_socket_t;
 
-		#define SONO_SOCKET_MAX SONO_SOCKET_UDP
+		#define SONO_SOCKET_MAX SONO_SOCKET_SSDP
+
+		#define SONO_SOCKET_INVALID SCALAR_INVALID(int)
+		#define SONO_SOCKET_NO_TIMEOUT SCALAR_INVALID(uint32_t)
 
 		typedef class _sono_socket :
 				public sono_uid_base {
@@ -56,7 +60,9 @@ namespace SONO {
 
 				std::string address(void);
 
-				void connect(void);
+				void connect(
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
 
 				void disconnect(void);
 
@@ -96,7 +102,7 @@ namespace SONO {
 
 				struct sockaddr_in m_socket_address;
 
-				struct hostent *m_socket_host;
+				socklen_t m_socket_address_length;
 
 				sono_socket_t m_type;
 

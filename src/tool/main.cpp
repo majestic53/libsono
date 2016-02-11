@@ -35,6 +35,20 @@ main(
 		instance->initialize();
 
 		// TODO
+		sono_device_list list;
+		sono_device_list::iterator iter;
+
+		list = instance->discover(1);
+		std::cout << std::endl << "Found " << list.size() << " device(s)." << std::endl
+			<< "---";
+
+		for(iter = list.begin(); iter != list.end(); ++iter) {
+			std::cout << std::endl << "{" << iter->first << "} " << iter->second.first 
+				<< ":" << iter->second.second;
+		}
+
+		std::cout << std::endl;
+		// ---
 
 		instance->uninitialize();
 	} catch(sono_exception &exc) {

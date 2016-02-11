@@ -52,7 +52,9 @@ namespace SONO {
 
 			static _sono_manager *acquire(void);
 
-			sono_device_list discover(void);
+			sono_device_list discover(
+				__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+				);
 
 			void initialize(void);
 
