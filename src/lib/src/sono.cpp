@@ -120,7 +120,7 @@ namespace SONO {
 	_sono_manager::discover(
 		__in_opt uint32_t timeout
 		)
-	{		
+	{
 		std::match_results<const char *> match;
 		std::string address, config, house, output, port, uuid;
 
