@@ -105,24 +105,37 @@ namespace SONO {
 		return sono_manager::m_instance;
 	}
 
-	sono_device_factory *
-	_sono_manager::device(void)
+	sono_device &
+	_sono_manager::device(
+		__in sono_uid_t id
+		)
 	{
 
 		if(!m_initialized) {
 			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
 		}
 
-		return m_factory_device;
+		return m_factory_device->at(id);
+	}
+
+	size_t 
+	_sono_manager::device_count(void)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_device->size();
 	}
 
 	sono_device_list 
-	_sono_manager::discover(
+	_sono_manager::device_discovery(
 		__in_opt uint32_t timeout
 		)
 	{
 		std::match_results<const char *> match;
-		std::string address, config, house, output, port, uuid;
+		std::string address, fragment, config, house, output, port, uuid;
 
 		if(!m_initialized) {
 			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
@@ -138,7 +151,7 @@ namespace SONO {
 				THROW_SONO_EXCEPTION(SONO_EXCEPTION_DEVICE_DISCOVERY);
 			}
 
-			if(sock.read(output) == SONO_SOCKET_INVALID) {
+			if(sock.read(output) <= 0) {
 				break;
 			}
 
@@ -175,7 +188,72 @@ namespace SONO {
 
 		sock.disconnect();
 
-		return list();
+		return device_list();
+	}
+
+	sono_device_list 
+	_sono_manager::device_list(void)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_device->list();
+	}
+
+	sono_service &
+	_sono_manager::device_service(
+		__in sono_uid_t id,
+		__in sono_service_t type
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_device->at(id).service(type);
+	}
+
+	size_t 
+	_sono_manager::device_service_count(
+		__in sono_uid_t id
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_device->at(id).size();
+	}
+
+	sono_service_list 
+	_sono_manager::device_service_discovery(
+		__in sono_uid_t id,
+		__in_opt uint32_t timeout
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_device->at(id).service_discovery(timeout);
+	}
+
+	sono_service_list 
+	_sono_manager::device_service_list(
+		__in sono_uid_t id
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_device->at(id).service_list();
 	}
 
 	void 
@@ -204,39 +282,6 @@ namespace SONO {
 		return m_initialized;
 	}
 
-	sono_device_list 
-	_sono_manager::list(void)
-	{
-
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		return m_factory_device->list();
-	}
-
-	size_t 
-	_sono_manager::size(void)
-	{
-
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		return list().size();
-	}
-
-	sono_socket_factory *
-	_sono_manager::socket(void)
-	{
-
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		return m_factory_socket;
-	}
-
 	std::string 
 	_sono_manager::to_string(
 		__in_opt bool verbose
@@ -250,17 +295,6 @@ namespace SONO {
 			<< ", PTR. 0x" << SCALAR_AS_HEX(sono_manager *, this);
 
 		return result.str();
-	}
-
-	sono_uid_factory *
-	_sono_manager::uid(void)
-	{
-
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		return m_factory_uid;
 	}
 
 	void 

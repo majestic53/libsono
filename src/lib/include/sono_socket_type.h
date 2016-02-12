@@ -25,7 +25,7 @@ namespace SONO {
 	namespace COMP {
 
 		#define SONO_SOCKET_EXCEPTION 0x400
-		#define SONO_SOCKET_HEADER "<SONO:SOCKET>"
+		#define SONO_SOCKET_HEADER "[SONO:SOCKET]"
 #ifndef NDEBUG
 		#define SONO_SOCKET_EXCEPTION_HEADER SONO_SOCKET_HEADER " "
 #else

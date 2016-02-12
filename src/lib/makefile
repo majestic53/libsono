@@ -28,12 +28,12 @@ all: build archive
 archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
-	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)sono.o $(DIR_BUILD)sono_device.o $(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_socket.o \
-		$(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
+	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)sono.o $(DIR_BUILD)sono_device.o $(DIR_BUILD)sono_exception.o \
+		$(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: sono.o sono_device.o sono_exception.o sono_socket.o sono_uid.o sono_xml.o
+build: sono.o sono_device.o sono_exception.o sono_service.o sono_socket.o sono_uid.o sono_xml.o
 
 # SONO
 
@@ -43,16 +43,19 @@ sono.o: $(DIR_SRC)sono.cpp $(DIR_INC)sono.h
 sono_exception.o: $(DIR_SRC)sono_exception.cpp $(DIR_INC)sono_exception.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_exception.cpp -o $(DIR_BUILD)sono_exception.o
 
-sono_xml.o: $(DIR_SRC)sono_xml.cpp $(DIR_INC)sono_xml.h
-	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_xml.cpp -o $(DIR_BUILD)sono_xml.o
-
 # SONO::COMP
 
 sono_device.o: $(DIR_SRC)sono_device.cpp $(DIR_INC)sono_device.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_device.cpp -o $(DIR_BUILD)sono_device.o
+
+sono_service.o: $(DIR_SRC)sono_service.cpp $(DIR_INC)sono_service.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_service.cpp -o $(DIR_BUILD)sono_service.o
 
 sono_socket.o: $(DIR_SRC)sono_socket.cpp $(DIR_INC)sono_socket.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_socket.cpp -o $(DIR_BUILD)sono_socket.o
 
 sono_uid.o: $(DIR_SRC)sono_uid.cpp $(DIR_INC)sono_uid.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_uid.cpp -o $(DIR_BUILD)sono_uid.o
+
+sono_xml.o: $(DIR_SRC)sono_xml.cpp $(DIR_INC)sono_xml.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_xml.cpp -o $(DIR_BUILD)sono_xml.o

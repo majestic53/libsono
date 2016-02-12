@@ -24,6 +24,10 @@ namespace SONO {
 
 	namespace COMP {
 
+		#define SONO_GET_PREFIX "GET "
+		#define SONO_GET_SUFFIX " HTTP/1.1\r\n" \
+			"\r\n"
+
 		_sono_device::_sono_device(
 			__in const std::string &uuid,					
 			__in const std::string &household,
@@ -45,6 +49,7 @@ namespace SONO {
 				sono_socket_base(other),
 				m_configuration(other.m_configuration),
 				m_household(other.m_household),
+				m_service_map(other.m_service_map),
 				m_uuid(other.m_uuid)
 		{
 			return;
@@ -65,10 +70,36 @@ namespace SONO {
 				sono_socket_base::operator=(other);
 				m_configuration = other.m_configuration;
 				m_household = other.m_household;
+				m_service_map = other.m_service_map;
 				m_uuid = other.m_uuid;
 			}
 
 			return *this;
+		}
+
+		bool 
+		_sono_device::contains(
+			__in sono_service_t type
+			)
+		{
+			return (m_service_map.find(type) != m_service_map.end());
+		}
+
+		std::map<sono_service_t, sono_service>::iterator 
+		_sono_device::find(
+			__in sono_service_t type
+			)
+		{
+			std::map<sono_service_t, sono_service>::iterator result;
+
+			result = m_service_map.find(type);
+			if(result == m_service_map.end()) {
+				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_NOT_FOUND,
+					"%s --> service: 0x%x", STRING_CHECK(sono_socket_base::to_string()), 
+					type);
+			}
+
+			return result;
 		}
 
 		std::string 
@@ -77,15 +108,87 @@ namespace SONO {
 			return m_household;
 		}
 
+		sono_service &
+		_sono_device::service(
+			__in sono_service_t type
+			)
+		{
+			return find(type)->second;
+		}
+
+		sono_service_list 
+		_sono_device::service_discovery(
+			__in_opt uint32_t timeout
+			)
+		{
+			int length;
+			std::stringstream message;
+			std::string fragment, output;
+			sono_socket sock(SONO_SOCKET_TCP, socket().address(), socket().port());
+
+			message << SONO_GET_PREFIX << m_configuration << SONO_GET_SUFFIX;
+			m_service_map.clear();
+			sock.connect(timeout);
+
+			if(sock.write(STRING_CHECK(message.str())) == SONO_SOCKET_INVALID) {
+				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_DISCOVERY,
+					"%s", STRING_CHECK(sono_socket_base::to_string()));
+			}
+
+			for(;;) {
+
+				length = sock.read(fragment);
+				if(length <= 0) {
+					break;
+				}
+
+				output.insert(output.end(), fragment.begin(), fragment.begin() + length);
+			}
+
+			sock.disconnect();
+
+			// TODO: handle xml (chunked) parsing in xml class
+			//std::cout << std::endl << output << std::endl;
+			// ---
+
+			// TODO: build up list of supported services
+
+			return service_list();
+		}
+
+		sono_service_list 
+		_sono_device::service_list(void)
+		{
+			sono_service_list result;
+			std::map<sono_service_t, sono_service>::iterator iter;
+
+			for(iter = m_service_map.begin(); iter != m_service_map.end(); ++iter) {
+				result.insert(iter->first);
+			}
+
+			return result;
+		}
+
+		size_t 
+		_sono_device::size(void)
+		{
+			return m_service_map.size();
+		}
+
 		std::string 
 		_sono_device::to_string(
 			__in_opt bool verbose
 			)
 		{
 			std::stringstream result;
+			std::map<sono_service_t, sono_service>::iterator iter;
 
 			result << "{" << STRING_CHECK(m_household) << ":" << STRING_CHECK(m_uuid) << "}, "
-				<< sono_socket_base::to_string(verbose);
+				<< sono_socket_base::to_string(verbose) << ", SVC. " << m_service_map.size();
+
+			for(iter = m_service_map.begin(); iter != m_service_map.end(); ++iter) {
+				result << std::endl << "---- " << iter->second.to_string(verbose);
+			}
 
 			return result.str();
 		}
@@ -280,9 +383,10 @@ namespace SONO {
 			std::map<sono_uid_t, std::pair<sono_device, size_t>>::iterator iter;
 			
 			for(iter = m_map.begin(); iter != m_map.end(); ++iter) {
-				result.insert(std::pair<std::string, std::pair<std::string, uint16_t>>(
-					iter->second.first.uuid(), std::pair<std::string, uint16_t>(
-					iter->second.first.socket().address(), iter->second.first.socket().port())));
+				result.insert(std::pair<sono_uid_t, std::pair<std::string, std::pair<std::string, uint16_t>>>(
+					iter->first, std::pair<std::string, std::pair<std::string, uint16_t>>(iter->second.first.uuid(), 
+					std::pair<std::string, uint16_t>(iter->second.first.socket().address(), 
+					iter->second.first.socket().port()))));
 			}
 
 			return result;

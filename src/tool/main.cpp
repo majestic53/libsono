@@ -35,16 +35,29 @@ main(
 		instance->initialize();
 
 		// TODO
-		sono_device_list list;
-		sono_device_list::iterator iter;
+		#define DEVICE_DISCOVERY_TIMEOUT 1 // sec
+		#define SERVICE_DISCOVERY_TIMEOUT 2 // sec
 
-		list = instance->discover(1);
-		std::cout << std::endl << "Found " << list.size() << " device(s)." << std::endl
-			<< "---";
+		sono_device_list dev_list;
+		sono_service_list svc_list;
+		sono_device_list::iterator dev_iter;
+		sono_service_list::iterator svc_iter;
 
-		for(iter = list.begin(); iter != list.end(); ++iter) {
-			std::cout << std::endl << "{" << iter->first << "} " << iter->second.first 
-				<< ":" << iter->second.second;
+		dev_list = instance->device_discovery(DEVICE_DISCOVERY_TIMEOUT);
+		std::cout << std::endl << "Found " << dev_list.size() << " device(s)." << std::endl << "---";
+
+		for(dev_iter = dev_list.begin(); dev_iter != dev_list.end(); ++dev_iter) {
+			std::cout << std::endl << "{" << SCALAR_AS_HEX(sono_uid_t, dev_iter->first) << "} (" << dev_iter->second.first
+				<< ") " << dev_iter->second.second.first << ":" << dev_iter->second.second.second;
+
+			svc_list = instance->device_service_discovery(dev_iter->first, SERVICE_DISCOVERY_TIMEOUT);
+			std::cout << std::endl << "--- " << svc_list.size() << " service(s)." << std::endl << "----";
+
+			for(svc_iter = svc_list.begin(); svc_iter != svc_list.end(); ++svc_iter) {
+				std::cout << std::endl << "--- " << instance->device_service(dev_iter->first, *svc_iter).to_string(true);
+			}
+
+			std::cout << std::endl;
 		}
 
 		std::cout << std::endl;

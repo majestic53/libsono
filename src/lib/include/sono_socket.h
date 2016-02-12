@@ -70,7 +70,7 @@ namespace SONO {
 
 				uint16_t port(void);
 
-				size_t read(
+				int read(
 					__out std::string &data
 					);
 
@@ -86,7 +86,7 @@ namespace SONO {
 
 				sono_socket_t type(void);
 
-				size_t write(
+				int write(
 					__in const std::string &data
 					);
 

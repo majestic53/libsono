@@ -22,5 +22,8 @@
 
 namespace SONO {
 
-	// TODO
+	namespace COMP {
+
+		// TODO
+	}
 }

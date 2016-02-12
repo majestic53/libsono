@@ -22,7 +22,10 @@
 
 namespace SONO {
 
-	// TODO
+	namespace COMP {
+
+		// TODO
+	}
 }
 
 #endif // SONO_XML_TYPE_H_

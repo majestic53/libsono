@@ -28,7 +28,6 @@
 
 #include "sono_define.h"
 #include "sono_exception.h"
-#include "sono_xml.h"
 
 using namespace SONO;
 
@@ -38,6 +37,8 @@ using namespace SONO;
 
 #include "sono_uid.h"
 #include "sono_socket.h"
+#include "sono_xml.h"
+#include "sono_service.h"
 #include "sono_device.h"
 
 using namespace SONO::COMP;
@@ -52,8 +53,34 @@ namespace SONO {
 
 			static _sono_manager *acquire(void);
 
-			sono_device_list discover(
+			sono_device &device(
+				__in sono_uid_t id
+				);
+
+			size_t device_count(void);
+
+			sono_device_list device_discovery(
 				__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+				);
+
+			sono_device_list device_list(void);
+
+			sono_service &device_service(
+				__in sono_uid_t id,
+				__in sono_service_t type
+				);
+
+			size_t device_service_count(
+				__in sono_uid_t id
+				);
+
+			sono_service_list device_service_discovery(
+				__in sono_uid_t id,
+				__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+				);
+
+			sono_service_list device_service_list(
+				__in sono_uid_t id
 				);
 
 			void initialize(void);
@@ -61,10 +88,6 @@ namespace SONO {
 			static bool is_allocated(void);
 
 			bool is_initialized(void);
-
-			sono_device_list list(void);
-
-			size_t size(void);
 
 			std::string to_string(
 				__in_opt bool verbose = false
@@ -87,12 +110,6 @@ namespace SONO {
 				);
 
 			static void _delete(void);
-
-			sono_device_factory *device(void);
-
-			sono_socket_factory *socket(void);
-
-			sono_uid_factory *uid(void);
 
 			sono_device_factory *m_factory_device;
 

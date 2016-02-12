@@ -257,13 +257,12 @@ namespace SONO {
 			return m_port;
 		}
 
-		size_t 
+		int 
 		_sono_socket::read(
 			__out std::string &data
 			)
 		{
-			int flag = 0;
-			size_t result = 0;
+			int flag = 0, result = 0;
 
 			if(!m_connected) {
 				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_DISCONNECTED, 
@@ -342,13 +341,12 @@ namespace SONO {
 			return m_type;
 		}
 
-		size_t 
+		int 
 		_sono_socket::write(
 			__in const std::string &data
 			)
 		{
-			int flag = 0;
-			size_t result = 0;
+			int flag = 0, result = 0;
 
 			if(!m_connected) {
 				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_DISCONNECTED, 

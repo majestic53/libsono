@@ -46,6 +46,10 @@ Changelog
 =========
 
 ###Version 0.1.1606
+*Updated: 2/11/2016*
+
+* Added device service discovery support (partial)
+
 *Updated: 2/10/2016*
 
 * Finished SSDP discovery/list routines
