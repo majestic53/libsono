@@ -37,6 +37,7 @@ using namespace SONO;
 
 #include "sono_uid.h"
 #include "sono_socket.h"
+#include "sono_http.h"
 #include "sono_xml.h"
 #include "sono_service.h"
 #include "sono_device.h"

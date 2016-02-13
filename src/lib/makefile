@@ -29,11 +29,12 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)sono.o $(DIR_BUILD)sono_device.o $(DIR_BUILD)sono_exception.o \
-		$(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
+		$(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o \
+		$(DIR_BUILD)sono_xml.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: sono.o sono_device.o sono_exception.o sono_service.o sono_socket.o sono_uid.o sono_xml.o
+build: sono.o sono_device.o sono_exception.o sono_http.o sono_service.o sono_socket.o sono_uid.o sono_xml.o
 
 # SONO
 
@@ -47,6 +48,9 @@ sono_exception.o: $(DIR_SRC)sono_exception.cpp $(DIR_INC)sono_exception.h
 
 sono_device.o: $(DIR_SRC)sono_device.cpp $(DIR_INC)sono_device.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_device.cpp -o $(DIR_BUILD)sono_device.o
+
+sono_http.o: $(DIR_SRC)sono_http.cpp $(DIR_INC)sono_http.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_http.cpp -o $(DIR_BUILD)sono_http.o
 
 sono_service.o: $(DIR_SRC)sono_service.cpp $(DIR_INC)sono_service.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_service.cpp -o $(DIR_BUILD)sono_service.o

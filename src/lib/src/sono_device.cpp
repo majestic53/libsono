@@ -24,10 +24,6 @@ namespace SONO {
 
 	namespace COMP {
 
-		#define SONO_GET_PREFIX "GET "
-		#define SONO_GET_SUFFIX " HTTP/1.1\r\n" \
-			"\r\n"
-
 		_sono_device::_sono_device(
 			__in const std::string &uuid,					
 			__in const std::string &household,
@@ -121,37 +117,40 @@ namespace SONO {
 			__in_opt uint32_t timeout
 			)
 		{
-			int length;
-			std::stringstream message;
-			std::string fragment, output;
-			sono_socket sock(SONO_SOCKET_TCP, socket().address(), socket().port());
+			int code;
+			sono_http_encode_t encoding;
+			std::string body, body_encoded, response;
 
-			message << SONO_GET_PREFIX << m_configuration << SONO_GET_SUFFIX;
 			m_service_map.clear();
-			sock.connect(timeout);
 
-			if(sock.write(STRING_CHECK(message.str())) == SONO_SOCKET_INVALID) {
-				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_DISCOVERY,
-					"%s", STRING_CHECK(sono_socket_base::to_string()));
-			}
+			try {
+				response = sono_http::get(m_configuration.path(), socket().address(), socket().port(), 
+					SONO_SOCKET_TCP, timeout);
 
-			for(;;) {
-
-				length = sock.read(fragment);
-				if(length <= 0) {
-					break;
+				code = sono_http::parse_header(response, encoding);
+				if(code != SONO_HTTP_SUCCESS) {
+					THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_GET_RESPONSE,
+						"%u", code);
 				}
 
-				output.insert(output.end(), fragment.begin(), fragment.begin() + length);
+				body = sono_http::remove_header(response);
+
+				if(encoding != SONO_HTTP_ENCODE_NONE) {
+					body_encoded = body;
+					body = sono_http::parse_body(body_encoded, encoding);
+				}
+
+				m_configuration.set(body);
+
+				// TODO: build up list of supported services by parsing m_configuration xml document for service tags
+
+			} catch(sono_exception &exc) {
+				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_DISCOVERY,
+					"%s --> %s", STRING_CHECK(sono_socket_base::to_string()), STRING_CHECK(exc.to_string()));
+			} catch(std::exception &exc) {
+				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_DISCOVERY,
+					"%s --> %s", STRING_CHECK(sono_socket_base::to_string()), exc.what());
 			}
-
-			sock.disconnect();
-
-			// TODO: handle xml (chunked) parsing in xml class
-			//std::cout << std::endl << output << std::endl;
-			// ---
-
-			// TODO: build up list of supported services
 
 			return service_list();
 		}

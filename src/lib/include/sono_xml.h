@@ -24,7 +24,43 @@ namespace SONO {
 
 	namespace COMP {
 
-		// TODO
+		typedef class _sono_xml {
+
+			public:
+
+				_sono_xml(
+					__in const std::string &path
+					);
+
+				_sono_xml(
+					__in const _sono_xml &other
+					);
+
+				virtual ~_sono_xml(void);
+
+				_sono_xml &operator=(
+					__in const _sono_xml &other
+					);
+
+				std::string path(void);
+
+				void set(
+					__in const std::string &source
+					);
+
+				std::string source(void);
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				std::string m_path;
+
+				std::string m_source;
+
+		} sono_xml;
 	}
 }
 

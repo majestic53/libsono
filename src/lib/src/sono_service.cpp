@@ -187,7 +187,7 @@ namespace SONO {
 		{
 			std::stringstream result;
 
-			result << "[" << SONO_SERVICE_STRING(m_type) << "] (";
+			result << SONO_SERVICE_STRING(m_type) << " (";
 
 			if(m_registered) {
 				result << "REG, PTR. 0x" << SCALAR_AS_HEX(sono_service_event, m_event_handler);

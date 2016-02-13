@@ -80,7 +80,7 @@ namespace SONO {
 					__in sono_service_t type
 					);
 
-				std::string m_configuration;
+				sono_xml m_configuration;
 
 				std::string m_household;
 
