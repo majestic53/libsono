@@ -28,10 +28,13 @@ namespace SONO {
 
 		#define SONO_HTTP_ENCODING_CHUNKED "chunked"
 		#define SONO_HTTP_GET_PREFIX "GET "
-		#define SONO_HTTP_GET_SUFFIX " HTTP/1.1" SONO_HTTP_TERM
+		#define SONO_HTTP_GET_SUFFIX " HTTP/1.1" SONO_HTTP_TERM_HEAD
 		#define SONO_HTTP_REGEX_ENCODING "Transfer-Encoding: (.*)\r\n"
 		#define SONO_HTTP_REGEX_STATUS "HTTP/1.1 ([0-9]+) .*\r\n"
-		#define SONO_HTTP_TERM "\r\n\r\n"
+		#define SONO_HTTP_TERM "\r\n"
+		#define SONO_HTTP_TERM_LEN std::strlen(SONO_HTTP_TERM)
+		#define SONO_HTTP_TERM_HEAD SONO_HTTP_TERM SONO_HTTP_TERM
+		#define SONO_HTTP_TERM_HEAD_LEN std::strlen(SONO_HTTP_TERM_HEAD)
 
 		enum {
 			SONO_HTTP_REGEX_ENCODING_ROOT = 0,
@@ -90,7 +93,9 @@ namespace SONO {
 			__in sono_http_encode_t encoding
 			)
 		{
+			bool mode = true;
 			std::stringstream result;
+			size_t current = 0, delta, next;
 
 			switch(encoding) {
 				case SONO_HTTP_ENCODE_NONE:
@@ -98,9 +103,26 @@ namespace SONO {
 					break;
 				case SONO_HTTP_ENCODE_CHUNKED:
 
-					// TODO: decode chunked data
-					result << source;
-					// ---
+					for(;;) {
+
+						if(current >= source.size()) {
+							break;
+						}
+
+						next = source.find(SONO_HTTP_TERM, current);
+						if(next == std::string::npos) {
+							break;
+						}
+
+						if(!mode) {
+							result << source.substr(current, next - current);
+						} else {
+							delta = sono_http::parse_body_length(source.substr(current, next - current));
+						}
+
+						current = next + SONO_HTTP_TERM_LEN;
+						mode = !mode;
+					}
 					break;
 				default:
 					THROW_SONO_HTTP_EXCEPTION_FORMAT(SONO_HTTP_EXCEPTION_UNSUPPORTED,
@@ -108,6 +130,22 @@ namespace SONO {
 			}
 
 			return result.str();
+		}
+
+		uint32_t 
+		_sono_http::parse_body_length(
+			__in const std::string &source
+			)
+		{
+			uint32_t result = 0;
+			std::stringstream stream;
+
+			if(!source.empty()) {
+				stream << source;
+				stream >> result;
+			}
+
+			return result;
 		}
 
 		int 
@@ -125,7 +163,7 @@ namespace SONO {
 
 			if(!source.empty()) {
 
-				position = source.find(SONO_HTTP_TERM);
+				position = source.find(SONO_HTTP_TERM_HEAD);
 				if(position == std::string::npos) {
 					THROW_SONO_HTTP_EXCEPTION(SONO_HTTP_EXCEPTION_MALFORMED);
 				}
@@ -174,13 +212,13 @@ namespace SONO {
 
 			if(!source.empty()) {
 
-				position = source.find(SONO_HTTP_TERM);
+				position = source.find(SONO_HTTP_TERM_HEAD);
 				if(position == std::string::npos) {
 					THROW_SONO_HTTP_EXCEPTION(SONO_HTTP_EXCEPTION_MALFORMED);
 				}
 
 				try {
-					result = source.substr(position + std::strlen(SONO_HTTP_TERM), source.size());
+					result = source.substr(position + SONO_HTTP_TERM_HEAD_LEN, source.size());
 				} catch(std::exception &exc) {
 					THROW_SONO_HTTP_EXCEPTION_FORMAT(SONO_HTTP_EXCEPTION_MALFORMED,
 						"%s", exc.what());

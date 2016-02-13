@@ -59,6 +59,12 @@ namespace SONO {
 					__in const std::string &source
 					);
 
+			protected:
+
+				static uint32_t parse_body_length(
+					__in const std::string &source
+					);
+
 		} sono_http;
 	}
 }
