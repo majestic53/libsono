@@ -45,15 +45,51 @@ namespace SONO {
 			((_TYPE_) > SONO_SERVICE_MAX ? STRING_UNKNOWN : \
 			STRING_CHECK(SONO_SERVICE_STR[_TYPE_]))
 
+		static const std::string SONO_SERVICE_TYPE_STR[] = {
+			"AlarmClock",
+			"DeviceProperties",
+			"GroupManagement",
+			"MusicServices",
+			"QPlay",
+			"AVTransport",
+			"ConnectionManager",
+			"RenderingControl",
+			"GroupRenderingControl",
+			"Queue",
+			"ConnectionManager",
+			"ContentDirectory",
+			"SystemProperties",
+			"ZoneGroupTopology",
+			};
+
+		#define SONO_SERVICE_TYPE_STRING(_TYPE_) \
+			((_TYPE_) > SONO_SERVICE_MAX ? STRING_UNKNOWN : \
+			STRING_CHECK(SONO_SERVICE_TYPE_STR[_TYPE_]))
+
+		enum {
+			SONO_SERVICE_MEDIA_SERVER = 0,
+			SONO_SERVICE_MEDIA_RENDERER,
+		};
+
+		#define SONO_SERVICE_MEDIA_MAX SONO_SERVICE_MEDIA_RENDERER
+
+		static const std::string SONO_SERVICE_MEDIA_STR[] = {
+			"MediaServer", "MediaRenderer",
+			};
+
+		#define SONO_SERVICE_MEDIA_STRING(_TYPE_) \
+			((_TYPE_) > SONO_SERVICE_MEDIA_MAX ? STRING_UNKNOWN : \
+			STRING_CHECK(SONO_SERVICE_MEDIA_STR[_TYPE_]))
+
 		_sono_service::_sono_service(
 			__in sono_service_t type,
 			__in const sono_service_meta &data
 			) :
-				m_control(SONO_SOCKET_UDP, 0, 0),
-				m_event(SONO_SOCKET_UDP, 0, 0),
+				m_control(SONO_SOCKET_UDP, SONO_SOCKET_LOCAL_ADDRESS, 0),
+				m_event(SONO_SOCKET_UDP, SONO_SOCKET_LOCAL_ADDRESS, 0),
 				m_event_handler(NULL),
 				m_registered(false),
-				m_type(SOON_SERVICE_INVALID)
+				m_type(SONO_SERVICE_INVALID)
 		{
 			set(type, data);
 		}
@@ -109,6 +145,50 @@ namespace SONO {
 		_sono_service::is_registered(void)
 		{
 			return m_registered;
+		}
+
+		sono_service_t 
+		_sono_service::metadata_as_type(
+			__in const sono_service_meta &data
+			)
+		{
+			size_t iter_media = 0, iter_type = 0;
+			sono_service_t result = SONO_SERVICE_INVALID;
+
+			for(; iter_type <= SONO_SERVICE_MAX; ++iter_type) {
+
+				if(data.type.find(SONO_SERVICE_TYPE_STRING(iter_type)) != std::string::npos) {
+					break;
+				}
+			}
+
+			if(iter_type > SONO_SERVICE_MAX) {
+				THROW_SONO_SERVICE_EXCEPTION(SONO_SERVICE_EXCEPTION_UNKNOWN_TYPE);
+			} else if((iter_type == SONO_SERVICE_RENDER_CONNECTION_MANAGER)
+					|| (iter_type == SONO_SERVICE_SERVER_CONNECTION_MANAGER)) {
+
+				for(; iter_media <= SONO_SERVICE_MEDIA_MAX; ++iter_media) {
+
+					if(data.control.find(SONO_SERVICE_MEDIA_STRING(iter_media)) != std::string::npos) {
+						break;
+					}
+				}
+
+				switch(iter_media) {
+					case SONO_SERVICE_MEDIA_SERVER:
+						iter_type = SONO_SERVICE_SERVER_CONNECTION_MANAGER;
+						break;
+					case SONO_SERVICE_MEDIA_RENDERER:
+						iter_type = SONO_SERVICE_RENDER_CONNECTION_MANAGER;
+						break;
+					default:
+						THROW_SONO_SERVICE_EXCEPTION(SONO_SERVICE_EXCEPTION_UNKNOWN_TYPE);
+				}
+			}
+
+			result = (sono_service_t) iter_type;
+
+			return result;
 		}
 
 		void 
@@ -172,9 +252,9 @@ namespace SONO {
 				unregister_event();
 			}
 
+			m_data = data;
 			m_control.socket().set(SONO_SOCKET_UDP, m_data.address, m_data.port);
 			m_event.socket().set(SONO_SOCKET_UDP, m_data.address, m_data.port);
-			m_data = m_data;
 			m_event_handler = NULL;
 			m_registered = false;
 			m_type = type;

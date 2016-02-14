@@ -24,6 +24,17 @@ namespace SONO {
 
 	namespace COMP {
 
+		#define SONO_XML_DEVICE_TAG "device"
+		#define SONO_XML_DEVICE_TAG_LIST "deviceList"
+		#define SONO_XML_ROOT_TAG "root"
+		#define SONO_XML_SERVICE_TAG "service"
+		#define SONO_XML_SERVICE_TAG_CONTROL_URL "controlURL"
+		#define SONO_XML_SERVICE_TAG_EVENT_URL "eventSubURL"
+		#define SONO_XML_SERVICE_TAG_ID "serviceId"
+		#define SONO_XML_SERVICE_TAG_LIST "serviceList"
+		#define SONO_XML_SERVICE_TAG_SCPD_URL "SCPDURL"
+		#define SONO_XML_SERVICE_TAG_TYPE "serviceType"
+
 		_sono_device::_sono_device(
 			__in const std::string &uuid,					
 			__in const std::string &household,
@@ -73,6 +84,25 @@ namespace SONO {
 			return *this;
 		}
 
+		void 
+		_sono_device::add_service(
+			__in const sono_service_meta &data
+			)
+		{
+			sono_service_t type;
+			std::map<sono_service_t, sono_service>::iterator iter;
+
+			type = sono_service::metadata_as_type(data);
+			if(type < SONO_SERVICE_MAX) {
+
+				iter = m_service_map.find(type);
+				if(iter == m_service_map.end()) {
+					m_service_map.insert(std::pair<sono_service_t, sono_service>(type, 
+						sono_service(type, data)));
+				}
+			}
+		}
+
 		bool 
 		_sono_device::contains(
 			__in sono_service_t type
@@ -98,6 +128,19 @@ namespace SONO {
 			return result;
 		}
 
+		void 
+		_sono_device::extract_service_metadata(
+			__in const boost::property_tree::ptree::const_iterator child,
+			__inout sono_service_meta &data
+			)
+		{
+			data.control = child->second.get<std::string>(SONO_XML_SERVICE_TAG_CONTROL_URL);
+			data.event = child->second.get<std::string>(SONO_XML_SERVICE_TAG_EVENT_URL);
+			data.id = child->second.get<std::string>(SONO_XML_SERVICE_TAG_ID);
+			data.scpd = child->second.get<std::string>(SONO_XML_SERVICE_TAG_SCPD_URL);
+			data.type = child->second.get<std::string>(SONO_XML_SERVICE_TAG_TYPE);
+		}
+
 		std::string 
 		_sono_device::household(void)
 		{
@@ -118,8 +161,13 @@ namespace SONO {
 			)
 		{
 			int code;
-			sono_http_encode_t encoding;
+			sono_service_meta data;
+			sono_http_encode_t encoding;			
 			std::string body, body_encoded, response;
+			boost::property_tree::ptree child, child_inner, root;
+			std::vector<boost::property_tree::ptree::value_type> child_root;
+			boost::property_tree::ptree::const_iterator iter_child, iter_child_inner;
+			std::vector<boost::property_tree::ptree::value_type>::const_iterator iter_root;
 
 			m_service_map.clear();
 
@@ -142,8 +190,40 @@ namespace SONO {
 
 				m_configuration.set(body);
 
-				// TODO: build up list of supported services by parsing m_configuration xml document for service tags
+				child_root = m_configuration.as_tree(root, SONO_XML_ROOT_TAG);
+				for(iter_root = child_root.begin(); iter_root != child_root.end(); ++iter_root) {
 
+					if(iter_root->first == SONO_XML_DEVICE_TAG) {
+						data.address = socket().address();
+						data.port = socket().port();
+
+						child = iter_root->second.get_child(SONO_XML_SERVICE_TAG_LIST);
+						for(iter_child = child.begin(); iter_child != child.end(); ++iter_child) {
+
+							if(iter_child->first == SONO_XML_SERVICE_TAG) {
+								extract_service_metadata(iter_child, data);
+								add_service(data);
+							}
+						}
+
+						child = iter_root->second.get_child(SONO_XML_DEVICE_TAG_LIST);
+						for(iter_child = child.begin(); iter_child != child.end(); ++iter_child) {
+
+							if(iter_child->first == SONO_XML_DEVICE_TAG) {
+
+								child_inner = iter_child->second.get_child(SONO_XML_SERVICE_TAG_LIST);
+								for(iter_child_inner = child_inner.begin(); iter_child_inner != child_inner.end(); 
+										++iter_child_inner) {
+
+									if(iter_child_inner->first == SONO_XML_SERVICE_TAG) {
+										extract_service_metadata(iter_child_inner, data);
+										add_service(data);
+									}
+								}
+							}
+						}
+					}
+				}
 			} catch(sono_exception &exc) {
 				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_DISCOVERY,
 					"%s --> %s", STRING_CHECK(sono_socket_base::to_string()), STRING_CHECK(exc.to_string()));

@@ -76,8 +76,17 @@ namespace SONO {
 
 			protected:
 
+				void add_service(
+					__in const sono_service_meta &data
+					);
+
 				std::map<sono_service_t, sono_service>::iterator find(
 					__in sono_service_t type
+					);
+
+				void extract_service_metadata(
+					__in const boost::property_tree::ptree::const_iterator child,
+					__inout sono_service_meta &data
 					);
 
 				sono_xml m_configuration;

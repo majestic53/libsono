@@ -35,6 +35,7 @@ namespace SONO {
 		#define SONO_SOCKET_MAX SONO_SOCKET_SSDP
 
 		#define SONO_SOCKET_INVALID SCALAR_INVALID(int)
+		#define SONO_SOCKET_LOCAL_ADDRESS "127.0.0.1"
 		#define SONO_SOCKET_NO_TIMEOUT SCALAR_INVALID(uint32_t)
 
 		typedef class _sono_socket :

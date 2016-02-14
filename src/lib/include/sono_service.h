@@ -41,7 +41,7 @@ namespace SONO {
 			SONO_SERVICE_ZONE_GROUP_TOPOLOGY,
 		} sono_service_t;
 
-		#define SOON_SERVICE_INVALID SCALAR_INVALID(sono_service_t)
+		#define SONO_SERVICE_INVALID SCALAR_INVALID(sono_service_t)
 		#define SONO_SERVICE_MAX SONO_SERVICE_ZONE_GROUP_TOPOLOGY
 
 		typedef struct {
@@ -84,6 +84,10 @@ namespace SONO {
 					);
 
 				bool is_registered(void);
+
+				static sono_service_t metadata_as_type(
+					__in const sono_service_meta &data
+					);
 
 				void register_event(
 					__in sono_service_event handler,

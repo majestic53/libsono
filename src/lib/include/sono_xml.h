@@ -20,6 +20,9 @@
 #ifndef SONO_XML_H_
 #define SONO_XML_H_
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
 namespace SONO {
 
 	namespace COMP {
@@ -40,6 +43,11 @@ namespace SONO {
 
 				_sono_xml &operator=(
 					__in const _sono_xml &other
+					);
+
+				std::vector<boost::property_tree::ptree::value_type> as_tree(
+					__in boost::property_tree::ptree &root,
+					__in_opt const std::string &child = std::string()
 					);
 
 				std::string path(void);

@@ -60,6 +60,38 @@ namespace SONO {
 			return *this;
 		}
 
+		std::vector<boost::property_tree::ptree::value_type> 
+		_sono_xml::as_tree(
+			__in boost::property_tree::ptree &root,
+			__in_opt const std::string &child
+			)
+		{
+			std::stringstream stream;
+			boost::property_tree::ptree::const_iterator iter;
+			std::vector<boost::property_tree::ptree::value_type> result;
+
+			try {
+				stream << m_source;
+				boost::property_tree::read_xml(stream, root);
+
+				if(!child.empty()) {
+
+					boost::property_tree::ptree const &children = root.get_child(child.c_str());
+					for(iter = children.begin(); iter != children.end(); ++iter) {
+						result.push_back(*iter);
+					}
+				}
+			} catch(boost::property_tree::xml_parser_error &exc) {
+				THROW_SONO_XML_EXCEPTION_FORMAT(SONO_XML_EXCEPTION_INTERNAL,
+					"boost::property_tree::read_xml failed: %s", exc.what());
+			} catch(std::exception &exc) {
+				THROW_SONO_XML_EXCEPTION_FORMAT(SONO_XML_EXCEPTION_INTERNAL,
+					"boost::property_tree::read_xml failed: %s", exc.what());
+			}
+
+			return result;
+		}
+
 		std::string 
 		_sono_xml::path(void)
 		{

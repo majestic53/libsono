@@ -48,7 +48,8 @@ Changelog
 ###Version 0.1.1606
 *Updated: 2/13/2016*
 
-* Added http chunked parsing support (incomplete)
+* Added device service discovery support
+* Added http chunked parsing support
 
 *Updated: 2/11/2016*
 
