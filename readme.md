@@ -46,6 +46,10 @@ Changelog
 =========
 
 ###Version 0.1.1606
+*Updated: 2/14/2016*
+
+* Added device service action discovery support (incomplete)
+
 *Updated: 2/13/2016*
 
 * Added device service discovery support

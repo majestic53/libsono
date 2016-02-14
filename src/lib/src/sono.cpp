@@ -202,7 +202,7 @@ namespace SONO {
 		return m_factory_device->list();
 	}
 
-	sono_service &
+	sono_service *
 	_sono_manager::device_service(
 		__in sono_uid_t id,
 		__in sono_service_t type

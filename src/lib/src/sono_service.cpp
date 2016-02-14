@@ -81,15 +81,16 @@ namespace SONO {
 			((_TYPE_) > SONO_SERVICE_MEDIA_MAX ? STRING_UNKNOWN : \
 			STRING_CHECK(SONO_SERVICE_MEDIA_STR[_TYPE_]))
 
+		#define SONO_SERVICE_XML_ACTION_TAG "action"
+		#define SONO_SERVICE_XML_ACTION_TAG_LIST "actionList"
+		#define SONO_SERVICE_XML_ACTION_TAG_NAME "name"
+		#define SONO_SERVICE_XML_ROOT_TAG "scpd"
+
 		_sono_service::_sono_service(
 			__in sono_service_t type,
 			__in const sono_service_meta &data
 			) :
 				m_configuration(std::string()),
-				m_control(SONO_SOCKET_UDP, SONO_SOCKET_LOCAL_ADDRESS, 0),
-				m_event(SONO_SOCKET_UDP, SONO_SOCKET_LOCAL_ADDRESS, 0),
-				m_event_handler(NULL),
-				m_registered(false),
 				m_type(SONO_SERVICE_INVALID)
 		{
 			set(type, data);
@@ -98,12 +99,9 @@ namespace SONO {
 		_sono_service::_sono_service(
 			__in const _sono_service &other
 			) :
+				m_action_map(other.m_action_map),
 				m_configuration(other.m_configuration),
-				m_control(other.m_control),
 				m_data(other.m_data),
-				m_event(other.m_event),
-				m_event_handler(NULL),
-				m_registered(false),
 				m_type(other.m_type)
 		{
 			return;
@@ -111,10 +109,7 @@ namespace SONO {
 
 		_sono_service::~_sono_service(void)
 		{
-
-			if(m_registered) {
-				unregister_event();
-			}
+			return;
 		}
 
 		_sono_service &
@@ -124,16 +119,33 @@ namespace SONO {
 		{
 
 			if(this != &other) {
+				m_action_map = other.m_action_map;
 				m_configuration = other.m_configuration;
-				m_control = other.m_control;
 				m_data = other.m_data;
-				m_event = other.m_event;
-				m_event_handler = NULL;
-				m_registered = false;
 				m_type = other.m_type;
 			}
 
 			return *this;
+		}
+
+		void 
+		_sono_service::add_action(
+			__in const std::string &name
+			)
+		{
+			std::map<std::string, sono_action>::iterator iter;
+
+			iter = m_action_map.find(name);
+			if(iter == m_action_map.end()) {
+				m_action_map.insert(std::pair<std::string, sono_action>(name, sono_action(name, 
+					m_data.type)));
+			}
+		}
+
+		sono_service_meta &
+		_sono_service::data(void)
+		{
+			return m_data;
 		}
 
 		void 
@@ -143,11 +155,13 @@ namespace SONO {
 		{
 			int code;
 			sono_http_encode_t encoding;
+			boost::property_tree::ptree child, root;
 			std::string body, body_encoded, response;
+			boost::property_tree::ptree::const_iterator iter_child;
+			std::vector<boost::property_tree::ptree::value_type> child_root;
+			std::vector<boost::property_tree::ptree::value_type>::const_iterator iter_root;
 
-			if(m_registered) {
-				unregister_event();
-			}
+			m_action_map.clear();
 
 			try {
 				response = sono_http::get(m_data.scpd, m_data.address, m_data.port, SONO_SOCKET_TCP, timeout);
@@ -167,8 +181,21 @@ namespace SONO {
 
 				m_configuration.set(body);
 
-				// TODO: parse serviceStateTable and actionList
+				child_root = m_configuration.as_tree(root, SONO_SERVICE_XML_ROOT_TAG);
+				for(iter_root = child_root.begin(); iter_root != child_root.end(); ++iter_root) {
 
+					if(iter_root->first == SONO_SERVICE_XML_ACTION_TAG_LIST) {
+
+						child = iter_root->second;
+						for(iter_child = child.begin(); iter_child != child.end(); ++iter_child) {
+
+							if(iter_child->first == SONO_SERVICE_XML_ACTION_TAG) {
+								add_action(iter_child->second.get<std::string>(
+									SONO_SERVICE_XML_ACTION_TAG_NAME));
+							}
+						}
+					}
+				}
 			} catch(sono_exception &exc) {
 				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_SERVICE_DISCOVERY,
 					"%s:%u --> %s", STRING_CHECK(m_data.address), m_data.port, STRING_CHECK(exc.to_string()));
@@ -178,10 +205,20 @@ namespace SONO {
 			}
 		}
 
-		bool 
-		_sono_service::is_registered(void)
+		std::map<std::string, sono_action>::iterator 
+		_sono_service::find(
+			__in const std::string &name
+			)
 		{
-			return m_registered;
+			std::map<std::string, sono_action>::iterator result;
+
+			result = m_action_map.find(name);
+			if(result == m_action_map.end()) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_NOT_FOUND,
+					"%s", STRING_CHECK(name));
+			}
+
+			return result;
 		}
 
 		sono_service_t 
@@ -228,49 +265,14 @@ namespace SONO {
 			return result;
 		}
 
-		void 
-		_sono_service::register_event(
-			__in sono_service_event handler,
+		std::string 
+		_sono_service::run(
+			__in const std::string &name,
+			__in const std::string &parameters,
 			__in_opt uint32_t timeout
 			)
 		{
-
-			if(m_registered) {
-				THROW_SONO_SERVICE_EXCEPTION(SONO_SERVICE_EXCEPTION_REGISTERED);
-			}
-
-			if(!handler) {
-				THROW_SONO_SERVICE_EXCEPTION(SONO_SERVICE_EXCEPTION_INVALID_HANDLER);
-			}
-
-			m_event_handler = handler;
-
-			// TODO: register for service events
-
-			m_registered = true;
-		}
-
-		size_t 
-		_sono_service::send(
-			__in const void *in_data,
-			__in size_t in_data_length,
-			__inout void *out_data,
-			__inout size_t *out_data_length,
-			__in_opt uint32_t timeout
-			)
-		{
-			size_t result = 0;
-
-			if((!in_data && in_data_length)
-					|| (in_data && !in_data_length)
-					|| (!out_data && out_data_length)
-					|| (out_data && !out_data_length)) {
-				THROW_SONO_SERVICE_EXCEPTION(SONO_SERVICE_EXCEPTION_INVALID_PARAMETER);
-			}
-
-			// TODO: send service command
-
-			return result;
+			return find(name)->second.run(m_data.control, m_data.address, m_data.port, parameters, timeout);
 		}
 
 		void 
@@ -285,15 +287,7 @@ namespace SONO {
 					"0x%x", type);
 			}
 
-			if(m_registered) {
-				unregister_event();
-			}
-
 			m_data = data;
-			m_control.socket().set(SONO_SOCKET_UDP, m_data.address, m_data.port);
-			m_event.socket().set(SONO_SOCKET_UDP, m_data.address, m_data.port);
-			m_event_handler = NULL;
-			m_registered = false;
 			m_type = type;
 		}
 
@@ -303,16 +297,14 @@ namespace SONO {
 			)
 		{
 			std::stringstream result;
+			std::map<std::string, sono_action>::iterator iter;
 
-			result << SONO_SERVICE_STRING(m_type) << " (";
+			result << SONO_SERVICE_HEADER << " " << SONO_SERVICE_STRING(m_type) << ", ACT. " 
+				<< m_action_map.size();
 
-			if(m_registered) {
-				result << "REG, PTR. 0x" << SCALAR_AS_HEX(sono_service_event, m_event_handler);
-			} else {
-				result << "UNREG";
+			for(iter = m_action_map.begin(); iter != m_action_map.end(); ++iter) {
+				result << std::endl << "---- " << iter->second.to_string(verbose);
 			}
-
-			result << "), CTRL. " << m_control.to_string(verbose) << ", EVT. " << m_event.to_string(verbose);
 
 			return result.str();
 		}
@@ -321,22 +313,6 @@ namespace SONO {
 		_sono_service::type(void)
 		{
 			return m_type;
-		}
-
-		void 
-		_sono_service::unregister_event(
-			__in_opt uint32_t timeout
-			)
-		{
-
-			if(!m_registered) {
-				THROW_SONO_SERVICE_EXCEPTION(SONO_SERVICE_EXCEPTION_UNREGISTERED);
-			}
-
-			// TODO: unregister from service events
-
-			m_event_handler = NULL;
-			m_registered = false;
 		}
 	}
 }

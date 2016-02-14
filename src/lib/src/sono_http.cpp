@@ -29,6 +29,11 @@ namespace SONO {
 		#define SONO_HTTP_ENCODING_CHUNKED "chunked"
 		#define SONO_HTTP_GET_PREFIX "GET "
 		#define SONO_HTTP_GET_SUFFIX " HTTP/1.1" SONO_HTTP_TERM_HEAD
+		#define SONO_HTTP_POST_CONTENT_LENGTH_PREFIX "Content-Length: "
+		#define SONO_HTTP_POST_CONTENT_LENGTH_SUFFIX SONO_HTTP_TERM
+		#define SONO_HTTP_POST_CONTENT_TYPE "Content-Type: text/xml; charset=\"utf-8\"" SONO_HTTP_TERM
+		#define SONO_HTTP_POST_PREFIX "POST "
+		#define SONO_HTTP_POST_SUFFIX " HTTP/1.1" SONO_HTTP_TERM
 		#define SONO_HTTP_REGEX_ENCODING "Transfer-Encoding: (.*)\r\n"
 		#define SONO_HTTP_REGEX_STATUS "HTTP/1.1 ([0-9]+) .*\r\n"
 		#define SONO_HTTP_TERM "\r\n"
@@ -202,6 +207,49 @@ namespace SONO {
 					}
 				}
 			}
+
+			return result;
+		}
+
+		std::string 
+		_sono_http::post(
+			__in const std::string &path,
+			__in const std::string &address,
+			__in uint16_t port,
+			__in const std::string &head,
+			__in const std::string &body,
+			__in_opt sono_socket_t type,
+			__in_opt uint32_t timeout
+			)
+		{
+			int length;
+			std::stringstream request;
+			std::string fragment, result;
+
+			sono_socket sock(type, address, port);
+			request << SONO_HTTP_POST_PREFIX << path << SONO_HTTP_POST_SUFFIX
+				<< SONO_HTTP_POST_CONTENT_TYPE << SONO_HTTP_POST_CONTENT_LENGTH_PREFIX << body.size() 
+				<< SONO_HTTP_POST_CONTENT_LENGTH_SUFFIX << head << SONO_HTTP_TERM_HEAD << body 
+				<< SONO_HTTP_TERM;
+
+			sock.connect(timeout);
+
+			if(sock.write(STRING_CHECK(request.str())) == SONO_SOCKET_INVALID) {
+				THROW_SONO_HTTP_EXCEPTION_FORMAT(SONO_HTTP_EXCEPTION_POST,
+					"%s:%u --> %s", STRING_CHECK(address), port, STRING_CHECK(path));
+			}
+
+			for(;;) {
+
+				length = sock.read(fragment);
+				if(length <= 0) {
+					break;
+				}
+
+				result.insert(result.end(), fragment.begin(), fragment.begin() + length);
+			}
+
+			sock.disconnect();
 
 			return result;
 		}

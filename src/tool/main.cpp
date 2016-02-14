@@ -54,7 +54,7 @@ main(
 			std::cout << std::endl << "--- " << svc_list.size() << " service(s)." << std::endl << "----";
 
 			for(svc_iter = svc_list.begin(); svc_iter != svc_list.end(); ++svc_iter) {
-				std::cout << std::endl << "--- " << instance->device_service(dev_iter->first, *svc_iter).to_string(true);
+				std::cout << std::endl << "--- " << instance->device_service(dev_iter->first, *svc_iter)->to_string(true);
 			}
 
 			std::cout << std::endl;

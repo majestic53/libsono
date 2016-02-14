@@ -38,6 +38,7 @@ using namespace SONO;
 #include "sono_uid.h"
 #include "sono_socket.h"
 #include "sono_http.h"
+#include "sono_action.h"
 #include "sono_xml.h"
 #include "sono_service.h"
 #include "sono_device.h"
@@ -66,7 +67,7 @@ namespace SONO {
 
 			sono_device_list device_list(void);
 
-			sono_service &device_service(
+			sono_service *device_service(
 				__in sono_uid_t id,
 				__in sono_service_t type
 				);

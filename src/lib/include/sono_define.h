@@ -72,7 +72,7 @@ namespace SONO {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 7
+	#define VERSION_REVISION 8
 	#define VERSION_WEEK 1606
 
 	#define VERSION_STRING \

@@ -35,6 +35,7 @@ namespace SONO {
 		enum {
 			SONO_HTTP_EXCEPTION_GET = 0,
 			SONO_HTTP_EXCEPTION_MALFORMED,
+			SONO_HTTP_EXCEPTION_POST,
 			SONO_HTTP_EXCEPTION_UNSUPPORTED,
 		};
 
@@ -43,6 +44,7 @@ namespace SONO {
 		static const std::string SONO_HTTP_EXCEPTION_STR[] = {
 			SONO_HTTP_EXCEPTION_HEADER "GET request failed",
 			SONO_HTTP_EXCEPTION_HEADER "Malformed GET response",
+			SONO_HTTP_EXCEPTION_HEADER "POST request failed",
 			SONO_HTTP_EXCEPTION_HEADER "Unsupported encoding",
 			};
 

@@ -55,6 +55,16 @@ namespace SONO {
 					__out sono_http_encode_t &encoding
 					);
 
+				static std::string post(
+					__in const std::string &path,
+					__in const std::string &address,
+					__in uint16_t port,
+					__in const std::string &head,
+					__in const std::string &body,
+					__in_opt sono_socket_t type = SONO_SOCKET_TCP,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
 				static std::string remove_header(
 					__in const std::string &source
 					);

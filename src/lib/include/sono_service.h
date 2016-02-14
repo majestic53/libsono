@@ -54,12 +54,6 @@ namespace SONO {
 			std::string type;
 		} sono_service_meta;
 
-		typedef void(*sono_service_event)(
-			__in const void *service,
-			__in const void *data,
-			__in size_t length
-			);
-
 		typedef class _sono_service {
 
 			public:
@@ -79,11 +73,11 @@ namespace SONO {
 					__in const _sono_service &other
 					);
 
+				sono_service_meta &data(void);
+
 				virtual void discovery(
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
-
-				bool is_registered(void);
 
 				static sono_service_t metadata_as_type(
 					__in const sono_service_meta &data
@@ -97,16 +91,17 @@ namespace SONO {
 
 			protected:
 
-				void register_event(
-					__in sono_service_event handler,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+				void add_action(
+					__in const std::string &name
 					);
 
-				size_t send(
-					__in const void *in_data,
-					__in size_t in_data_length,
-					__inout void *out_data,
-					__inout size_t *out_data_length,
+				std::map<std::string, sono_action>::iterator find(
+					__in const std::string &name
+					);
+
+				std::string run(
+					__in const std::string &name,
+					__in const std::string &parameters,
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
@@ -115,21 +110,11 @@ namespace SONO {
 					__in const sono_service_meta &data
 					);
 
-				void unregister_event(
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
+				std::map<std::string, sono_action> m_action_map;
 
 				sono_xml m_configuration;
-
-				sono_socket_base m_control;
 		
 				sono_service_meta m_data;
-		
-				sono_socket_base m_event;
-		
-				sono_service_event m_event_handler;
-	
-				bool m_registered;
 	
 				sono_service_t m_type;
 
