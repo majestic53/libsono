@@ -77,7 +77,9 @@ namespace SONO {
 			protected:
 
 				void add_service(
-					__in const sono_service_meta &data
+					__in const sono_service_meta &data,
+					__in_opt bool discover = false,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
 				std::map<sono_service_t, sono_service>::iterator find(

@@ -60,7 +60,7 @@ namespace SONO {
 			__in size_t length
 			);
 
-		typedef struct _sono_service {
+		typedef class _sono_service {
 
 			public:
 
@@ -89,6 +89,14 @@ namespace SONO {
 					__in const sono_service_meta &data
 					);
 
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+				sono_service_t type(void);
+
+			protected:
+
 				void register_event(
 					__in sono_service_event handler,
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
@@ -107,15 +115,11 @@ namespace SONO {
 					__in const sono_service_meta &data
 					);
 
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
 				void unregister_event(
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
-			protected:
+				sono_xml m_configuration;
 
 				sono_socket_base m_control;
 		
@@ -130,6 +134,440 @@ namespace SONO {
 				sono_service_t m_type;
 
 		} sono_service;
+
+		typedef class _sono_service_alarm_clock :
+				public sono_service {
+
+			public:
+
+				_sono_service_alarm_clock(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_alarm_clock(
+					__in const _sono_service_alarm_clock &other
+					);
+
+				virtual ~_sono_service_alarm_clock(void);
+
+				_sono_service_alarm_clock &operator=(
+					__in const _sono_service_alarm_clock &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_alarm_clock;
+
+		typedef class _sono_service_device_properties :
+				public sono_service {
+
+			public:
+
+				_sono_service_device_properties(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_device_properties(
+					__in const _sono_service_device_properties &other
+					);
+
+				virtual ~_sono_service_device_properties(void);
+
+				_sono_service_device_properties &operator=(
+					__in const _sono_service_device_properties &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_device_properties;
+
+		typedef class _sono_service_group_management :
+				public sono_service {
+
+			public:
+
+				_sono_service_group_management(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_group_management(
+					__in const _sono_service_group_management &other
+					);
+
+				virtual ~_sono_service_group_management(void);
+
+				_sono_service_group_management &operator=(
+					__in const _sono_service_group_management &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_group_management;
+
+		typedef class _sono_service_music_services :
+				public sono_service {
+
+			public:
+
+				_sono_service_music_services(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_music_services(
+					__in const _sono_service_music_services &other
+					);
+
+				virtual ~_sono_service_music_services(void);
+
+				_sono_service_music_services &operator=(
+					__in const _sono_service_music_services &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_music_services;
+
+		typedef class _sono_service_qplay :
+				public sono_service {
+
+			public:
+
+				_sono_service_qplay(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_qplay(
+					__in const _sono_service_qplay &other
+					);
+
+				virtual ~_sono_service_qplay(void);
+
+				_sono_service_qplay &operator=(
+					__in const _sono_service_qplay &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_qplay;
+
+		typedef class _sono_service_render_av_transport :
+				public sono_service {
+
+			public:
+
+				_sono_service_render_av_transport(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_render_av_transport(
+					__in const _sono_service_render_av_transport &other
+					);
+
+				virtual ~_sono_service_render_av_transport(void);
+
+				_sono_service_render_av_transport &operator=(
+					__in const _sono_service_render_av_transport &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_render_av_transport;
+
+		typedef class _sono_service_render_connection_manager :
+				public sono_service {
+
+			public:
+
+				_sono_service_render_connection_manager(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_render_connection_manager(
+					__in const _sono_service_render_connection_manager &other
+					);
+
+				virtual ~_sono_service_render_connection_manager(void);
+
+				_sono_service_render_connection_manager &operator=(
+					__in const _sono_service_render_connection_manager &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_render_connection_manager;
+
+		typedef class _sono_service_render_control :
+				public sono_service {
+
+			public:
+
+				_sono_service_render_control(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_render_control(
+					__in const _sono_service_render_control &other
+					);
+
+				virtual ~_sono_service_render_control(void);
+
+				_sono_service_render_control &operator=(
+					__in const _sono_service_render_control &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_render_control;
+
+		typedef class _sono_service_render_group_control :
+				public sono_service {
+
+			public:
+
+				_sono_service_render_group_control(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_render_group_control(
+					__in const _sono_service_render_group_control &other
+					);
+
+				virtual ~_sono_service_render_group_control(void);
+
+				_sono_service_render_group_control &operator=(
+					__in const _sono_service_render_group_control &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_render_group_control;
+
+		typedef class _sono_service_render_queue :
+				public sono_service {
+
+			public:
+
+				_sono_service_render_queue(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_render_queue(
+					__in const _sono_service_render_queue &other
+					);
+
+				virtual ~_sono_service_render_queue(void);
+
+				_sono_service_render_queue &operator=(
+					__in const _sono_service_render_queue &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_render_queue;
+
+		typedef class _sono_service_server_connection_manager :
+				public sono_service {
+
+			public:
+
+				_sono_service_server_connection_manager(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_server_connection_manager(
+					__in const _sono_service_server_connection_manager &other
+					);
+
+				virtual ~_sono_service_server_connection_manager(void);
+
+				_sono_service_server_connection_manager &operator=(
+					__in const _sono_service_server_connection_manager &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_server_connection_manager;
+
+		typedef class _sono_service_server_content_directory :
+				public sono_service {
+
+			public:
+
+				_sono_service_server_content_directory(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_server_content_directory(
+					__in const _sono_service_server_content_directory &other
+					);
+
+				virtual ~_sono_service_server_content_directory(void);
+
+				_sono_service_server_content_directory &operator=(
+					__in const _sono_service_server_content_directory &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_server_content_directory;
+
+		typedef class _sono_service_system_properties :
+				public sono_service {
+
+			public:
+
+				_sono_service_system_properties(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_system_properties(
+					__in const _sono_service_system_properties &other
+					);
+
+				virtual ~_sono_service_system_properties(void);
+
+				_sono_service_system_properties &operator=(
+					__in const _sono_service_system_properties &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_system_properties;
+
+		typedef class _sono_service_zone_group_topology :
+				public sono_service {
+
+			public:
+
+				_sono_service_zone_group_topology(
+					__in const sono_service_meta &data
+					);
+
+				_sono_service_zone_group_topology(
+					__in const _sono_service_zone_group_topology &other
+					);
+
+				virtual ~_sono_service_zone_group_topology(void);
+
+				_sono_service_zone_group_topology &operator=(
+					__in const _sono_service_zone_group_topology &other
+					);
+
+				// TODO
+
+				virtual std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+			protected:
+
+				// TODO
+
+		} sono_service_zone_group_topology;
 	}
 }
 

@@ -188,14 +188,18 @@ namespace SONO {
 				if(result == SONO_HTTP_SUCCESS) {
 
 					std::regex_search(header.c_str(), match, std::regex(SONO_HTTP_REGEX_ENCODING));
-					if(match.size() != (SONO_HTTP_REGEX_ENCODING_MAX + 1)) {
-						THROW_SONO_HTTP_EXCEPTION_FORMAT(SONO_HTTP_EXCEPTION_MALFORMED,
-							"std::regex_search(encoding) found %lu entries (should be %lu)", match.size(),
-							SONO_HTTP_REGEX_ENCODING_MAX + 1);
-					}
 
-					encoded = (match[SONO_HTTP_REGEX_ENCODING_TYPE] == SONO_HTTP_ENCODING_CHUNKED) ? 
-						SONO_HTTP_ENCODE_CHUNKED : SONO_HTTP_ENCODE_NONE;
+					if(match.size()) {
+
+						if(match.size() != (SONO_HTTP_REGEX_ENCODING_MAX + 1)) {
+							THROW_SONO_HTTP_EXCEPTION_FORMAT(SONO_HTTP_EXCEPTION_MALFORMED,
+								"std::regex_search(encoding) found %lu entries (should be %lu)", match.size(),
+								SONO_HTTP_REGEX_ENCODING_MAX + 1);
+						}
+
+						encoded = (match[SONO_HTTP_REGEX_ENCODING_TYPE] == SONO_HTTP_ENCODING_CHUNKED) ? 
+							SONO_HTTP_ENCODE_CHUNKED : SONO_HTTP_ENCODE_NONE;
+					}
 				}
 			}
 

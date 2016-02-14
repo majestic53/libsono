@@ -86,7 +86,9 @@ namespace SONO {
 
 		void 
 		_sono_device::add_service(
-			__in const sono_service_meta &data
+			__in const sono_service_meta &data,
+			__in_opt bool discover,
+			__in_opt uint32_t timeout
 			)
 		{
 			sono_service_t type;
@@ -99,6 +101,14 @@ namespace SONO {
 				if(iter == m_service_map.end()) {
 					m_service_map.insert(std::pair<sono_service_t, sono_service>(type, 
 						sono_service(type, data)));
+
+					if(discover) {
+
+						iter = m_service_map.find(type);
+						if(iter != m_service_map.end()) {
+							iter->second.discovery(timeout);
+						}
+					}
 				}
 			}
 		}
@@ -165,6 +175,7 @@ namespace SONO {
 			sono_http_encode_t encoding;			
 			std::string body, body_encoded, response;
 			boost::property_tree::ptree child, child_inner, root;
+			std::map<sono_service_t, sono_service>::iterator iter_svc;
 			std::vector<boost::property_tree::ptree::value_type> child_root;
 			boost::property_tree::ptree::const_iterator iter_child, iter_child_inner;
 			std::vector<boost::property_tree::ptree::value_type>::const_iterator iter_root;
@@ -223,6 +234,10 @@ namespace SONO {
 							}
 						}
 					}
+				}
+
+				for(iter_svc = m_service_map.begin(); iter_svc != m_service_map.end(); ++iter_svc) {
+					iter_svc->second.discovery(timeout);
 				}
 			} catch(sono_exception &exc) {
 				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_DISCOVERY,

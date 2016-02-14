@@ -1,0 +1,54 @@
+http://<ADDRESS>:<PORT>
+
+/xml/AlarmClock1.xml
+	/AlarmClock/Control
+	/AlarmClock/Event
+
+/xml/MusicServices1.xml
+	/MusicServices/Control
+	/MusicServices/Event
+
+/xml/DeviceProperties1.xml
+	/DeviceProperties/Control
+	/DeviceProperties/Event
+
+/xml/SystemProperties1.xml
+	/SystemProperties/Control
+	/SystemProperties/Event
+
+/xml/GroupManagement1.xml
+	/GroupManagement/Control
+	/GroupManagement/Event
+
+/xml/QPlay1.xml
+	/QPlay/Control
+	/QPlay/Event
+
+/xml/ContentDirectory1.xml
+	/MediaServer/ContentDirectory/Control
+	/MediaServer/ContentDirectory/Event
+
+/xml/ConnectionManager1.xml
+	/MediaServer/ConnectionManager/Control
+	/MediaServer/ConnectionManager/Event
+
+/xml/RenderingControl1.xml
+	/MediaRenderer/RenderingControl/Control
+	/MediaRenderer/RenderingControl/Event
+
+/xml/ConnectionManager1.xml
+	/MediaRenderer/ConnectionManager/Control
+	/MediaRenderer/ConnectionManager/Event
+
+/xml/AVTransport1.xml
+	/MediaRenderer/AVTransport/Control
+	/MediaRenderer/AVTransport/Event
+
+/xml/Queue1.xml
+	/MediaRenderer/Queue/Control
+	/MediaRenderer/Queue/Event
+
+/xml/GroupRenderingControl1.xml
+	/MediaRenderer/GroupRenderingControl/Control
+	/MediaRenderer/GroupRenderingControl/Event
+

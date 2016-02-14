@@ -48,7 +48,7 @@ namespace SONO {
 			SONO_DEVICE_EXCEPTION_HEADER "Failed to allocate device manager",
 			SONO_DEVICE_EXCEPTION_HEADER "Device manager is initialized",
 			SONO_DEVICE_EXCEPTION_HEADER "Device does not exist",
-			SONO_DEVICE_EXCEPTION_HEADER "GET request unsuccessful",
+			SONO_DEVICE_EXCEPTION_HEADER "GET request was unsuccessful",
 			SONO_DEVICE_EXCEPTION_HEADER "Device service discovery failed",
 			SONO_DEVICE_EXCEPTION_HEADER "Device service does not exist",
 			SONO_DEVICE_EXCEPTION_HEADER "Device manager is uninitialized",

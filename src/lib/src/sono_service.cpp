@@ -85,6 +85,7 @@ namespace SONO {
 			__in sono_service_t type,
 			__in const sono_service_meta &data
 			) :
+				m_configuration(std::string()),
 				m_control(SONO_SOCKET_UDP, SONO_SOCKET_LOCAL_ADDRESS, 0),
 				m_event(SONO_SOCKET_UDP, SONO_SOCKET_LOCAL_ADDRESS, 0),
 				m_event_handler(NULL),
@@ -97,6 +98,7 @@ namespace SONO {
 		_sono_service::_sono_service(
 			__in const _sono_service &other
 			) :
+				m_configuration(other.m_configuration),
 				m_control(other.m_control),
 				m_data(other.m_data),
 				m_event(other.m_event),
@@ -122,6 +124,7 @@ namespace SONO {
 		{
 
 			if(this != &other) {
+				m_configuration = other.m_configuration;
 				m_control = other.m_control;
 				m_data = other.m_data;
 				m_event = other.m_event;
@@ -138,7 +141,41 @@ namespace SONO {
 			__in_opt uint32_t timeout
 			)
 		{
-			// TODO: discover service properties
+			int code;
+			sono_http_encode_t encoding;
+			std::string body, body_encoded, response;
+
+			if(m_registered) {
+				unregister_event();
+			}
+
+			try {
+				response = sono_http::get(m_data.scpd, m_data.address, m_data.port, SONO_SOCKET_TCP, timeout);
+
+				code = sono_http::parse_header(response, encoding);
+				if(code != SONO_HTTP_SUCCESS) {
+					THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_GET_RESPONSE,
+						"%u", code);
+				}
+
+				body = sono_http::remove_header(response);
+
+				if(encoding != SONO_HTTP_ENCODE_NONE) {
+					body_encoded = body;
+					body = sono_http::parse_body(body_encoded, encoding);
+				}
+
+				m_configuration.set(body);
+
+				// TODO: parse serviceStateTable and actionList
+
+			} catch(sono_exception &exc) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_SERVICE_DISCOVERY,
+					"%s:%u --> %s", STRING_CHECK(m_data.address), m_data.port, STRING_CHECK(exc.to_string()));
+			} catch(std::exception &exc) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_SERVICE_DISCOVERY,
+					"%s:%u --> %s", STRING_CHECK(m_data.address), m_data.port, exc.what());
+			}
 		}
 
 		bool 
@@ -278,6 +315,12 @@ namespace SONO {
 			result << "), CTRL. " << m_control.to_string(verbose) << ", EVT. " << m_event.to_string(verbose);
 
 			return result.str();
+		}
+
+		sono_service_t 
+		_sono_service::type(void)
+		{
+			return m_type;
 		}
 
 		void 
