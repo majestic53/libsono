@@ -108,7 +108,7 @@ namespace SONO {
 		{
 
 			if(name.empty() || type.empty()) {
-				THROW_SONO_ACTION_EXCEPTION(SONO_ACTION_EXCEPTION_UNSUPPORTED);
+				THROW_SONO_ACTION_EXCEPTION(SONO_ACTION_EXCEPTION_INVALID);
 			}
 
 			m_name = name;

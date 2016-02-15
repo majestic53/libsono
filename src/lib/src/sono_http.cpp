@@ -155,6 +155,16 @@ namespace SONO {
 
 		int 
 		_sono_http::parse_header(
+			__in const std::string &source
+			)
+		{
+			sono_http_encode_t encoding;
+
+			return sono_http::parse_header(source, encoding);
+		}
+
+		int 
+		_sono_http::parse_header(
 			__in const std::string &source,
 			__out sono_http_encode_t &encoded
 			)

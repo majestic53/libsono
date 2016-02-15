@@ -317,6 +317,7 @@ namespace SONO {
 				for(iter_root = child_root.begin(); iter_root != child_root.end(); ++iter_root) {
 
 					if(iter_root->first == SONO_DEVICE_XML_DEVICE_TAG) {
+						data.device = id();
 						data.address = socket().address();
 						data.port = socket().port();
 

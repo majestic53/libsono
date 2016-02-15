@@ -19,6 +19,24 @@
 
 #include "../lib/include/sono.h"
 
+void 
+event_handler(
+	__in sono_uid_t device,
+	__in sono_service_t service,
+	__in std::string &action,
+	__in std::string &data
+	)
+{
+	std::cout << "{" << SCALAR_AS_HEX(sono_uid_t, device) << "} -- SVC. 0x" << SCALAR_AS_HEX(sono_service_t, service) 
+		<< ", ACT. " << action << ", DATA[" << data.size() << "]";
+
+	if(!data.empty()) {
+		std::cout << " " << data;
+	}
+
+	std::cout << std::endl;
+}
+
 int 
 main(
 	__in int argc,
@@ -32,7 +50,7 @@ main(
 
 	try {
 		instance = sono_manager::acquire();
-		instance->initialize();
+		instance->initialize(event_handler);
 
 		// TODO
 		#define DEVICE_DISCOVERY_TIMEOUT 1 // sec
@@ -65,8 +83,7 @@ main(
 		sono_service_device_properties *svc_inst = (sono_service_device_properties *) 
 			instance->device_service(1, SONO_SERVICE_DEVICE_PROPERTIES);
 
-		/*std::cout << std::endl << (svc_inst->led_state(SERVICE_ACTION_TIMEOUT) ? "ON" : "OFF") 
-			<< std::endl;*/
+		std::cout << std::endl << svc_inst->led_state(SERVICE_ACTION_TIMEOUT) << std::endl;
 
 		svc_inst->set_led_state(true, SERVICE_ACTION_TIMEOUT);
 		// ---

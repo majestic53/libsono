@@ -51,6 +51,10 @@ namespace SONO {
 					);
 
 				static int parse_header(
+					__in const std::string &source
+					);
+
+				static int parse_header(
 					__in const std::string &source,
 					__out sono_http_encode_t &encoding
 					);

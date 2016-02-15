@@ -47,6 +47,13 @@ using namespace SONO::COMP;
 
 namespace SONO {
 
+	typedef void (*sono_event_handler)(
+		__in sono_uid_t device,
+		__in sono_service_t service,
+		__in std::string &action,
+		__in std::string &data
+		);
+
 	typedef class _sono_manager {
 
 		public:
@@ -85,11 +92,20 @@ namespace SONO {
 				__in sono_uid_t id
 				);
 
-			void initialize(void);
+			void initialize(
+				__in sono_event_handler handler
+				);
 
 			static bool is_allocated(void);
 
 			bool is_initialized(void);
+
+			void service_event(
+				__in sono_uid_t device,
+				__in sono_service_t service,
+				__in std::string &action,
+				__in std::string &data
+				);
 
 			std::string to_string(
 				__in_opt bool verbose = false
@@ -118,6 +134,8 @@ namespace SONO {
 			sono_socket_factory *m_factory_socket;
 
 			sono_uid_factory *m_factory_uid;
+
+			sono_event_handler m_handler;
 
 			bool m_initialized;
 

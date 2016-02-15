@@ -45,6 +45,11 @@ sonoctl [-h|-v][-l]
 Changelog
 =========
 
+###Version 0.1.1607
+*Updated 2/15/2016*
+
+* Added device service actions
+
 ###Version 0.1.1606
 *Updated: 2/14/2016*
 

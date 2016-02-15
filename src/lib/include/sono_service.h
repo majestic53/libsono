@@ -45,6 +45,7 @@ namespace SONO {
 		#define SONO_SERVICE_MAX SONO_SERVICE_ZONE_GROUP_TOPOLOGY
 
 		typedef struct {
+			sono_uid_t device;
 			std::string address;
 			std::string control;
 			std::string event;
@@ -105,6 +106,12 @@ namespace SONO {
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
+				void service_event(
+					__in sono_service_t service,
+					__in std::string &action,
+					__in std::string &data
+					);
+
 				void set(
 					__in sono_service_t type,
 					__in const sono_service_meta &data
@@ -139,6 +146,13 @@ namespace SONO {
 					__in const _sono_service_alarm_clock &other
 					);
 
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
+					);
+
 		} sono_service_alarm_clock;
 
 		typedef class _sono_service_device_properties :
@@ -160,13 +174,20 @@ namespace SONO {
 					__in const _sono_service_device_properties &other
 					);
 
-				bool led_state(
+				std::string led_state(
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
 				void set_led_state(
 					__in bool state,
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
 					);
 
 		} sono_service_device_properties;
@@ -190,6 +211,13 @@ namespace SONO {
 					__in const _sono_service_group_management &other
 					);
 
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
+					);
+
 		} sono_service_group_management;
 
 		typedef class _sono_service_music_services :
@@ -209,6 +237,13 @@ namespace SONO {
 
 				_sono_service_music_services &operator=(
 					__in const _sono_service_music_services &other
+					);
+
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
 					);
 
 		} sono_service_music_services;
@@ -232,6 +267,13 @@ namespace SONO {
 					__in const _sono_service_qplay &other
 					);
 
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
+					);
+
 		} sono_service_qplay;
 
 		typedef class _sono_service_render_av_transport :
@@ -251,6 +293,13 @@ namespace SONO {
 
 				_sono_service_render_av_transport &operator=(
 					__in const _sono_service_render_av_transport &other
+					);
+
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
 					);
 
 		} sono_service_render_av_transport;
@@ -274,6 +323,13 @@ namespace SONO {
 					__in const _sono_service_render_connection_manager &other
 					);
 
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
+					);
+
 		} sono_service_render_connection_manager;
 
 		typedef class _sono_service_render_control :
@@ -293,6 +349,13 @@ namespace SONO {
 
 				_sono_service_render_control &operator=(
 					__in const _sono_service_render_control &other
+					);
+
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
 					);
 
 		} sono_service_render_control;
@@ -316,6 +379,13 @@ namespace SONO {
 					__in const _sono_service_render_group_control &other
 					);
 
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
+					);
+
 		} sono_service_render_group_control;
 
 		typedef class _sono_service_render_queue :
@@ -335,6 +405,13 @@ namespace SONO {
 
 				_sono_service_render_queue &operator=(
 					__in const _sono_service_render_queue &other
+					);
+
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
 					);
 
 		} sono_service_render_queue;
@@ -358,6 +435,13 @@ namespace SONO {
 					__in const _sono_service_server_connection_manager &other
 					);
 
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
+					);
+
 		} sono_service_server_connection_manager;
 
 		typedef class _sono_service_server_content_directory :
@@ -377,6 +461,13 @@ namespace SONO {
 
 				_sono_service_server_content_directory &operator=(
 					__in const _sono_service_server_content_directory &other
+					);
+
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
 					);
 
 		} sono_service_server_content_directory;
@@ -400,6 +491,13 @@ namespace SONO {
 					__in const _sono_service_system_properties &other
 					);
 
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
+					);
+
 		} sono_service_system_properties;
 
 		typedef class _sono_service_zone_group_topology :
@@ -419,6 +517,13 @@ namespace SONO {
 
 				_sono_service_zone_group_topology &operator=(
 					__in const _sono_service_zone_group_topology &other
+					);
+
+			protected:
+
+				void service_event(
+					__in std::string &action,
+					__in std::string &data
 					);
 
 		} sono_service_zone_group_topology;

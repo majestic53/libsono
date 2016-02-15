@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <regex>
 #include "../include/sono.h"
 #include "../include/sono_service_type.h"
 
@@ -81,16 +82,17 @@ namespace SONO {
 			((_TYPE_) > SONO_SERVICE_MEDIA_MAX ? STRING_UNKNOWN : \
 			STRING_CHECK(SONO_SERVICE_MEDIA_STR[_TYPE_]))
 
-		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_CURRENT "CurrentLEDState"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE "DesiredLEDState"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_GET "GetLEDState"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_OFF "Off"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_ON "On"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_SET "SetLEDState"
-
 		#define SONO_SERVICE_XML_ACTION_TAG "action"
 		#define SONO_SERVICE_XML_ACTION_TAG_LIST "actionList"
 		#define SONO_SERVICE_XML_ACTION_TAG_NAME "name"
+		#define SONO_SERVICE_XML_CLOSE_BRACKET ">"
+		#define SONO_SERVICE_XML_OPEN_BRACKET "<"
+		#define SONO_SERVICE_XML_OPEN_BRACKET_TERM "</"
 		#define SONO_SERVICE_XML_ROOT_TAG "scpd"
 
 		_sono_service::_sono_service(
@@ -283,6 +285,24 @@ namespace SONO {
 		}
 
 		void 
+		_sono_service::service_event(
+			__in sono_service_t service,
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_manager *instance = NULL;
+
+			if(sono_manager::is_allocated()) {
+
+				instance = sono_manager::acquire();
+				if(instance->is_initialized()) {
+					instance->service_event(m_data.device, service, action, data);
+				}
+			}
+		}
+
+		void 
 		_sono_service::set(
 			__in sono_service_t type,
 			__in const sono_service_meta &data
@@ -356,6 +376,15 @@ namespace SONO {
 			return *this;
 		}
 
+		void 
+		_sono_service_alarm_clock::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_ALARM_CLOCK, action, data);
+		}
+
 		_sono_service_device_properties::_sono_service_device_properties(
 			__in const sono_service_meta &data
 			) :
@@ -390,21 +419,24 @@ namespace SONO {
 			return *this;
 		}
 
-		bool 
+		std::string 
 		_sono_service_device_properties::led_state(
 			__in_opt uint32_t timeout
 			)
 		{
-			bool result = false;
+			int code;
 			std::string response;
+			std::match_results<const char *> match;
 
 			response = run(SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_GET, std::string(), timeout);
 
-			// TODO
-			std::cout << std::endl << response << std::endl;
-			// ---
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_GET, code);
+			}
 
-			return result;
+			return sono_http::remove_header(response);
 		}
 
 		void 
@@ -413,20 +445,32 @@ namespace SONO {
 			__in_opt uint32_t timeout
 			)
 		{
+			int code;
 			std::string response;
 			std::stringstream stream;
 
-			stream << "<" << SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE << ">"
+			stream << SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET
 				<< (state ? SONO_SERVICE_DEVICE_PROPERTIES_LED_ON : SONO_SERVICE_DEVICE_PROPERTIES_LED_OFF)
-				<< "</" << SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE << ">";
-
+				<< SONO_SERVICE_XML_OPEN_BRACKET_TERM << SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET;
 			response = run(SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_SET, stream.str(), timeout);
 
-			// TODO
-			std::cout << std::endl << response << std::endl;
-			// ---
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE, code);
+			}
 		}
 
+		void 
+		_sono_service_device_properties::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_DEVICE_PROPERTIES, action, data);
+		}
 
 		_sono_service_group_management::_sono_service_group_management(
 			__in const sono_service_meta &data
@@ -460,6 +504,15 @@ namespace SONO {
 			}
 
 			return *this;
+		}
+
+		void 
+		_sono_service_group_management::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_GROUP_MANAGEMENT, action, data);
 		}
 
 		_sono_service_music_services::_sono_service_music_services(
@@ -496,6 +549,15 @@ namespace SONO {
 			return *this;
 		}
 
+		void 
+		_sono_service_music_services::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_MUSIC_SERVICES, action, data);
+		}
+
 		_sono_service_qplay::_sono_service_qplay(
 			__in const sono_service_meta &data
 			) :
@@ -528,6 +590,15 @@ namespace SONO {
 			}
 
 			return *this;
+		}
+
+		void 
+		_sono_service_qplay::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_QPLAY, action, data);
 		}
 
 		_sono_service_render_av_transport::_sono_service_render_av_transport(
@@ -564,6 +635,15 @@ namespace SONO {
 			return *this;
 		}
 
+		void 
+		_sono_service_render_av_transport::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_RENDER_AV_TRANSPORT, action, data);
+		}
+
 		_sono_service_render_connection_manager::_sono_service_render_connection_manager(
 			__in const sono_service_meta &data
 			) :
@@ -596,6 +676,15 @@ namespace SONO {
 			}
 
 			return *this;
+		}
+
+		void 
+		_sono_service_render_connection_manager::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_RENDER_CONNECTION_MANAGER, action, data);
 		}
 
 		_sono_service_render_control::_sono_service_render_control(
@@ -632,6 +721,15 @@ namespace SONO {
 			return *this;
 		}
 
+		void 
+		_sono_service_render_control::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_RENDER_CONTROL, action, data);
+		}
+
 		_sono_service_render_group_control::_sono_service_render_group_control(
 			__in const sono_service_meta &data
 			) :
@@ -664,6 +762,15 @@ namespace SONO {
 			}
 
 			return *this;
+		}
+
+		void 
+		_sono_service_render_group_control::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_RENDER_GROUP_CONTROL, action, data);
 		}
 
 		_sono_service_render_queue::_sono_service_render_queue(
@@ -700,6 +807,15 @@ namespace SONO {
 			return *this;
 		}
 
+		void 
+		_sono_service_render_queue::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_RENDER_QUEUE, action, data);
+		}
+
 		_sono_service_server_connection_manager::_sono_service_server_connection_manager(
 			__in const sono_service_meta &data
 			) :
@@ -732,6 +848,15 @@ namespace SONO {
 			}
 
 			return *this;
+		}
+
+		void 
+		_sono_service_server_connection_manager::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_SERVER_CONNECTION_MANAGER, action, data);
 		}
 
 		_sono_service_server_content_directory::_sono_service_server_content_directory(
@@ -768,6 +893,15 @@ namespace SONO {
 			return *this;
 		}
 
+		void 
+		_sono_service_server_content_directory::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_SERVER_CONTENT_DIRECTORY, action, data);
+		}
+
 		_sono_service_system_properties::_sono_service_system_properties(
 			__in const sono_service_meta &data
 			) :
@@ -802,6 +936,15 @@ namespace SONO {
 			return *this;
 		}
 
+		void 
+		_sono_service_system_properties::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_SYSTEM_PROPERTIES, action, data);
+		}
+
 		_sono_service_zone_group_topology::_sono_service_zone_group_topology(
 			__in const sono_service_meta &data
 			) :
@@ -834,6 +977,15 @@ namespace SONO {
 			}
 
 			return *this;
+		}
+
+		void 
+		_sono_service_zone_group_topology::service_event(
+			__in std::string &action,
+			__in std::string &data
+			)
+		{
+			sono_service::service_event(SONO_SERVICE_ZONE_GROUP_TOPOLOGY, action, data);
 		}
 	}
 }

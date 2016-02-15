@@ -67,6 +67,7 @@ namespace SONO {
 		m_factory_device(sono_device_factory::acquire()),
 		m_factory_socket(sono_socket_factory::acquire()),
 		m_factory_uid(sono_uid_factory::acquire()),
+		m_handler(NULL),
 		m_initialized(false)
 	{
 		std::atexit(sono_manager::_delete);
@@ -257,13 +258,16 @@ namespace SONO {
 	}
 
 	void 
-	_sono_manager::initialize(void)
+	_sono_manager::initialize(
+		__in sono_event_handler handler
+		)
 	{
 
 		if(m_initialized) {
 			THROW_SONO_EXCEPTION(SONO_EXCEPTION_INITIALIZED);
 		}
 
+		m_handler = handler;
 		m_factory_uid->initialize();
 		m_factory_socket->initialize();
 		m_factory_device->initialize();
@@ -282,6 +286,20 @@ namespace SONO {
 		return m_initialized;
 	}
 
+	void 
+	_sono_manager::service_event(
+		__in sono_uid_t device,
+		__in sono_service_t service,
+		__in std::string &action,
+		__in std::string &data
+		)
+	{
+
+		if(m_handler) {
+			m_handler(device, service, action, data);
+		}
+	}
+
 	std::string 
 	_sono_manager::to_string(
 		__in_opt bool verbose
@@ -293,6 +311,10 @@ namespace SONO {
 
 		result << SONO_HEADER << " -- " << (m_initialized ? "INIT" : "UNINIT")
 			<< ", PTR. 0x" << SCALAR_AS_HEX(sono_manager *, this);
+
+		if(m_initialized) {
+			result << ", HDL. 0x" << SCALAR_AS_HEX(sono_event_handler, m_handler);
+		}
 
 		return result.str();
 	}
@@ -308,6 +330,7 @@ namespace SONO {
 		m_factory_device->uninitialize();
 		m_factory_socket->uninitialize();
 		m_factory_uid->uninitialize();
+		m_handler = NULL;
 		m_initialized = false;
 	}
 
