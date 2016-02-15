@@ -42,15 +42,15 @@
 [ ] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:DeviceProperties:1", ACT. "SetUseAutoplayVolume"
 [ ] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:DeviceProperties:1", ACT. "SetZoneAttributes"
 --- [SONO::SERVICE] GROUP_MANAGEMENT, ACT. 3
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:GroupManagement:1", ACT. "AddMember"
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:GroupManagement:1", ACT. "RemoveMember"
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:GroupManagement:1", ACT. "ReportTrackBufferingResult"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:GroupManagement:1", ACT. "AddMember"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:GroupManagement:1", ACT. "RemoveMember"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:GroupManagement:1", ACT. "ReportTrackBufferingResult"
 --- [SONO::SERVICE] MUSIC_SERVICES, ACT. 3
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:MusicServices:1", ACT. "GetSessionId"
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:MusicServices:1", ACT. "ListAvailableServices"
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:MusicServices:1", ACT. "UpdateAvailableServices"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:MusicServices:1", ACT. "GetSessionId"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:MusicServices:1", ACT. "ListAvailableServices"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:MusicServices:1", ACT. "UpdateAvailableServices"
 --- [SONO::SERVICE] QPLAY, ACT. 1
----- [SONO::ACTION], TYPE. "urn:schemas-tencent-com:service:QPlay:1", ACT. "QPlayAuth"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-tencent-com:service:QPlay:1", ACT. "QPlayAuth"
 --- [SONO::SERVICE] RENDER_AV_TRANSPORT, ACT. 42
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:AVTransport:1", ACT. "AddMultipleURIsToQueue"
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:AVTransport:1", ACT. "AddURIToQueue"
@@ -95,9 +95,9 @@
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:AVTransport:1", ACT. "StartAutoplay"
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:AVTransport:1", ACT. "Stop"
 --- [SONO::SERVICE] SONO_SERVICE_RENDER_CONNECTION_MANAGER, ACT. 3
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetCurrentConnectionIDs"
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetCurrentConnectionInfo"
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetProtocolInfo"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetCurrentConnectionIDs"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetCurrentConnectionInfo"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetProtocolInfo"
 --- [SONO::SERVICE] SONO_SERVICE_RENDER_CONTROL, ACT. 28
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:RenderingControl:1", ACT. "GetBass"
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:RenderingControl:1", ACT. "GetEQ"
@@ -140,9 +140,9 @@
 ---- [SONO::ACTION], TYPE. "urn:schemas-sonos-com:service:Queue:1", ACT. "ReplaceAllTracks"
 ---- [SONO::ACTION], TYPE. "urn:schemas-sonos-com:service:Queue:1", ACT. "SaveAsSonosPlaylist"
 --- [SONO::SERVICE] SONO_SERVICE_SERVER_CONNECTION_MANAGER, ACT. 3
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetCurrentConnectionIDs"
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetCurrentConnectionInfo"
----- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetProtocolInfo"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetCurrentConnectionIDs"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetCurrentConnectionInfo"
+[X] ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ConnectionManager:1", ACT. "GetProtocolInfo"
 --- [SONO::SERVICE] SONO_SERVICE_SERVER_CONTENT_DIRECTORY, ACT. 16
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ContentDirectory:1", ACT. "Browse"
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ContentDirectory:1", ACT. "CreateObject"

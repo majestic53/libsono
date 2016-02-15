@@ -174,11 +174,11 @@ namespace SONO {
 					__in const _sono_service_device_properties &other
 					);
 
-				std::string led_state(
+				std::string get_led_state(
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
-				void set_led_state(
+				std::string set_led_state(
 					__in bool state,
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
@@ -211,6 +211,23 @@ namespace SONO {
 					__in const _sono_service_group_management &other
 					);
 
+				std::string add_member(
+					__in const std::string &id,
+					__in uint32_t seq,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				std::string remove_member(
+					__in const std::string &id,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				std::string report_track_buffering_result(
+					__in const std::string &id,
+					__in uint32_t result,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
 			protected:
 
 				void service_event(
@@ -239,6 +256,20 @@ namespace SONO {
 					__in const _sono_service_music_services &other
 					);
 
+				std::string get_session_id(
+					__in uint32_t service,
+					__in const std::string &user,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				std::string list_available_services(
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				std::string update_available_services(
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
 			protected:
 
 				void service_event(
@@ -265,6 +296,11 @@ namespace SONO {
 
 				_sono_service_qplay &operator=(
 					__in const _sono_service_qplay &other
+					);
+
+				std::string auth(
+					__in const std::string &seed,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
 			protected:
@@ -321,6 +357,19 @@ namespace SONO {
 
 				_sono_service_render_connection_manager &operator=(
 					__in const _sono_service_render_connection_manager &other
+					);
+
+				std::string get_current_connection_ids(
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				std::string get_current_connection_info(
+					__in uint32_t id,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				std::string get_protocol_info(
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
 			protected:
@@ -433,6 +482,19 @@ namespace SONO {
 
 				_sono_service_server_connection_manager &operator=(
 					__in const _sono_service_server_connection_manager &other
+					);
+
+				std::string get_current_connection_ids(
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				std::string get_current_connection_info(
+					__in uint32_t id,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				std::string get_protocol_info(
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
 			protected:

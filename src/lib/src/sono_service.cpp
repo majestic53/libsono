@@ -82,11 +82,28 @@ namespace SONO {
 			((_TYPE_) > SONO_SERVICE_MEDIA_MAX ? STRING_UNKNOWN : \
 			STRING_CHECK(SONO_SERVICE_MEDIA_STR[_TYPE_]))
 
+		#define SONO_SERVICE_CONNECTION_MANAGER_CONNECTION_ID "ConnectionID"
+		#define SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_IDS "GetCurrentConnectionIDs"
+		#define SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_INFO "GetCurrentConnectionInfo"
+		#define SONO_SERVICE_CONNECTION_MAANGER_PROTOCOL_INFO "GetProtocolInfo"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE "DesiredLEDState"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_GET "GetLEDState"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_OFF "Off"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_ON "On"
 		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_SET "SetLEDState"
+		#define SONO_SERVICE_GROUP_MANAGEMENT_ADD_MEMBER "AddMember"
+		#define SONO_SERVICE_GROUP_MANAGEMENT_BOOT_SEQ "BootSeq"
+		#define SONO_SERVICE_GROUP_MANAGEMENT_MEMBER_ID "MemberId"
+		#define SONO_SERVICE_GROUP_MANAGEMENT_REMOVE_MEMBER "RemoveMember"
+		#define SONO_SERVICE_GROUP_MANAGEMENT_REPORT_TRACK_BUFFERING_RESULT "ReportTrackBufferingResult"
+		#define SONO_SERVICE_GROUP_MANAGEMENT_RESULT_CODE "ResultCode"
+		#define SONO_SERVICE_MUSIC_SERVICES_GET_SESSION_ID "GetSessionId"
+		#define SONO_SERVICE_MUSIC_SERVICES_LIST_AVAILABLE_SERVICES "ListAvailableServices"
+		#define SONO_SERVICE_MUSIC_SERVICES_SERVICE_ID "ServiceId"
+		#define SONO_SERVICE_MUSIC_SERVICES_UPDATE_AVAILABLE_SERVICES "UpdateAvailableServices"
+		#define SONO_SERVICE_MUSIC_SERVICES_USERNAME "Username"
+		#define SONO_SERVICE_QPLAY_AUTH "QPlayAuth"
+		#define SONO_SERVICE_QPLAY_AUTH_SEED "Seed"
 		#define SONO_SERVICE_XML_ACTION_TAG "action"
 		#define SONO_SERVICE_XML_ACTION_TAG_LIST "actionList"
 		#define SONO_SERVICE_XML_ACTION_TAG_NAME "name"
@@ -420,7 +437,7 @@ namespace SONO {
 		}
 
 		std::string 
-		_sono_service_device_properties::led_state(
+		_sono_service_device_properties::get_led_state(
 			__in_opt uint32_t timeout
 			)
 		{
@@ -439,7 +456,7 @@ namespace SONO {
 			return sono_http::remove_header(response);
 		}
 
-		void 
+		std::string 
 		_sono_service_device_properties::set_led_state(
 			__in bool state,
 			__in_opt uint32_t timeout
@@ -459,8 +476,10 @@ namespace SONO {
 			code = sono_http::parse_header(response);
 			if(code != SONO_HTTP_SUCCESS) {
 				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
-					"%s --> %u", SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE, code);
+					"%s --> %u", SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_SET, code);
 			}
+
+			return sono_http::remove_header(response);
 		}
 
 		void 
@@ -506,6 +525,86 @@ namespace SONO {
 			return *this;
 		}
 
+		std::string 
+		_sono_service_group_management::add_member(
+			__in const std::string &id,
+			__in uint32_t seq,
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::stringstream stream;
+
+			stream << SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_GROUP_MANAGEMENT_MEMBER_ID 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << id << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_GROUP_MANAGEMENT_MEMBER_ID << SONO_SERVICE_XML_CLOSE_BRACKET
+				<< SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_GROUP_MANAGEMENT_BOOT_SEQ 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << seq << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_GROUP_MANAGEMENT_BOOT_SEQ << SONO_SERVICE_XML_CLOSE_BRACKET;
+			response = run(SONO_SERVICE_GROUP_MANAGEMENT_ADD_MEMBER, stream.str(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_GROUP_MANAGEMENT_ADD_MEMBER, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
+		std::string 
+		_sono_service_group_management::remove_member(
+			__in const std::string &id,
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::stringstream stream;
+
+			stream << SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_GROUP_MANAGEMENT_MEMBER_ID 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << id << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_GROUP_MANAGEMENT_MEMBER_ID << SONO_SERVICE_XML_CLOSE_BRACKET;
+			response = run(SONO_SERVICE_GROUP_MANAGEMENT_REMOVE_MEMBER, stream.str(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_GROUP_MANAGEMENT_REMOVE_MEMBER, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
+		std::string 
+		_sono_service_group_management::report_track_buffering_result(
+			__in const std::string &id,
+			__in uint32_t result,
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::stringstream stream;
+
+			stream << SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_GROUP_MANAGEMENT_MEMBER_ID 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << id << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_GROUP_MANAGEMENT_MEMBER_ID << SONO_SERVICE_XML_CLOSE_BRACKET
+				<< SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_GROUP_MANAGEMENT_RESULT_CODE 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << result << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_GROUP_MANAGEMENT_RESULT_CODE << SONO_SERVICE_XML_CLOSE_BRACKET;
+			response = run(SONO_SERVICE_GROUP_MANAGEMENT_REPORT_TRACK_BUFFERING_RESULT, stream.str(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_GROUP_MANAGEMENT_REPORT_TRACK_BUFFERING_RESULT, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
 		void 
 		_sono_service_group_management::service_event(
 			__in std::string &action,
@@ -549,6 +648,74 @@ namespace SONO {
 			return *this;
 		}
 
+		std::string 
+		_sono_service_music_services::get_session_id(
+			__in uint32_t service,
+			__in const std::string &user,
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::stringstream stream;
+
+			stream << SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_MUSIC_SERVICES_SERVICE_ID 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << service << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_MUSIC_SERVICES_SERVICE_ID << SONO_SERVICE_XML_CLOSE_BRACKET
+				<< SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_MUSIC_SERVICES_USERNAME 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << user << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_MUSIC_SERVICES_USERNAME << SONO_SERVICE_XML_CLOSE_BRACKET;
+			response = run(SONO_SERVICE_MUSIC_SERVICES_GET_SESSION_ID, stream.str(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_MUSIC_SERVICES_GET_SESSION_ID, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
+		std::string 
+		_sono_service_music_services::list_available_services(
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::stringstream stream;
+
+			response = run(SONO_SERVICE_MUSIC_SERVICES_LIST_AVAILABLE_SERVICES, std::string(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_MUSIC_SERVICES_LIST_AVAILABLE_SERVICES, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
+		std::string 
+		_sono_service_music_services::update_available_services(
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::stringstream stream;
+
+			response = run(SONO_SERVICE_MUSIC_SERVICES_UPDATE_AVAILABLE_SERVICES, std::string(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_MUSIC_SERVICES_UPDATE_AVAILABLE_SERVICES, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
 		void 
 		_sono_service_music_services::service_event(
 			__in std::string &action,
@@ -590,6 +757,30 @@ namespace SONO {
 			}
 
 			return *this;
+		}
+
+		std::string 
+		_sono_service_qplay::auth(
+			__in const std::string &seed,
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::stringstream stream;
+
+			stream << SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_QPLAY_AUTH_SEED 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << seed << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_QPLAY_AUTH_SEED << SONO_SERVICE_XML_CLOSE_BRACKET;
+			response = run(SONO_SERVICE_QPLAY_AUTH, stream.str(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_QPLAY_AUTH, code);
+			}
+
+			return sono_http::remove_header(response);
 		}
 
 		void 
@@ -676,6 +867,70 @@ namespace SONO {
 			}
 
 			return *this;
+		}
+
+		std::string 
+		_sono_service_render_connection_manager::get_current_connection_ids(
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::match_results<const char *> match;
+
+			response = run(SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_IDS, std::string(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_IDS, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
+		std::string 
+		_sono_service_render_connection_manager::get_current_connection_info(
+			__in uint32_t id,
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::stringstream stream;
+
+			stream << SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_CONNECTION_MANAGER_CONNECTION_ID 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << id << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_CONNECTION_MANAGER_CONNECTION_ID << SONO_SERVICE_XML_CLOSE_BRACKET;
+			response = run(SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_INFO, stream.str(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_INFO, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
+		std::string 
+		_sono_service_render_connection_manager::get_protocol_info(
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::match_results<const char *> match;
+
+			response = run(SONO_SERVICE_CONNECTION_MAANGER_PROTOCOL_INFO, std::string(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_CONNECTION_MAANGER_PROTOCOL_INFO, code);
+			}
+
+			return sono_http::remove_header(response);
 		}
 
 		void 
@@ -848,6 +1103,70 @@ namespace SONO {
 			}
 
 			return *this;
+		}
+
+		std::string 
+		_sono_service_server_connection_manager::get_current_connection_ids(
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::match_results<const char *> match;
+
+			response = run(SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_IDS, std::string(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_IDS, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
+		std::string 
+		_sono_service_server_connection_manager::get_current_connection_info(
+			__in uint32_t id,
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::stringstream stream;
+
+			stream << SONO_SERVICE_XML_OPEN_BRACKET << SONO_SERVICE_CONNECTION_MANAGER_CONNECTION_ID 
+				<< SONO_SERVICE_XML_CLOSE_BRACKET << id << SONO_SERVICE_XML_OPEN_BRACKET_TERM 
+				<< SONO_SERVICE_CONNECTION_MANAGER_CONNECTION_ID << SONO_SERVICE_XML_CLOSE_BRACKET;
+			response = run(SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_INFO, stream.str(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_CONNECTION_MANAGER_CURRENT_CONNECTION_INFO, code);
+			}
+
+			return sono_http::remove_header(response);
+		}
+
+		std::string 
+		_sono_service_server_connection_manager::get_protocol_info(
+			__in_opt uint32_t timeout
+			)
+		{
+			int code;
+			std::string response;
+			std::match_results<const char *> match;
+
+			response = run(SONO_SERVICE_CONNECTION_MAANGER_PROTOCOL_INFO, std::string(), timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", SONO_SERVICE_CONNECTION_MAANGER_PROTOCOL_INFO, code);
+			}
+
+			return sono_http::remove_header(response);
 		}
 
 		void 

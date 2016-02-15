@@ -83,7 +83,7 @@ main(
 		sono_service_device_properties *svc_inst = (sono_service_device_properties *) 
 			instance->device_service(1, SONO_SERVICE_DEVICE_PROPERTIES);
 
-		std::cout << std::endl << svc_inst->led_state(SERVICE_ACTION_TIMEOUT) << std::endl;
+		std::cout << std::endl << svc_inst->get_led_state(SERVICE_ACTION_TIMEOUT) << std::endl;
 
 		svc_inst->set_led_state(true, SERVICE_ACTION_TIMEOUT);
 		// ---
