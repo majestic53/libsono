@@ -81,6 +81,13 @@ namespace SONO {
 			((_TYPE_) > SONO_SERVICE_MEDIA_MAX ? STRING_UNKNOWN : \
 			STRING_CHECK(SONO_SERVICE_MEDIA_STR[_TYPE_]))
 
+		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_CURRENT "CurrentLEDState"
+		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE "DesiredLEDState"
+		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_GET "GetLEDState"
+		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_OFF "Off"
+		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_ON "On"
+		#define SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_SET "SetLEDState"
+
 		#define SONO_SERVICE_XML_ACTION_TAG "action"
 		#define SONO_SERVICE_XML_ACTION_TAG_LIST "actionList"
 		#define SONO_SERVICE_XML_ACTION_TAG_NAME "name"
@@ -313,6 +320,520 @@ namespace SONO {
 		_sono_service::type(void)
 		{
 			return m_type;
+		}
+
+		_sono_service_alarm_clock::_sono_service_alarm_clock(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_ALARM_CLOCK, data)
+		{
+			return;
+		}
+
+		_sono_service_alarm_clock::_sono_service_alarm_clock(
+			__in const _sono_service_alarm_clock &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_alarm_clock::~_sono_service_alarm_clock(void)
+		{
+			return;
+		}
+
+		_sono_service_alarm_clock &
+		_sono_service_alarm_clock::operator=(
+			__in const _sono_service_alarm_clock &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_device_properties::_sono_service_device_properties(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_DEVICE_PROPERTIES, data)
+		{
+			return;
+		}
+
+		_sono_service_device_properties::_sono_service_device_properties(
+			__in const _sono_service_device_properties &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_device_properties::~_sono_service_device_properties(void)
+		{
+			return;
+		}
+
+		_sono_service_device_properties &
+		_sono_service_device_properties::operator=(
+			__in const _sono_service_device_properties &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		bool 
+		_sono_service_device_properties::led_state(
+			__in_opt uint32_t timeout
+			)
+		{
+			bool result = false;
+			std::string response;
+
+			response = run(SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_GET, std::string(), timeout);
+
+			// TODO
+			std::cout << std::endl << response << std::endl;
+			// ---
+
+			return result;
+		}
+
+		void 
+		_sono_service_device_properties::set_led_state(
+			__in bool state,
+			__in_opt uint32_t timeout
+			)
+		{
+			std::string response;
+			std::stringstream stream;
+
+			stream << "<" << SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE << ">"
+				<< (state ? SONO_SERVICE_DEVICE_PROPERTIES_LED_ON : SONO_SERVICE_DEVICE_PROPERTIES_LED_OFF)
+				<< "</" << SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_DESIRE << ">";
+
+			response = run(SONO_SERVICE_DEVICE_PROPERTIES_LED_STATE_SET, stream.str(), timeout);
+
+			// TODO
+			std::cout << std::endl << response << std::endl;
+			// ---
+		}
+
+
+		_sono_service_group_management::_sono_service_group_management(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_GROUP_MANAGEMENT, data)
+		{
+			return;
+		}
+
+		_sono_service_group_management::_sono_service_group_management(
+			__in const _sono_service_group_management &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_group_management::~_sono_service_group_management(void)
+		{
+			return;
+		}
+
+		_sono_service_group_management &
+		_sono_service_group_management::operator=(
+			__in const _sono_service_group_management &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_music_services::_sono_service_music_services(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_MUSIC_SERVICES, data)
+		{
+			return;
+		}
+
+		_sono_service_music_services::_sono_service_music_services(
+			__in const _sono_service_music_services &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_music_services::~_sono_service_music_services(void)
+		{
+			return;
+		}
+
+		_sono_service_music_services &
+		_sono_service_music_services::operator=(
+			__in const _sono_service_music_services &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_qplay::_sono_service_qplay(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_QPLAY, data)
+		{
+			return;
+		}
+
+		_sono_service_qplay::_sono_service_qplay(
+			__in const _sono_service_qplay &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_qplay::~_sono_service_qplay(void)
+		{
+			return;
+		}
+
+		_sono_service_qplay &
+		_sono_service_qplay::operator=(
+			__in const _sono_service_qplay &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_render_av_transport::_sono_service_render_av_transport(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_RENDER_AV_TRANSPORT, data)
+		{
+			return;
+		}
+
+		_sono_service_render_av_transport::_sono_service_render_av_transport(
+			__in const _sono_service_render_av_transport &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_render_av_transport::~_sono_service_render_av_transport(void)
+		{
+			return;
+		}
+
+		_sono_service_render_av_transport &
+		_sono_service_render_av_transport::operator=(
+			__in const _sono_service_render_av_transport &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_render_connection_manager::_sono_service_render_connection_manager(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_RENDER_CONNECTION_MANAGER, data)
+		{
+			return;
+		}
+
+		_sono_service_render_connection_manager::_sono_service_render_connection_manager(
+			__in const _sono_service_render_connection_manager &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_render_connection_manager::~_sono_service_render_connection_manager(void)
+		{
+			return;
+		}
+
+		_sono_service_render_connection_manager &
+		_sono_service_render_connection_manager::operator=(
+			__in const _sono_service_render_connection_manager &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_render_control::_sono_service_render_control(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_RENDER_CONTROL, data)
+		{
+			return;
+		}
+
+		_sono_service_render_control::_sono_service_render_control(
+			__in const _sono_service_render_control &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_render_control::~_sono_service_render_control(void)
+		{
+			return;
+		}
+
+		_sono_service_render_control &
+		_sono_service_render_control::operator=(
+			__in const _sono_service_render_control &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_render_group_control::_sono_service_render_group_control(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_RENDER_GROUP_CONTROL, data)
+		{
+			return;
+		}
+
+		_sono_service_render_group_control::_sono_service_render_group_control(
+			__in const _sono_service_render_group_control &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_render_group_control::~_sono_service_render_group_control(void)
+		{
+			return;
+		}
+
+		_sono_service_render_group_control &
+		_sono_service_render_group_control::operator=(
+			__in const _sono_service_render_group_control &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_render_queue::_sono_service_render_queue(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_RENDER_QUEUE, data)
+		{
+			return;
+		}
+
+		_sono_service_render_queue::_sono_service_render_queue(
+			__in const _sono_service_render_queue &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_render_queue::~_sono_service_render_queue(void)
+		{
+			return;
+		}
+
+		_sono_service_render_queue &
+		_sono_service_render_queue::operator=(
+			__in const _sono_service_render_queue &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_server_connection_manager::_sono_service_server_connection_manager(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_SERVER_CONNECTION_MANAGER, data)
+		{
+			return;
+		}
+
+		_sono_service_server_connection_manager::_sono_service_server_connection_manager(
+			__in const _sono_service_server_connection_manager &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_server_connection_manager::~_sono_service_server_connection_manager(void)
+		{
+			return;
+		}
+
+		_sono_service_server_connection_manager &
+		_sono_service_server_connection_manager::operator=(
+			__in const _sono_service_server_connection_manager &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_server_content_directory::_sono_service_server_content_directory(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_SERVER_CONTENT_DIRECTORY, data)
+		{
+			return;
+		}
+
+		_sono_service_server_content_directory::_sono_service_server_content_directory(
+			__in const _sono_service_server_content_directory &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_server_content_directory::~_sono_service_server_content_directory(void)
+		{
+			return;
+		}
+
+		_sono_service_server_content_directory &
+		_sono_service_server_content_directory::operator=(
+			__in const _sono_service_server_content_directory &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_system_properties::_sono_service_system_properties(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_SYSTEM_PROPERTIES, data)
+		{
+			return;
+		}
+
+		_sono_service_system_properties::_sono_service_system_properties(
+			__in const _sono_service_system_properties &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_system_properties::~_sono_service_system_properties(void)
+		{
+			return;
+		}
+
+		_sono_service_system_properties &
+		_sono_service_system_properties::operator=(
+			__in const _sono_service_system_properties &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
+		}
+
+		_sono_service_zone_group_topology::_sono_service_zone_group_topology(
+			__in const sono_service_meta &data
+			) :
+				sono_service(SONO_SERVICE_ZONE_GROUP_TOPOLOGY, data)
+		{
+			return;
+		}
+
+		_sono_service_zone_group_topology::_sono_service_zone_group_topology(
+			__in const _sono_service_zone_group_topology &other
+			) :
+				sono_service(other)
+		{
+			return;
+		}
+
+		_sono_service_zone_group_topology::~_sono_service_zone_group_topology(void)
+		{
+			return;
+		}
+
+		_sono_service_zone_group_topology &
+		_sono_service_zone_group_topology::operator=(
+			__in const _sono_service_zone_group_topology &other
+			)
+		{
+
+			if(this != &other) {
+				sono_service::operator=(other);
+			}
+
+			return *this;
 		}
 	}
 }

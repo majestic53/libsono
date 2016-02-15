@@ -20,25 +20,22 @@
 #include "../include/sono.h"
 #include "../include/sono_action_type.h"
 
-#define SONO_HTTP_ACTION_BODY_PREFIX \
-	"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" \
-	"<s:Body>"
-#define SONO_HTTP_ACTION_BODY_SUFFIX "</s:Body></s:Envelope>"
-
-#define SONO_HTTP_ACTION_COMMAND_PREFIX_0 "<u:"
-#define SONO_HTTP_ACTION_COMMAND_PREFIX_1 " xmlns:u=\""
-#define SONO_HTTP_ACTION_COMMAND_PREFIX_2 "\">"
-
-#define SONO_HTTP_ACTION_COMMAND_SUFFIX_0 "</u:"
-#define SONO_HTTP_ACTION_COMMAND_SUFFIX_1 ">"
-
-#define SONO_HTTP_ACTION_DIVIDER "#"
-#define SONO_HTTP_ACTION_PREFIX "SOAPAction: \""
-#define SONO_HTTP_ACTION_SUFFIX "\""
-
 namespace SONO {
 
 	namespace COMP {
+
+		#define SONO_HTTP_ACTION_BODY_PREFIX \
+			"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" \
+			"<s:Body>"
+		#define SONO_HTTP_ACTION_BODY_SUFFIX "</s:Body></s:Envelope>"
+		#define SONO_HTTP_ACTION_COMMAND_PREFIX_0 "<u:"
+		#define SONO_HTTP_ACTION_COMMAND_PREFIX_1 " xmlns:u=\""
+		#define SONO_HTTP_ACTION_COMMAND_PREFIX_2 "\">"
+		#define SONO_HTTP_ACTION_COMMAND_SUFFIX_0 "</u:"
+		#define SONO_HTTP_ACTION_COMMAND_SUFFIX_1 ">"
+		#define SONO_HTTP_ACTION_DIVIDER "#"
+		#define SONO_HTTP_ACTION_PREFIX "SOAPAction: \""
+		#define SONO_HTTP_ACTION_SUFFIX "\""
 
 		_sono_action::_sono_action(
 			__in const std::string &name,
@@ -100,7 +97,7 @@ namespace SONO {
 				<< parameters << SONO_HTTP_ACTION_COMMAND_SUFFIX_0 << m_name << SONO_HTTP_ACTION_COMMAND_SUFFIX_1
 				<< SONO_HTTP_ACTION_BODY_SUFFIX;
 
-			return sono_http::post(path, address, port, head.str(), body.str(), SONO_SOCKET_UDP, timeout);
+			return sono_http::post(path, address, port, head.str(), body.str(), SONO_SOCKET_TCP, timeout);
 		}
 
 		void 

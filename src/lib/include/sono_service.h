@@ -139,16 +139,6 @@ namespace SONO {
 					__in const _sono_service_alarm_clock &other
 					);
 
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
-
 		} sono_service_alarm_clock;
 
 		typedef class _sono_service_device_properties :
@@ -170,15 +160,14 @@ namespace SONO {
 					__in const _sono_service_device_properties &other
 					);
 
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
+				bool led_state(
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
-			protected:
-
-				// TODO
+				void set_led_state(
+					__in bool state,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
 
 		} sono_service_device_properties;
 
@@ -201,16 +190,6 @@ namespace SONO {
 					__in const _sono_service_group_management &other
 					);
 
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
-
 		} sono_service_group_management;
 
 		typedef class _sono_service_music_services :
@@ -231,16 +210,6 @@ namespace SONO {
 				_sono_service_music_services &operator=(
 					__in const _sono_service_music_services &other
 					);
-
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
 
 		} sono_service_music_services;
 
@@ -263,16 +232,6 @@ namespace SONO {
 					__in const _sono_service_qplay &other
 					);
 
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
-
 		} sono_service_qplay;
 
 		typedef class _sono_service_render_av_transport :
@@ -293,16 +252,6 @@ namespace SONO {
 				_sono_service_render_av_transport &operator=(
 					__in const _sono_service_render_av_transport &other
 					);
-
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
 
 		} sono_service_render_av_transport;
 
@@ -325,16 +274,6 @@ namespace SONO {
 					__in const _sono_service_render_connection_manager &other
 					);
 
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
-
 		} sono_service_render_connection_manager;
 
 		typedef class _sono_service_render_control :
@@ -355,16 +294,6 @@ namespace SONO {
 				_sono_service_render_control &operator=(
 					__in const _sono_service_render_control &other
 					);
-
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
 
 		} sono_service_render_control;
 
@@ -387,16 +316,6 @@ namespace SONO {
 					__in const _sono_service_render_group_control &other
 					);
 
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
-
 		} sono_service_render_group_control;
 
 		typedef class _sono_service_render_queue :
@@ -417,16 +336,6 @@ namespace SONO {
 				_sono_service_render_queue &operator=(
 					__in const _sono_service_render_queue &other
 					);
-
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
 
 		} sono_service_render_queue;
 
@@ -449,16 +358,6 @@ namespace SONO {
 					__in const _sono_service_server_connection_manager &other
 					);
 
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
-
 		} sono_service_server_connection_manager;
 
 		typedef class _sono_service_server_content_directory :
@@ -479,16 +378,6 @@ namespace SONO {
 				_sono_service_server_content_directory &operator=(
 					__in const _sono_service_server_content_directory &other
 					);
-
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
 
 		} sono_service_server_content_directory;
 
@@ -511,16 +400,6 @@ namespace SONO {
 					__in const _sono_service_system_properties &other
 					);
 
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
-
 		} sono_service_system_properties;
 
 		typedef class _sono_service_zone_group_topology :
@@ -541,16 +420,6 @@ namespace SONO {
 				_sono_service_zone_group_topology &operator=(
 					__in const _sono_service_zone_group_topology &other
 					);
-
-				// TODO
-
-				virtual std::string to_string(
-					__in_opt bool verbose = false
-					);
-
-			protected:
-
-				// TODO
 
 		} sono_service_zone_group_topology;
 	}

@@ -145,46 +145,46 @@ namespace SONO {
 
 			switch(type) {
 				case SONO_SERVICE_ALARM_CLOCK:
-					result = (sono_service *) new sono_service(type, data); //sono_service_alarm_clock(data);
+					result = (sono_service *) new sono_service_alarm_clock(data);
 					break;
 				case SONO_SERVICE_DEVICE_PROPERTIES:
-					result = (sono_service *) new sono_service(type, data); //sono_service_device_properties(data);
+					result = (sono_service *) new sono_service_device_properties(data);
 					break;
 				case SONO_SERVICE_GROUP_MANAGEMENT:
-					result = (sono_service *) new sono_service(type, data); //sono_service_group_management(data);
+					result = (sono_service *) new sono_service_group_management(data);
 					break;
 				case SONO_SERVICE_MUSIC_SERVICES:
-					result = (sono_service *) new sono_service(type, data); //sono_service_music_services(data);
+					result = (sono_service *) new sono_service_music_services(data);
 					break;
 				case SONO_SERVICE_QPLAY:
-					result = (sono_service *) new sono_service(type, data); //sono_service_qplay(data);
+					result = (sono_service *) new sono_service_qplay(data);
 					break;
 				case SONO_SERVICE_RENDER_AV_TRANSPORT:
-					result = (sono_service *) new sono_service(type, data); //sono_service_render_av_transport(data);
+					result = (sono_service *) new sono_service_render_av_transport(data);
 					break;
 				case SONO_SERVICE_RENDER_CONNECTION_MANAGER:
-					result = (sono_service *) new sono_service(type, data); //sono_service_render_connection_manager(data);
+					result = (sono_service *) new sono_service_render_connection_manager(data);
 					break;
 				case SONO_SERVICE_RENDER_CONTROL:
-					result = (sono_service *) new sono_service(type, data); //sono_service_render_control(data);
+					result = (sono_service *) new sono_service_render_control(data);
 					break;
 				case SONO_SERVICE_RENDER_GROUP_CONTROL:
-					result = (sono_service *) new sono_service(type, data); //sono_service_render_group_control(data);
+					result = (sono_service *) new sono_service_render_group_control(data);
 					break;
 				case SONO_SERVICE_RENDER_QUEUE:
-					result = (sono_service *) new sono_service(type, data); //sono_service_render_queue(data);
+					result = (sono_service *) new sono_service_render_queue(data);
 					break;
 				case SONO_SERVICE_SERVER_CONNECTION_MANAGER:
-					result = (sono_service *) new sono_service(type, data); //sono_service_server_connection_manager(data);
+					result = (sono_service *) new sono_service_server_connection_manager(data);
 					break;
 				case SONO_SERVICE_SERVER_CONTENT_DIRECTORY:
-					result = (sono_service *) new sono_service(type, data); //sono_service_server_content_directory(data);
+					result = (sono_service *) new sono_service_server_content_directory(data);
 					break;
 				case SONO_SERVICE_SYSTEM_PROPERTIES:
-					result = (sono_service *) new sono_service(type, data); //sono_service_system_properties(data);
+					result = (sono_service *) new sono_service_system_properties(data);
 					break;
 				case SONO_SERVICE_ZONE_GROUP_TOPOLOGY:
-					result = (sono_service *) new sono_service(type, data); //sono_service_zone_group_topology(data);
+					result = (sono_service *) new sono_service_zone_group_topology(data);
 					break;
 				default:
 					THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_UNSUPPORTED,

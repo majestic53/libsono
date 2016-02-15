@@ -37,6 +37,7 @@ main(
 		// TODO
 		#define DEVICE_DISCOVERY_TIMEOUT 1 // sec
 		#define SERVICE_DISCOVERY_TIMEOUT 2 // sec
+		#define SERVICE_ACTION_TIMEOUT 2 // sec
 
 		sono_device_list dev_list;
 		sono_service_list svc_list;
@@ -54,11 +55,21 @@ main(
 			std::cout << std::endl << "--- " << svc_list.size() << " service(s)." << std::endl << "----";
 
 			for(svc_iter = svc_list.begin(); svc_iter != svc_list.end(); ++svc_iter) {
-				std::cout << std::endl << "--- " << instance->device_service(dev_iter->first, *svc_iter)->to_string(true);
+				//std::cout << std::endl << "--- " << instance->device_service(dev_iter->first, *svc_iter)->to_string(true);
 			}
 
 			std::cout << std::endl;
 		}
+
+		// TODO
+		sono_service_device_properties *svc_inst = (sono_service_device_properties *) 
+			instance->device_service(1, SONO_SERVICE_DEVICE_PROPERTIES);
+
+		/*std::cout << std::endl << (svc_inst->led_state(SERVICE_ACTION_TIMEOUT) ? "ON" : "OFF") 
+			<< std::endl;*/
+
+		svc_inst->set_led_state(true, SERVICE_ACTION_TIMEOUT);
+		// ---
 
 		std::cout << std::endl;
 		// ---
