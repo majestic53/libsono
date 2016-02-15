@@ -94,7 +94,7 @@ namespace SONO {
 			std::map<sono_service_t, sono_service *>::iterator iter;
 
 			type = sono_service::metadata_as_type(data);
-			if(type < SONO_SERVICE_MAX) {
+			if(type <= SONO_SERVICE_MAX) {
 
 				iter = m_service_map.find(type);
 				if(iter == m_service_map.end()) {

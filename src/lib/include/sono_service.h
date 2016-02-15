@@ -146,6 +146,8 @@ namespace SONO {
 					__in const _sono_service_alarm_clock &other
 					);
 
+				// TODO
+
 			protected:
 
 				void service_event(
@@ -173,6 +175,8 @@ namespace SONO {
 				_sono_service_device_properties &operator=(
 					__in const _sono_service_device_properties &other
 					);
+
+				// TODO
 
 				std::string get_led_state(
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
@@ -331,6 +335,8 @@ namespace SONO {
 					__in const _sono_service_render_av_transport &other
 					);
 
+				// TODO
+
 			protected:
 
 				void service_event(
@@ -400,6 +406,8 @@ namespace SONO {
 					__in const _sono_service_render_control &other
 					);
 
+				// TODO
+
 			protected:
 
 				void service_event(
@@ -428,6 +436,8 @@ namespace SONO {
 					__in const _sono_service_render_group_control &other
 					);
 
+				// TODO
+
 			protected:
 
 				void service_event(
@@ -455,6 +465,8 @@ namespace SONO {
 				_sono_service_render_queue &operator=(
 					__in const _sono_service_render_queue &other
 					);
+
+				// TODO
 
 			protected:
 
@@ -525,6 +537,8 @@ namespace SONO {
 					__in const _sono_service_server_content_directory &other
 					);
 
+				// TODO
+
 			protected:
 
 				void service_event(
@@ -553,6 +567,8 @@ namespace SONO {
 					__in const _sono_service_system_properties &other
 					);
 
+				// TODO
+
 			protected:
 
 				void service_event(
@@ -580,6 +596,8 @@ namespace SONO {
 				_sono_service_zone_group_topology &operator=(
 					__in const _sono_service_zone_group_topology &other
 					);
+
+				// TODO
 
 			protected:
 

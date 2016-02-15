@@ -181,3 +181,12 @@
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:SystemProperties:1", ACT. "ResetThirdPartyCredentials"
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:SystemProperties:1", ACT. "SetAccountNicknameX"
 ---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:SystemProperties:1", ACT. "SetString"
+--- [SONO::SERVICE] SONO_SERVICE_ZONE_GROUP_TOPOLOGY, ACT. 8
+---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ZoneGroupTopology:1", ACT. "BeginSoftwareUpdate"
+---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ZoneGroupTopology:1", ACT. "CheckForUpdate"
+---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ZoneGroupTopology:1", ACT. "GetZoneGroupAttributes"
+---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ZoneGroupTopology:1", ACT. "GetZoneGroupState"
+---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ZoneGroupTopology:1", ACT. "RegisterMobileDevice"
+---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ZoneGroupTopology:1", ACT. "ReportAlarmStartedRunning"
+---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ZoneGroupTopology:1", ACT. "ReportUnresponsiveDevice"
+---- [SONO::ACTION], TYPE. "urn:schemas-upnp-org:service:ZoneGroupTopology:1", ACT. "SubmitDiagnostics"

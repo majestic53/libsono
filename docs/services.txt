@@ -1,4 +1,5 @@
 http://<ADDRESS>:<PORT>
+/xml/device_description.xml
 
 /xml/AlarmClock1.xml
 	/AlarmClock/Control
@@ -52,3 +53,6 @@ http://<ADDRESS>:<PORT>
 	/MediaRenderer/GroupRenderingControl/Control
 	/MediaRenderer/GroupRenderingControl/Event
 
+/xml/ZoneGroupTopology1.xml
+	/ZoneGroupTopology/Control
+	/ZoneGroupTopology/Event

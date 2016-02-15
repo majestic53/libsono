@@ -73,7 +73,7 @@ main(
 			std::cout << std::endl << "--- " << svc_list.size() << " service(s)." << std::endl << "----";
 
 			for(svc_iter = svc_list.begin(); svc_iter != svc_list.end(); ++svc_iter) {
-				//std::cout << std::endl << "--- " << instance->device_service(dev_iter->first, *svc_iter)->to_string(true);
+				std::cout << std::endl << "--- " << instance->device_service(dev_iter->first, *svc_iter)->to_string(true);
 			}
 
 			std::cout << std::endl;
@@ -85,7 +85,7 @@ main(
 
 		std::cout << std::endl << svc_inst->get_led_state(SERVICE_ACTION_TIMEOUT) << std::endl;
 
-		svc_inst->set_led_state(true, SERVICE_ACTION_TIMEOUT);
+		std::cout << std::endl << svc_inst->set_led_state(true, SERVICE_ACTION_TIMEOUT) << std::endl;
 		// ---
 
 		std::cout << std::endl;
