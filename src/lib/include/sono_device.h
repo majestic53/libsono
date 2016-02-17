@@ -24,7 +24,6 @@ namespace SONO {
 
 	namespace COMP {
 
-		typedef std::set<sono_service_t> sono_service_list;
 		typedef std::map<sono_uid_t, std::pair<std::string, std::pair<std::string, uint16_t>>> sono_device_list;
 
 		typedef class _sono_device :
@@ -54,9 +53,9 @@ namespace SONO {
 					__in sono_service_t type
 					);
 
-				std::string household(void);
+				const std::string &household(void);
 
-				sono_service *service(
+				sono_service &service(
 					__in sono_service_t type
 					);
 
@@ -72,7 +71,7 @@ namespace SONO {
 					__in_opt bool verbose = false
 					);
 
-				std::string uuid(void);
+				const std::string &uuid(void);
 
 			protected:
 
@@ -82,22 +81,7 @@ namespace SONO {
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
-				sono_service *create_service(
-					__in const sono_service_meta &data,
-					__in sono_service_t type
-					);
-
-				void copy_services(
-					__in const _sono_device &other
-					);
-
-				void remove_service(
-					__in sono_service_t type
-					);
-
-				void remove_services(void);
-
-				std::map<sono_service_t, sono_service *>::iterator find(
+				std::map<sono_service_t, sono_service>::iterator find(
 					__in sono_service_t type
 					);
 
@@ -110,7 +94,7 @@ namespace SONO {
 
 				std::string m_household;
 
-				std::map<sono_service_t, sono_service *> m_service_map;
+				std::map<sono_service_t, sono_service> m_service_map;
 
 				std::string m_uuid;
 

@@ -203,7 +203,7 @@ namespace SONO {
 		return m_factory_device->list();
 	}
 
-	sono_service *
+	sono_service &
 	_sono_manager::device_service(
 		__in sono_uid_t id,
 		__in sono_service_t type
@@ -215,6 +215,49 @@ namespace SONO {
 		}
 
 		return m_factory_device->at(id).service(type);
+	}
+
+	sono_action &
+	_sono_manager::device_service_action(
+		__in sono_uid_t id,
+		__in sono_service_t type,
+		__in const std::string &name
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_device->at(id).service(type).action(name);
+	}
+
+	size_t 
+	_sono_manager::device_service_action_count(
+		__in sono_uid_t id,
+		__in sono_service_t type
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_device->at(id).service(type).size();
+	}
+
+	sono_action_list 
+	_sono_manager::device_service_action_list(
+		__in sono_uid_t id,
+		__in sono_service_t type
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_factory_device->at(id).service(type).action_list();
 	}
 
 	size_t 

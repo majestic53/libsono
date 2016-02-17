@@ -124,7 +124,7 @@ namespace SONO {
 			return *this;
 		}
 
-		std::string 
+		const std::string &
 		_sono_socket::address(void)
 		{
 			return m_address;

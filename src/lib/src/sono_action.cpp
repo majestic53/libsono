@@ -24,31 +24,38 @@ namespace SONO {
 
 	namespace COMP {
 
-		#define SONO_HTTP_ACTION_BODY_PREFIX \
+		#define SONO_ACTION_BODY_PREFIX \
 			"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" \
 			"<s:Body>"
-		#define SONO_HTTP_ACTION_BODY_SUFFIX "</s:Body></s:Envelope>"
-		#define SONO_HTTP_ACTION_COMMAND_PREFIX_0 "<u:"
-		#define SONO_HTTP_ACTION_COMMAND_PREFIX_1 " xmlns:u=\""
-		#define SONO_HTTP_ACTION_COMMAND_PREFIX_2 "\">"
-		#define SONO_HTTP_ACTION_COMMAND_SUFFIX_0 "</u:"
-		#define SONO_HTTP_ACTION_COMMAND_SUFFIX_1 ">"
-		#define SONO_HTTP_ACTION_DIVIDER "#"
-		#define SONO_HTTP_ACTION_PREFIX "SOAPAction: \""
-		#define SONO_HTTP_ACTION_SUFFIX "\""
+		#define SONO_ACTION_BODY_SUFFIX "</s:Body></s:Envelope>"
+		#define SONO_ACTION_COMMAND_PREFIX_0 "<u:"
+		#define SONO_ACTION_COMMAND_PREFIX_1 " xmlns:u=\""
+		#define SONO_ACTION_COMMAND_PREFIX_2 "\">"
+		#define SONO_ACTION_COMMAND_SUFFIX_0 "</u:"
+		#define SONO_ACTION_COMMAND_SUFFIX_1 ">"
+		#define SONO_ACTION_DIVIDER "#"
+		#define SONO_ACTION_PREFIX "SOAPAction: \""
+		#define SONO_ACTION_SUFFIX "\""
+		#define SONO_ACTION_CLOSE_BRACKET ">"
+		#define SONO_ACTION_OPEN_BRACKET "<"
+		#define SONO_ACTION_OPEN_BRACKET_TERM "</"
 
 		_sono_action::_sono_action(
+			__in const std::string &type,
 			__in const std::string &name,
-			__in const std::string &type
+			__in_opt const std::vector<std::string> &input,
+			__in_opt const std::vector<std::string> &output
 			)
 		{
-			set(name, type);
+			set(type, name, input, output);
 		}
 
 		_sono_action::_sono_action(
 			__in const _sono_action &other
 			) :
+				m_input(other.m_input),
 				m_name(other.m_name),
+				m_output(other.m_output),
 				m_type(other.m_type)
 		{
 			return;
@@ -66,44 +73,97 @@ namespace SONO {
 		{
 
 			if(this != &other) {
+				m_input = other.m_input;
 				m_name = other.m_name;
+				m_output = other.m_output;
 				m_type = other.m_type;
 			}
 
 			return *this;
 		}
 
-		std::string 
+		const std::vector<std::string> &
+		_sono_action::input(void)
+		{
+			return m_input;
+		}
+
+		const std::string &
 		_sono_action::name(void)
 		{
 			return m_name;
 		}
 
-		std::string 
+		const std::vector<std::string> &
+		_sono_action::output(void)
+		{
+			return m_output;
+		}
+
+		std::map<std::string, std::string> 
 		_sono_action::run(
 			__in const std::string &path,
 			__in const std::string &address,
 			__in uint16_t port,
-			__in const std::string &parameters,
+			__in const std::map<std::string, std::string> &argument,
 			__in_opt uint32_t timeout
 			)
 		{
+			int code;
+			size_t iter = 0;
+			std::string response;
 			std::stringstream head, body;
+			std::map<std::string, std::string> result;
+			std::map<std::string, std::string>::const_iterator entry;
 
-			head << SONO_HTTP_ACTION_PREFIX << m_type << SONO_HTTP_ACTION_DIVIDER << m_name 
-				<< SONO_HTTP_ACTION_SUFFIX;
-			body << SONO_HTTP_ACTION_BODY_PREFIX << SONO_HTTP_ACTION_COMMAND_PREFIX_0 << m_name 
-				<< SONO_HTTP_ACTION_COMMAND_PREFIX_1 << m_type << SONO_HTTP_ACTION_COMMAND_PREFIX_2 
-				<< parameters << SONO_HTTP_ACTION_COMMAND_SUFFIX_0 << m_name << SONO_HTTP_ACTION_COMMAND_SUFFIX_1
-				<< SONO_HTTP_ACTION_BODY_SUFFIX;
+			if(argument.size() != m_input.size()) {
+				THROW_SONO_ACTION_EXCEPTION_FORMAT(SONO_ACTION_EXCEPTION_INVALID_ARGUMENT_COUNT,
+					"found %lu arguments (expecting %lu)", argument.size(), m_input.size());
+			}
 
-			return sono_http::post(path, address, port, head.str(), body.str(), SONO_SOCKET_TCP, timeout);
+			head << SONO_ACTION_PREFIX << m_type << SONO_ACTION_DIVIDER << m_name << SONO_ACTION_SUFFIX;
+			body << SONO_ACTION_BODY_PREFIX << SONO_ACTION_COMMAND_PREFIX_0 << m_name << SONO_ACTION_COMMAND_PREFIX_1 
+				<< m_type << SONO_ACTION_COMMAND_PREFIX_2;
+
+			for(; iter < m_input.size(); ++iter) {
+
+				entry = argument.find(m_input.at(iter));
+				if(entry == argument.end()) {
+					THROW_SONO_ACTION_EXCEPTION_FORMAT(SONO_ACTION_EXCEPTION_MISSING_ARGUMENT,
+						"missing argument: %s", STRING_CHECK(m_input.at(iter)));
+				}
+
+				body << SONO_ACTION_OPEN_BRACKET << m_input.at(iter) << SONO_ACTION_CLOSE_BRACKET
+					<< entry->second << SONO_ACTION_OPEN_BRACKET_TERM << m_input.at(iter) 
+					<< SONO_ACTION_CLOSE_BRACKET;
+			}
+
+			body << SONO_ACTION_COMMAND_SUFFIX_0 << m_name << SONO_ACTION_COMMAND_SUFFIX_1 << SONO_ACTION_BODY_SUFFIX;
+			response = sono_http::post(path, address, port, head.str(), body.str(), SONO_SOCKET_TCP, timeout);
+
+			code = sono_http::parse_header(response);
+			if(code != SONO_HTTP_SUCCESS) {
+				THROW_SONO_ACTION_EXCEPTION_FORMAT(SONO_ACTION_EXCEPTION_POST_RESPONSE,
+					"%s --> %u", STRING_CHECK(m_name), code);
+			}
+
+			response = sono_http::remove_header(response);
+
+			// TODO: parse response and populate result map
+
+			// TODO
+			std::cout << std::endl << head.str() << std::endl << body.str() << std::endl << std::endl << response << std::endl;
+			// ---
+
+			return result;
 		}
 
 		void 
 		_sono_action::set(
+			__in const std::string &type,
 			__in const std::string &name,
-			__in const std::string &type
+			__in_opt const std::vector<std::string> &input,
+			__in_opt const std::vector<std::string> &output
 			)
 		{
 
@@ -111,7 +171,9 @@ namespace SONO {
 				THROW_SONO_ACTION_EXCEPTION(SONO_ACTION_EXCEPTION_INVALID);
 			}
 
+			m_input = input;
 			m_name = name;
+			m_output = output;
 			m_type = type;
 		}
 
@@ -121,15 +183,46 @@ namespace SONO {
 			)
 		{
 			std::stringstream result;
+			std::vector<std::string>::iterator iter;
 
-			UNREF_PARAM(verbose);
+			result << SONO_ACTION_HEADER << ", \", ACT. \"" << m_name << "\", IN[" << m_input.size() << "]";
 
-			result << SONO_ACTION_HEADER << ", TYPE. \"" << m_type << "\", ACT. \"" << m_name << "\"";
+			if(verbose && !m_input.empty()) {
+				result << " {";
+
+				for(iter = m_input.begin(); iter != m_input.end(); ++iter) {
+
+					if(iter != m_input.begin()) {
+						result << ", ";
+					}
+
+					result << *iter;
+				}
+
+				result << "}";
+			}
+
+			result << ", OUT[" << m_output.size() << "]";
+
+			if(verbose && !m_output.empty()) {
+				result << " {";
+
+				for(iter = m_output.begin(); iter != m_output.end(); ++iter) {
+
+					if(iter != m_output.begin()) {
+						result << ", ";
+					}
+
+					result << *iter;
+				}
+
+				result << "}";
+			}
 
 			return result.str();
 		}
 
-		std::string 
+		const std::string &
 		_sono_action::type(void)
 		{
 			return m_type;

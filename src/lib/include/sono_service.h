@@ -44,6 +44,8 @@ namespace SONO {
 		#define SONO_SERVICE_INVALID SCALAR_INVALID(sono_service_t)
 		#define SONO_SERVICE_MAX SONO_SERVICE_ZONE_GROUP_TOPOLOGY
 
+		typedef std::set<sono_service_t> sono_service_list;
+
 		typedef struct {
 			sono_uid_t device;
 			std::string address;
@@ -74,7 +76,17 @@ namespace SONO {
 					__in const _sono_service &other
 					);
 
-				sono_service_meta &data(void);
+				sono_action &action(
+					__in const std::string &name
+					);
+
+				sono_action_list action_list(void);
+
+				bool contains(
+					__in const std::string &name
+					);
+
+				const sono_service_meta &data(void);
 
 				virtual void discovery(
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
@@ -83,6 +95,14 @@ namespace SONO {
 				static sono_service_t metadata_as_type(
 					__in const sono_service_meta &data
 					);
+
+				std::map<std::string, std::string> run(
+					__in const std::string &name,
+					__in const std::map<std::string, std::string> &argument,
+					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				size_t size(void);
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false
@@ -96,14 +116,13 @@ namespace SONO {
 					__in const std::string &name
 					);
 
-				std::map<std::string, sono_action>::iterator find(
-					__in const std::string &name
+				void add_action(
+					__in const std::string &name,
+					__in const boost::property_tree::ptree &arguments
 					);
 
-				std::string run(
-					__in const std::string &name,
-					__in const std::string &parameters,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
+				std::map<std::string, sono_action>::iterator find(
+					__in const std::string &name
 					);
 
 				void service_event(
@@ -126,487 +145,6 @@ namespace SONO {
 				sono_service_t m_type;
 
 		} sono_service;
-
-		typedef class _sono_service_alarm_clock :
-				public sono_service {
-
-			public:
-
-				_sono_service_alarm_clock(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_alarm_clock(
-					__in const _sono_service_alarm_clock &other
-					);
-
-				virtual ~_sono_service_alarm_clock(void);
-
-				_sono_service_alarm_clock &operator=(
-					__in const _sono_service_alarm_clock &other
-					);
-
-				// TODO
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_alarm_clock;
-
-		typedef class _sono_service_device_properties :
-				public sono_service {
-
-			public:
-
-				_sono_service_device_properties(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_device_properties(
-					__in const _sono_service_device_properties &other
-					);
-
-				virtual ~_sono_service_device_properties(void);
-
-				_sono_service_device_properties &operator=(
-					__in const _sono_service_device_properties &other
-					);
-
-				// TODO
-
-				std::string get_led_state(
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string set_led_state(
-					__in bool state,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_device_properties;
-
-		typedef class _sono_service_group_management :
-				public sono_service {
-
-			public:
-
-				_sono_service_group_management(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_group_management(
-					__in const _sono_service_group_management &other
-					);
-
-				virtual ~_sono_service_group_management(void);
-
-				_sono_service_group_management &operator=(
-					__in const _sono_service_group_management &other
-					);
-
-				std::string add_member(
-					__in const std::string &id,
-					__in uint32_t seq,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string remove_member(
-					__in const std::string &id,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string report_track_buffering_result(
-					__in const std::string &id,
-					__in uint32_t result,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_group_management;
-
-		typedef class _sono_service_music_services :
-				public sono_service {
-
-			public:
-
-				_sono_service_music_services(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_music_services(
-					__in const _sono_service_music_services &other
-					);
-
-				virtual ~_sono_service_music_services(void);
-
-				_sono_service_music_services &operator=(
-					__in const _sono_service_music_services &other
-					);
-
-				std::string get_session_id(
-					__in uint32_t service,
-					__in const std::string &user,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string list_available_services(
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string update_available_services(
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_music_services;
-
-		typedef class _sono_service_qplay :
-				public sono_service {
-
-			public:
-
-				_sono_service_qplay(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_qplay(
-					__in const _sono_service_qplay &other
-					);
-
-				virtual ~_sono_service_qplay(void);
-
-				_sono_service_qplay &operator=(
-					__in const _sono_service_qplay &other
-					);
-
-				std::string auth(
-					__in const std::string &seed,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_qplay;
-
-		typedef class _sono_service_render_av_transport :
-				public sono_service {
-
-			public:
-
-				_sono_service_render_av_transport(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_render_av_transport(
-					__in const _sono_service_render_av_transport &other
-					);
-
-				virtual ~_sono_service_render_av_transport(void);
-
-				_sono_service_render_av_transport &operator=(
-					__in const _sono_service_render_av_transport &other
-					);
-
-				// TODO
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_render_av_transport;
-
-		typedef class _sono_service_render_connection_manager :
-				public sono_service {
-
-			public:
-
-				_sono_service_render_connection_manager(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_render_connection_manager(
-					__in const _sono_service_render_connection_manager &other
-					);
-
-				virtual ~_sono_service_render_connection_manager(void);
-
-				_sono_service_render_connection_manager &operator=(
-					__in const _sono_service_render_connection_manager &other
-					);
-
-				std::string get_current_connection_ids(
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string get_current_connection_info(
-					__in uint32_t id,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string get_protocol_info(
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_render_connection_manager;
-
-		typedef class _sono_service_render_control :
-				public sono_service {
-
-			public:
-
-				_sono_service_render_control(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_render_control(
-					__in const _sono_service_render_control &other
-					);
-
-				virtual ~_sono_service_render_control(void);
-
-				_sono_service_render_control &operator=(
-					__in const _sono_service_render_control &other
-					);
-
-				// TODO
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_render_control;
-
-		typedef class _sono_service_render_group_control :
-				public sono_service {
-
-			public:
-
-				_sono_service_render_group_control(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_render_group_control(
-					__in const _sono_service_render_group_control &other
-					);
-
-				virtual ~_sono_service_render_group_control(void);
-
-				_sono_service_render_group_control &operator=(
-					__in const _sono_service_render_group_control &other
-					);
-
-				// TODO
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_render_group_control;
-
-		typedef class _sono_service_render_queue :
-				public sono_service {
-
-			public:
-
-				_sono_service_render_queue(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_render_queue(
-					__in const _sono_service_render_queue &other
-					);
-
-				virtual ~_sono_service_render_queue(void);
-
-				_sono_service_render_queue &operator=(
-					__in const _sono_service_render_queue &other
-					);
-
-				// TODO
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_render_queue;
-
-		typedef class _sono_service_server_connection_manager :
-				public sono_service {
-
-			public:
-
-				_sono_service_server_connection_manager(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_server_connection_manager(
-					__in const _sono_service_server_connection_manager &other
-					);
-
-				virtual ~_sono_service_server_connection_manager(void);
-
-				_sono_service_server_connection_manager &operator=(
-					__in const _sono_service_server_connection_manager &other
-					);
-
-				std::string get_current_connection_ids(
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string get_current_connection_info(
-					__in uint32_t id,
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string get_protocol_info(
-					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_server_connection_manager;
-
-		typedef class _sono_service_server_content_directory :
-				public sono_service {
-
-			public:
-
-				_sono_service_server_content_directory(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_server_content_directory(
-					__in const _sono_service_server_content_directory &other
-					);
-
-				virtual ~_sono_service_server_content_directory(void);
-
-				_sono_service_server_content_directory &operator=(
-					__in const _sono_service_server_content_directory &other
-					);
-
-				// TODO
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_server_content_directory;
-
-		typedef class _sono_service_system_properties :
-				public sono_service {
-
-			public:
-
-				_sono_service_system_properties(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_system_properties(
-					__in const _sono_service_system_properties &other
-					);
-
-				virtual ~_sono_service_system_properties(void);
-
-				_sono_service_system_properties &operator=(
-					__in const _sono_service_system_properties &other
-					);
-
-				// TODO
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_system_properties;
-
-		typedef class _sono_service_zone_group_topology :
-				public sono_service {
-
-			public:
-
-				_sono_service_zone_group_topology(
-					__in const sono_service_meta &data
-					);
-
-				_sono_service_zone_group_topology(
-					__in const _sono_service_zone_group_topology &other
-					);
-
-				virtual ~_sono_service_zone_group_topology(void);
-
-				_sono_service_zone_group_topology &operator=(
-					__in const _sono_service_zone_group_topology &other
-					);
-
-				// TODO
-
-			protected:
-
-				void service_event(
-					__in std::string &action,
-					__in std::string &data
-					);
-
-		} sono_service_zone_group_topology;
 	}
 }
 

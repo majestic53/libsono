@@ -24,13 +24,17 @@ namespace SONO {
 
 	namespace COMP {
 
+		typedef std::set<std::string> sono_action_list;
+
 		typedef class _sono_action {
 
 			public:
 
 				_sono_action(
+					__in const std::string &type,
 					__in const std::string &name,
-					__in const std::string &type
+					__in_opt const std::vector<std::string> &input = std::vector<std::string>(),
+					__in_opt const std::vector<std::string> &output = std::vector<std::string>()
 					);
 
 				_sono_action(
@@ -43,30 +47,40 @@ namespace SONO {
 					__in const _sono_action &other
 					);
 
-				std::string name(void);
+				const std::vector<std::string> &input(void);
 
-				std::string run(
+				const std::string &name(void);
+
+				const std::vector<std::string> &output(void);
+
+				std::map<std::string, std::string> run(
 					__in const std::string &path,
 					__in const std::string &address,
 					__in uint16_t port,
-					__in const std::string &parameters,
+					__in const std::map<std::string, std::string> &argument,
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
 				void set(
+					__in const std::string &type,
 					__in const std::string &name,
-					__in const std::string &type
+					__in_opt const std::vector<std::string> &input = std::vector<std::string>(),
+					__in_opt const std::vector<std::string> &output = std::vector<std::string>()
 					);
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					);
 
-				std::string type(void);
+				const std::string &type(void);
 
 			protected:
 
+				std::vector<std::string> m_input;
+
 				std::string m_name;
+
+				std::vector<std::string> m_output;
 
 				std::string m_type;
 

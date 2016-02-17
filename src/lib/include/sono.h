@@ -74,7 +74,23 @@ namespace SONO {
 
 			sono_device_list device_list(void);
 
-			sono_service *device_service(
+			sono_service &device_service(
+				__in sono_uid_t id,
+				__in sono_service_t type
+				);
+
+			sono_action &device_service_action(
+				__in sono_uid_t id,
+				__in sono_service_t type,
+				__in const std::string &name
+				);
+
+			size_t device_service_action_count(
+				__in sono_uid_t id,
+				__in sono_service_t type
+				);
+
+			sono_action_list device_service_action_list(
 				__in sono_uid_t id,
 				__in sono_service_t type
 				);

@@ -56,14 +56,15 @@ namespace SONO {
 				sono_socket_base(other),
 				m_configuration(other.m_configuration),
 				m_household(other.m_household),
+				m_service_map(other.m_service_map),
 				m_uuid(other.m_uuid)
 		{
-			copy_services(other);
+			return;
 		}
 
 		_sono_device::~_sono_device(void)
 		{
-			remove_services();
+			return;
 		}
 
 		_sono_device &
@@ -76,8 +77,8 @@ namespace SONO {
 				sono_socket_base::operator=(other);
 				m_configuration = other.m_configuration;
 				m_household = other.m_household;
+				m_service_map = other.m_service_map;
 				m_uuid = other.m_uuid;
-				copy_services(other);
 			}
 
 			return *this;
@@ -91,21 +92,20 @@ namespace SONO {
 			)
 		{
 			sono_service_t type;
-			std::map<sono_service_t, sono_service *>::iterator iter;
+			std::map<sono_service_t, sono_service>::iterator iter;
 
 			type = sono_service::metadata_as_type(data);
 			if(type <= SONO_SERVICE_MAX) {
 
 				iter = m_service_map.find(type);
 				if(iter == m_service_map.end()) {
-					m_service_map.insert(std::pair<sono_service_t, sono_service *>(type, 
-						create_service(data, type)));
+					m_service_map.insert(std::pair<sono_service_t, sono_service>(type, sono_service(type, data)));
 
 					if(discover) {
 
 						iter = m_service_map.find(type);
 						if(iter != m_service_map.end()) {
-							iter->second->discovery(timeout);
+							iter->second.discovery(timeout);
 						}
 					}
 				}
@@ -120,91 +120,12 @@ namespace SONO {
 			return (m_service_map.find(type) != m_service_map.end());
 		}
 
-		void 
-		_sono_device::copy_services(
-			__in const _sono_device &other
-			)
-		{
-			std::map<sono_service_t, sono_service *>::const_iterator iter;
-
-			remove_services();
-
-			for(iter = other.m_service_map.begin(); iter != other.m_service_map.end(); ++iter) {
-				m_service_map.insert(std::pair<sono_service_t, sono_service *>(iter->second->type(), 
-					create_service(iter->second->data(), iter->second->type())));
-			}
-		}
-
-		sono_service *
-		_sono_device::create_service(
-			__in const sono_service_meta &data,
-			__in sono_service_t type
-			)
-		{
-			sono_service *result = NULL;
-
-			switch(type) {
-				case SONO_SERVICE_ALARM_CLOCK:
-					result = (sono_service *) new sono_service_alarm_clock(data);
-					break;
-				case SONO_SERVICE_DEVICE_PROPERTIES:
-					result = (sono_service *) new sono_service_device_properties(data);
-					break;
-				case SONO_SERVICE_GROUP_MANAGEMENT:
-					result = (sono_service *) new sono_service_group_management(data);
-					break;
-				case SONO_SERVICE_MUSIC_SERVICES:
-					result = (sono_service *) new sono_service_music_services(data);
-					break;
-				case SONO_SERVICE_QPLAY:
-					result = (sono_service *) new sono_service_qplay(data);
-					break;
-				case SONO_SERVICE_RENDER_AV_TRANSPORT:
-					result = (sono_service *) new sono_service_render_av_transport(data);
-					break;
-				case SONO_SERVICE_RENDER_CONNECTION_MANAGER:
-					result = (sono_service *) new sono_service_render_connection_manager(data);
-					break;
-				case SONO_SERVICE_RENDER_CONTROL:
-					result = (sono_service *) new sono_service_render_control(data);
-					break;
-				case SONO_SERVICE_RENDER_GROUP_CONTROL:
-					result = (sono_service *) new sono_service_render_group_control(data);
-					break;
-				case SONO_SERVICE_RENDER_QUEUE:
-					result = (sono_service *) new sono_service_render_queue(data);
-					break;
-				case SONO_SERVICE_SERVER_CONNECTION_MANAGER:
-					result = (sono_service *) new sono_service_server_connection_manager(data);
-					break;
-				case SONO_SERVICE_SERVER_CONTENT_DIRECTORY:
-					result = (sono_service *) new sono_service_server_content_directory(data);
-					break;
-				case SONO_SERVICE_SYSTEM_PROPERTIES:
-					result = (sono_service *) new sono_service_system_properties(data);
-					break;
-				case SONO_SERVICE_ZONE_GROUP_TOPOLOGY:
-					result = (sono_service *) new sono_service_zone_group_topology(data);
-					break;
-				default:
-					THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_UNSUPPORTED,
-						"%s --> service: 0x%x", STRING_CHECK(sono_socket_base::to_string()), type);
-			}
-
-			if(!result) {
-				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_ALLOCATED,
-					"%s --> service: 0x%x", STRING_CHECK(sono_socket_base::to_string()), type);
-			}
-
-			return result;
-		}
-
-		std::map<sono_service_t, sono_service *>::iterator 
+		std::map<sono_service_t, sono_service>::iterator 
 		_sono_device::find(
 			__in sono_service_t type
 			)
 		{
-			std::map<sono_service_t, sono_service *>::iterator result;
+			std::map<sono_service_t, sono_service>::iterator result;
 
 			result = m_service_map.find(type);
 			if(result == m_service_map.end()) {
@@ -228,48 +149,13 @@ namespace SONO {
 			data.type = child->second.get<std::string>(SONO_DEVICE_XML_SERVICE_TAG_TYPE);
 		}
 
-		std::string 
+		const std::string &
 		_sono_device::household(void)
 		{
 			return m_household;
 		}
 
-		void 
-		_sono_device::remove_service(
-			__in sono_service_t type
-			)
-		{
-			std::map<sono_service_t, sono_service *>::iterator iter;
-
-			iter = m_service_map.find(type);
-			if(iter == m_service_map.end()) {
-
-				if(iter->second) {
-					delete iter->second;
-					iter->second = NULL;
-				}
-
-				m_service_map.erase(iter);
-			}
-		}
-
-		void 
-		_sono_device::remove_services(void)
-		{
-			std::map<sono_service_t, sono_service *>::iterator iter;
-
-			for(iter = m_service_map.begin(); iter != m_service_map.end(); ++iter) {
-
-				if(iter->second) {
-					delete iter->second;
-					iter->second = NULL;
-				}
-			}
-
-			m_service_map.clear();
-		}
-
-		sono_service *
+		sono_service &
 		_sono_device::service(
 			__in sono_service_t type
 			)
@@ -287,12 +173,12 @@ namespace SONO {
 			sono_http_encode_t encoding;			
 			std::string body, body_encoded, response;
 			boost::property_tree::ptree child, child_inner, root;
-			std::map<sono_service_t, sono_service *>::iterator iter_svc;
+			std::map<sono_service_t, sono_service>::iterator iter_svc;
 			std::vector<boost::property_tree::ptree::value_type> child_root;
 			boost::property_tree::ptree::const_iterator iter_child, iter_child_inner;
 			std::vector<boost::property_tree::ptree::value_type>::const_iterator iter_root;
 
-			remove_services();
+			m_service_map.clear();
 
 			try {
 				response = sono_http::get(m_configuration.path(), socket().address(), socket().port(), 
@@ -350,7 +236,7 @@ namespace SONO {
 				}
 
 				for(iter_svc = m_service_map.begin(); iter_svc != m_service_map.end(); ++iter_svc) {
-					iter_svc->second->discovery(timeout);
+					iter_svc->second.discovery(timeout);
 				}
 			} catch(sono_exception &exc) {
 				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_DISCOVERY,
@@ -367,7 +253,7 @@ namespace SONO {
 		_sono_device::service_list(void)
 		{
 			sono_service_list result;
-			std::map<sono_service_t, sono_service *>::iterator iter;
+			std::map<sono_service_t, sono_service>::iterator iter;
 
 			for(iter = m_service_map.begin(); iter != m_service_map.end(); ++iter) {
 				result.insert(iter->first);
@@ -388,19 +274,19 @@ namespace SONO {
 			)
 		{
 			std::stringstream result;
-			std::map<sono_service_t, sono_service *>::iterator iter;
+			std::map<sono_service_t, sono_service>::iterator iter;
 
 			result << "{" << STRING_CHECK(m_household) << ":" << STRING_CHECK(m_uuid) << "}, "
 				<< sono_socket_base::to_string(verbose) << ", SVC. " << m_service_map.size();
 
 			for(iter = m_service_map.begin(); iter != m_service_map.end(); ++iter) {
-				result << std::endl << "---- " << iter->second->to_string(verbose);
+				result << std::endl << "---- " << iter->second.to_string(verbose);
 			}
 
 			return result.str();
 		}
 
-		std::string 
+		const std::string &
 		_sono_device::uuid(void)
 		{
 			return m_uuid;

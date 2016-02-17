@@ -45,12 +45,16 @@ sonoctl [-h|-v][-l]
 Changelog
 =========
 
-###Version 0.1.1607
-*Updated 2/15/2016*
+###Version 0.1.1608
+*Updated: 2/16/2016*
+
+* Modified actions to be indexed by string
+
+*Updated: 2/15/2016*
 
 * Added device service actions
 
-###Version 0.1.1606
+###Version 0.1.1607
 *Updated: 2/14/2016*
 
 * Added device service action discovery support (incomplete)

@@ -28,6 +28,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace SONO {
 
@@ -72,8 +73,8 @@ namespace SONO {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 1
-	#define VERSION_WEEK 1607
+	#define VERSION_REVISION 3
+	#define VERSION_WEEK 1608
 
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) "." \

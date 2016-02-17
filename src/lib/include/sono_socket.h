@@ -59,7 +59,7 @@ namespace SONO {
 					__in const _sono_socket &other
 					);
 
-				std::string address(void);
+				const std::string &address(void);
 
 				void connect(
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
