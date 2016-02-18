@@ -20,6 +20,7 @@ CC_FLAGS=-march=native -pthread -std=gnu++11 -O3 -Wall -Werror
 DIR_BIN=./../../bin/
 DIR_BUILD=./../../build/
 DIR_INC=include/
+DIR_ROOT=./
 DIR_SRC=src/
 LIB=libsono.a
 
@@ -28,13 +29,19 @@ all: build archive
 archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
-	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o \
-		$(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_service.o \
-		$(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
+	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)libsono.o $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o \
+		$(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o \
+		$(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: sono.o sono_action.o sono_device.o sono_exception.o sono_http.o sono_service.o sono_socket.o sono_uid.o sono_xml.o
+build: libsono.o sono.o sono_action.o sono_device.o sono_exception.o sono_http.o sono_service.o sono_socket.o sono_uid.o \
+	sono_xml.o
+
+# LIB
+
+libsono.o: $(DIR_SRC)libsono.cpp $(DIR_ROOT)libsono.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)libsono.cpp -o $(DIR_BUILD)libsono.o
 
 # SONO
 

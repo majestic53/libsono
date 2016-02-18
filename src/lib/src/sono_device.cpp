@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <regex>
 #include "../include/sono.h"
 #include "../include/sono_device_type.h"
 
@@ -34,6 +35,14 @@ namespace SONO {
 		#define SONO_DEVICE_XML_SERVICE_TAG_LIST "serviceList"
 		#define SONO_DEVICE_XML_SERVICE_TAG_SCPD_URL "SCPDURL"
 		#define SONO_DEVICE_XML_SERVICE_TAG_TYPE "serviceType"
+
+		enum {
+			SONO_DEVICE_SERVICE_ROOT = 0,
+			SONO_DEVICE_SERVICE_NAME,
+		};
+
+		#define SONO_DEVICE_SERVICE_MAX SONO_DEVICE_SERVICE_NAME
+		#define SONO_DEVICE_SERVICE_REGEX ".*:service:(.*):.*"
 
 		_sono_device::_sono_device(
 			__in const std::string &uuid,					
@@ -91,22 +100,28 @@ namespace SONO {
 			__in_opt uint32_t timeout
 			)
 		{
-			sono_service_t type;
-			std::map<sono_service_t, sono_service>::iterator iter;
+			std::string name;
+			std::match_results<const char *> match;
+			std::map<std::string, sono_service>::iterator iter;
 
-			type = sono_service::metadata_as_type(data);
-			if(type <= SONO_SERVICE_MAX) {
+			std::regex_search(data.type.c_str(), match, std::regex(SONO_DEVICE_SERVICE_REGEX));
+			if(match.size() != (SONO_DEVICE_SERVICE_MAX + 1)) {
+				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_MALFORMED,
+					"std::regex_search(service) found %lu entries (should be %lu)", match.size(),
+					SONO_DEVICE_SERVICE_MAX + 1);
+			}
 
-				iter = m_service_map.find(type);
-				if(iter == m_service_map.end()) {
-					m_service_map.insert(std::pair<sono_service_t, sono_service>(type, sono_service(type, data)));
+			name = match[SONO_DEVICE_SERVICE_NAME];
 
-					if(discover) {
+			iter = m_service_map.find(name);
+			if(iter == m_service_map.end()) {
+				m_service_map.insert(std::pair<std::string, sono_service>(name, sono_service(name, data)));
 
-						iter = m_service_map.find(type);
-						if(iter != m_service_map.end()) {
-							iter->second.discovery(timeout);
-						}
+				if(discover) {
+
+					iter = m_service_map.find(name);
+					if(iter != m_service_map.end()) {
+						iter->second.discovery(timeout);
 					}
 				}
 			}
@@ -114,23 +129,23 @@ namespace SONO {
 
 		bool 
 		_sono_device::contains(
-			__in sono_service_t type
+			__in const std::string &type
 			)
 		{
 			return (m_service_map.find(type) != m_service_map.end());
 		}
 
-		std::map<sono_service_t, sono_service>::iterator 
+		std::map<std::string, sono_service>::iterator 
 		_sono_device::find(
-			__in sono_service_t type
+			__in const std::string &type
 			)
 		{
-			std::map<sono_service_t, sono_service>::iterator result;
+			std::map<std::string, sono_service>::iterator result;
 
 			result = m_service_map.find(type);
 			if(result == m_service_map.end()) {
 				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_NOT_FOUND, 
-					"%s --> service: 0x%x", STRING_CHECK(sono_socket_base::to_string()), type);
+					"%s --> service: %s", STRING_CHECK(sono_socket_base::to_string()), STRING_CHECK(type));
 			}
 
 			return result;
@@ -157,7 +172,7 @@ namespace SONO {
 
 		sono_service &
 		_sono_device::service(
-			__in sono_service_t type
+			__in const std::string &type
 			)
 		{
 			return find(type)->second;
@@ -173,7 +188,7 @@ namespace SONO {
 			sono_http_encode_t encoding;			
 			std::string body, body_encoded, response;
 			boost::property_tree::ptree child, child_inner, root;
-			std::map<sono_service_t, sono_service>::iterator iter_svc;
+			std::map<std::string, sono_service>::iterator iter_svc;
 			std::vector<boost::property_tree::ptree::value_type> child_root;
 			boost::property_tree::ptree::const_iterator iter_child, iter_child_inner;
 			std::vector<boost::property_tree::ptree::value_type>::const_iterator iter_root;
@@ -253,7 +268,7 @@ namespace SONO {
 		_sono_device::service_list(void)
 		{
 			sono_service_list result;
-			std::map<sono_service_t, sono_service>::iterator iter;
+			std::map<std::string, sono_service>::iterator iter;
 
 			for(iter = m_service_map.begin(); iter != m_service_map.end(); ++iter) {
 				result.insert(iter->first);
@@ -274,7 +289,7 @@ namespace SONO {
 			)
 		{
 			std::stringstream result;
-			std::map<sono_service_t, sono_service>::iterator iter;
+			std::map<std::string, sono_service>::iterator iter;
 
 			result << "{" << STRING_CHECK(m_household) << ":" << STRING_CHECK(m_uuid) << "}, "
 				<< sono_socket_base::to_string(verbose) << ", SVC. " << m_service_map.size();
@@ -344,6 +359,34 @@ namespace SONO {
 			}
 
 			return find(id)->second.first;
+		}
+
+		sono_device &
+		_sono_device_factory::at(
+			__in const std::string &address,
+			__in uint16_t port
+			)
+		{
+			std::map<sono_uid_t, std::pair<sono_device, size_t>>::iterator iter;
+
+			if(!m_initialized) {
+				THROW_SONO_DEVICE_EXCEPTION(SONO_DEVICE_EXCEPTION_UNINITIALIZED);
+			}
+
+			for(iter = m_map.begin(); iter != m_map.end(); ++iter) {
+
+				if((iter->second.first.socket().address() == address)
+						&& (iter->second.first.socket().port() == port)) {
+					break;
+				}
+			}
+
+			if(iter == m_map.end()) {
+				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_NOT_FOUND, "%s:%u", 
+					STRING_CHECK(address), port);
+			}
+
+			return iter->second.first;
 		}
 
 		void 

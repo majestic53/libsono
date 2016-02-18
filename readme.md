@@ -46,6 +46,11 @@ Changelog
 =========
 
 ###Version 0.1.1608
+*Updated: 2/17/2016*
+
+* Modified device services to be indexed by string
+* Added c-style header
+
 *Updated: 2/16/2016*
 
 * Modified actions to be indexed by string

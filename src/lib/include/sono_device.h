@@ -50,13 +50,13 @@ namespace SONO {
 					);
 
 				bool contains(
-					__in sono_service_t type
+					__in const std::string &type
 					);
 
 				const std::string &household(void);
 
 				sono_service &service(
-					__in sono_service_t type
+					__in const std::string &type
 					);
 
 				sono_service_list service_discovery(
@@ -81,8 +81,8 @@ namespace SONO {
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
-				std::map<sono_service_t, sono_service>::iterator find(
-					__in sono_service_t type
+				std::map<std::string, sono_service>::iterator find(
+					__in const std::string &type
 					);
 
 				void extract_service_metadata(
@@ -94,7 +94,7 @@ namespace SONO {
 
 				std::string m_household;
 
-				std::map<sono_service_t, sono_service> m_service_map;
+				std::map<std::string, sono_service> m_service_map;
 
 				std::string m_uuid;
 
@@ -110,6 +110,11 @@ namespace SONO {
 
 				sono_device &at(
 					__in sono_uid_t id
+					);
+
+				sono_device &at(
+					__in const std::string &address,
+					__in uint16_t port
 					);
 
 				void clear(void);

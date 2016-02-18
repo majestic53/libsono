@@ -24,28 +24,6 @@ namespace SONO {
 
 	namespace COMP {
 
-		typedef enum {
-			SONO_SERVICE_ALARM_CLOCK = 0,
-			SONO_SERVICE_DEVICE_PROPERTIES,
-			SONO_SERVICE_GROUP_MANAGEMENT,
-			SONO_SERVICE_MUSIC_SERVICES,
-			SONO_SERVICE_QPLAY,
-			SONO_SERVICE_RENDER_AV_TRANSPORT,
-			SONO_SERVICE_RENDER_CONNECTION_MANAGER,
-			SONO_SERVICE_RENDER_CONTROL,
-			SONO_SERVICE_RENDER_GROUP_CONTROL,
-			SONO_SERVICE_RENDER_QUEUE,
-			SONO_SERVICE_SERVER_CONNECTION_MANAGER,
-			SONO_SERVICE_SERVER_CONTENT_DIRECTORY,
-			SONO_SERVICE_SYSTEM_PROPERTIES,
-			SONO_SERVICE_ZONE_GROUP_TOPOLOGY,
-		} sono_service_t;
-
-		#define SONO_SERVICE_INVALID SCALAR_INVALID(sono_service_t)
-		#define SONO_SERVICE_MAX SONO_SERVICE_ZONE_GROUP_TOPOLOGY
-
-		typedef std::set<sono_service_t> sono_service_list;
-
 		typedef struct {
 			sono_uid_t device;
 			std::string address;
@@ -57,12 +35,14 @@ namespace SONO {
 			std::string type;
 		} sono_service_meta;
 
+		typedef std::set<std::string> sono_service_list;
+
 		typedef class _sono_service {
 
 			public:
 
 				_sono_service(
-					__in sono_service_t type,
+					__in const std::string &type,
 					__in const sono_service_meta &data
 					);
 
@@ -92,13 +72,9 @@ namespace SONO {
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
-				static sono_service_t metadata_as_type(
-					__in const sono_service_meta &data
-					);
-
-				std::map<std::string, std::string> run(
+				sono_action_argument run(
 					__in const std::string &name,
-					__in const std::map<std::string, std::string> &argument,
+					__in const sono_action_argument &argument,
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
@@ -108,7 +84,7 @@ namespace SONO {
 					__in_opt bool verbose = false
 					);
 
-				sono_service_t type(void);
+				const std::string &type(void);
 
 			protected:
 
@@ -126,13 +102,13 @@ namespace SONO {
 					);
 
 				void service_event(
-					__in sono_service_t service,
-					__in std::string &action,
-					__in std::string &data
+					__in const std::string &service,
+					__in const std::string &action,
+					__in const std::string &data
 					);
 
 				void set(
-					__in sono_service_t type,
+					__in const std::string &type,
 					__in const sono_service_meta &data
 					);
 
@@ -142,7 +118,7 @@ namespace SONO {
 		
 				sono_service_meta m_data;
 	
-				sono_service_t m_type;
+				std::string m_type;
 
 		} sono_service;
 	}

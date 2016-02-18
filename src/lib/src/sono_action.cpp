@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <regex>
 #include "../include/sono.h"
 #include "../include/sono_action_type.h"
 
@@ -24,6 +25,7 @@ namespace SONO {
 
 	namespace COMP {
 
+		#define SONO_ACTION_BACKTRACE "(" SONO_ACTION_WILDCARD ")"
 		#define SONO_ACTION_BODY_PREFIX \
 			"<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" \
 			"<s:Body>"
@@ -39,6 +41,14 @@ namespace SONO {
 		#define SONO_ACTION_CLOSE_BRACKET ">"
 		#define SONO_ACTION_OPEN_BRACKET "<"
 		#define SONO_ACTION_OPEN_BRACKET_TERM "</"
+		#define SONO_ACTION_WILDCARD ".*"
+
+		enum {
+			SONO_ACTION_RESPONSE_ROOT = 0,
+			SONO_ACTION_RESPONSE_VALUE,
+		};
+
+		#define SONO_ACTION_RESPONSE_MAX SONO_ACTION_RESPONSE_VALUE
 
 		_sono_action::_sono_action(
 			__in const std::string &type,
@@ -100,12 +110,37 @@ namespace SONO {
 			return m_output;
 		}
 
-		std::map<std::string, std::string> 
+		sono_action_argument 
+		_sono_action::parse_response(
+			__in const std::string &response
+			)
+		{
+			std::stringstream search;
+			sono_action_argument result;
+			std::match_results<const char *> match;
+			std::vector<std::string>::iterator iter;
+
+			for(iter = m_output.begin(); iter != m_output.end(); ++iter) {
+				search << SONO_ACTION_WILDCARD << SONO_ACTION_OPEN_BRACKET << *iter 
+					<< SONO_ACTION_CLOSE_BRACKET << SONO_ACTION_BACKTRACE 
+					<< SONO_ACTION_OPEN_BRACKET_TERM << *iter << SONO_ACTION_CLOSE_BRACKET
+					<< SONO_ACTION_WILDCARD;
+
+				std::regex_search(response.c_str(), match, std::regex(search.str().c_str()));
+				if(match.size() == (SONO_ACTION_RESPONSE_MAX + 1)) {
+					result.insert(std::pair<std::string, std::string>(*iter, match[SONO_ACTION_RESPONSE_VALUE]));	
+				}
+			}
+
+			return result;
+		}
+
+		sono_action_argument 
 		_sono_action::run(
 			__in const std::string &path,
 			__in const std::string &address,
 			__in uint16_t port,
-			__in const std::map<std::string, std::string> &argument,
+			__in const sono_action_argument &argument,
 			__in_opt uint32_t timeout
 			)
 		{
@@ -113,12 +148,12 @@ namespace SONO {
 			size_t iter = 0;
 			std::string response;
 			std::stringstream head, body;
-			std::map<std::string, std::string> result;
-			std::map<std::string, std::string>::const_iterator entry;
+			sono_action_argument::const_iterator entry;
 
 			if(argument.size() != m_input.size()) {
 				THROW_SONO_ACTION_EXCEPTION_FORMAT(SONO_ACTION_EXCEPTION_INVALID_ARGUMENT_COUNT,
-					"found %lu arguments (expecting %lu)", argument.size(), m_input.size());
+					"%s: found %lu arguments (expecting %lu)", STRING_CHECK(m_name), argument.size(), 
+					m_input.size());
 			}
 
 			head << SONO_ACTION_PREFIX << m_type << SONO_ACTION_DIVIDER << m_name << SONO_ACTION_SUFFIX;
@@ -147,15 +182,7 @@ namespace SONO {
 					"%s --> %u", STRING_CHECK(m_name), code);
 			}
 
-			response = sono_http::remove_header(response);
-
-			// TODO: parse response and populate result map
-
-			// TODO
-			std::cout << std::endl << head.str() << std::endl << body.str() << std::endl << std::endl << response << std::endl;
-			// ---
-
-			return result;
+			return parse_response(sono_http::remove_header(response));
 		}
 
 		void 

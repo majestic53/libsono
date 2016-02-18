@@ -25,63 +25,6 @@ namespace SONO {
 
 	namespace COMP {
 
-		static const std::string SONO_SERVICE_STR[] = {
-			"ALARM_CLOCK",
-			"DEVICE_PROPERTIES",
-			"GROUP_MANAGEMENT",
-			"MUSIC_SERVICES",
-			"QPLAY",
-			"RENDER_AV_TRANSPORT",
-			"SONO_SERVICE_RENDER_CONNECTION_MANAGER",
-			"SONO_SERVICE_RENDER_CONTROL",
-			"SONO_SERVICE_RENDER_GROUP_CONTROL",
-			"SONO_SERVICE_RENDER_QUEUE",
-			"SONO_SERVICE_SERVER_CONNECTION_MANAGER",
-			"SONO_SERVICE_SERVER_CONTENT_DIRECTORY",
-			"SONO_SERVICE_SYSTEM_PROPERTIES",
-			"SONO_SERVICE_ZONE_GROUP_TOPOLOGY",
-			};
-
-		#define SONO_SERVICE_STRING(_TYPE_) \
-			((_TYPE_) > SONO_SERVICE_MAX ? STRING_UNKNOWN : \
-			STRING_CHECK(SONO_SERVICE_STR[_TYPE_]))
-
-		static const std::string SONO_SERVICE_TYPE_STR[] = {
-			"AlarmClock",
-			"DeviceProperties",
-			"GroupManagement",
-			"MusicServices",
-			"QPlay",
-			"AVTransport",
-			"ConnectionManager",
-			"RenderingControl",
-			"GroupRenderingControl",
-			"Queue",
-			"ConnectionManager",
-			"ContentDirectory",
-			"SystemProperties",
-			"ZoneGroupTopology",
-			};
-
-		#define SONO_SERVICE_TYPE_STRING(_TYPE_) \
-			((_TYPE_) > SONO_SERVICE_MAX ? STRING_UNKNOWN : \
-			STRING_CHECK(SONO_SERVICE_TYPE_STR[_TYPE_]))
-
-		enum {
-			SONO_SERVICE_MEDIA_SERVER = 0,
-			SONO_SERVICE_MEDIA_RENDERER,
-		};
-
-		#define SONO_SERVICE_MEDIA_MAX SONO_SERVICE_MEDIA_RENDERER
-
-		static const std::string SONO_SERVICE_MEDIA_STR[] = {
-			"MediaServer", "MediaRenderer",
-			};
-
-		#define SONO_SERVICE_MEDIA_STRING(_TYPE_) \
-			((_TYPE_) > SONO_SERVICE_MEDIA_MAX ? STRING_UNKNOWN : \
-			STRING_CHECK(SONO_SERVICE_MEDIA_STR[_TYPE_]))
-
 		#define SONO_SERVICE_XML_ACTION_TAG "action"
 		#define SONO_SERVICE_XML_ACTION_TAG_DIRECTION "direction"
 		#define SONO_SERVICE_XML_ACTION_TAG_LIST "actionList"
@@ -93,11 +36,10 @@ namespace SONO {
 		#define SONO_SERVICE_XML_ROOT_TAG "scpd"
 
 		_sono_service::_sono_service(
-			__in sono_service_t type,
+			__in const std::string &type,
 			__in const sono_service_meta &data
 			) :
-				m_configuration(std::string()),
-				m_type(SONO_SERVICE_INVALID)
+				m_configuration(std::string())
 		{
 			set(type, data);
 		}
@@ -294,54 +236,10 @@ namespace SONO {
 			return result;
 		}
 
-		sono_service_t 
-		_sono_service::metadata_as_type(
-			__in const sono_service_meta &data
-			)
-		{
-			size_t iter_media = 0, iter_type = 0;
-			sono_service_t result = SONO_SERVICE_INVALID;
-
-			for(; iter_type <= SONO_SERVICE_MAX; ++iter_type) {
-
-				if(data.type.find(SONO_SERVICE_TYPE_STRING(iter_type)) != std::string::npos) {
-					break;
-				}
-			}
-
-			if(iter_type > SONO_SERVICE_MAX) {
-				THROW_SONO_SERVICE_EXCEPTION(SONO_SERVICE_EXCEPTION_UNKNOWN_TYPE);
-			} else if((iter_type == SONO_SERVICE_RENDER_CONNECTION_MANAGER)
-					|| (iter_type == SONO_SERVICE_SERVER_CONNECTION_MANAGER)) {
-
-				for(; iter_media <= SONO_SERVICE_MEDIA_MAX; ++iter_media) {
-
-					if(data.control.find(SONO_SERVICE_MEDIA_STRING(iter_media)) != std::string::npos) {
-						break;
-					}
-				}
-
-				switch(iter_media) {
-					case SONO_SERVICE_MEDIA_SERVER:
-						iter_type = SONO_SERVICE_SERVER_CONNECTION_MANAGER;
-						break;
-					case SONO_SERVICE_MEDIA_RENDERER:
-						iter_type = SONO_SERVICE_RENDER_CONNECTION_MANAGER;
-						break;
-					default:
-						THROW_SONO_SERVICE_EXCEPTION(SONO_SERVICE_EXCEPTION_UNKNOWN_TYPE);
-				}
-			}
-
-			result = (sono_service_t) iter_type;
-
-			return result;
-		}
-
-		std::map<std::string, std::string> 
+		sono_action_argument 
 		_sono_service::run(
 			__in const std::string &name,
-			__in const std::map<std::string, std::string> &argument,
+			__in const sono_action_argument &argument,
 			__in_opt uint32_t timeout
 			)
 		{
@@ -350,9 +248,9 @@ namespace SONO {
 
 		void 
 		_sono_service::service_event(
-			__in sono_service_t service,
-			__in std::string &action,
-			__in std::string &data
+			__in const std::string &service,
+			__in const std::string &action,
+			__in const std::string &data
 			)
 		{
 			sono_manager *instance = NULL;
@@ -368,14 +266,13 @@ namespace SONO {
 
 		void 
 		_sono_service::set(
-			__in sono_service_t type,
+			__in const std::string &type,
 			__in const sono_service_meta &data
 			)
 		{
 
-			if(type > SONO_SERVICE_MAX) {
-				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_INVALID_TYPE,
-					"0x%x", type);
+			if(type.empty()) {
+				THROW_SONO_SERVICE_EXCEPTION(SONO_SERVICE_EXCEPTION_INVALID_TYPE);
 			}
 
 			m_data = data;
@@ -396,7 +293,7 @@ namespace SONO {
 			std::stringstream result;
 			std::map<std::string, sono_action>::iterator iter;
 
-			result << SONO_SERVICE_HEADER << " " << SONO_SERVICE_STRING(m_type) << ", ACT. " 
+			result << SONO_SERVICE_HEADER << " " << STRING_CHECK(m_type) << ", ACT. " 
 				<< m_action_map.size();
 
 			for(iter = m_action_map.begin(); iter != m_action_map.end(); ++iter) {
@@ -406,7 +303,7 @@ namespace SONO {
 			return result.str();
 		}
 
-		sono_service_t 
+		const std::string &
 		_sono_service::type(void)
 		{
 			return m_type;

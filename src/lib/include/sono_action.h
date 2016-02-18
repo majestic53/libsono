@@ -24,6 +24,7 @@ namespace SONO {
 
 	namespace COMP {
 
+		typedef std::map<std::string, std::string> sono_action_argument;
 		typedef std::set<std::string> sono_action_list;
 
 		typedef class _sono_action {
@@ -53,11 +54,11 @@ namespace SONO {
 
 				const std::vector<std::string> &output(void);
 
-				std::map<std::string, std::string> run(
+				sono_action_argument run(
 					__in const std::string &path,
 					__in const std::string &address,
 					__in uint16_t port,
-					__in const std::map<std::string, std::string> &argument,
+					__in const sono_action_argument &argument,
 					__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
@@ -75,6 +76,10 @@ namespace SONO {
 				const std::string &type(void);
 
 			protected:
+
+				sono_action_argument parse_response(
+					__in const std::string &response
+					);
 
 				std::vector<std::string> m_input;
 

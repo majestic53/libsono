@@ -49,9 +49,9 @@ namespace SONO {
 
 	typedef void (*sono_event_handler)(
 		__in sono_uid_t device,
-		__in sono_service_t service,
-		__in std::string &action,
-		__in std::string &data
+		__in const std::string &service,
+		__in const std::string &action,
+		__in const std::string &data
 		);
 
 	typedef class _sono_manager {
@@ -66,6 +66,11 @@ namespace SONO {
 				__in sono_uid_t id
 				);
 
+			sono_device &device(
+				__in const std::string &address,
+				__in uint16_t port
+				);
+
 			size_t device_count(void);
 
 			sono_device_list device_discovery(
@@ -73,40 +78,6 @@ namespace SONO {
 				);
 
 			sono_device_list device_list(void);
-
-			sono_service &device_service(
-				__in sono_uid_t id,
-				__in sono_service_t type
-				);
-
-			sono_action &device_service_action(
-				__in sono_uid_t id,
-				__in sono_service_t type,
-				__in const std::string &name
-				);
-
-			size_t device_service_action_count(
-				__in sono_uid_t id,
-				__in sono_service_t type
-				);
-
-			sono_action_list device_service_action_list(
-				__in sono_uid_t id,
-				__in sono_service_t type
-				);
-
-			size_t device_service_count(
-				__in sono_uid_t id
-				);
-
-			sono_service_list device_service_discovery(
-				__in sono_uid_t id,
-				__in_opt uint32_t timeout = SONO_SOCKET_NO_TIMEOUT
-				);
-
-			sono_service_list device_service_list(
-				__in sono_uid_t id
-				);
 
 			void initialize(
 				__in sono_event_handler handler
@@ -118,9 +89,9 @@ namespace SONO {
 
 			void service_event(
 				__in sono_uid_t device,
-				__in sono_service_t service,
-				__in std::string &action,
-				__in std::string &data
+				__in const std::string &service,
+				__in const std::string &action,
+				__in const std::string &data
 				);
 
 			std::string to_string(
