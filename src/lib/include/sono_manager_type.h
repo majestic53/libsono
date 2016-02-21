@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SONO_TYPE_H_
-#define SONO_TYPE_H_
+#ifndef SONO_MANAGER_TYPE_H_
+#define SONO_MANAGER_TYPE_H_
 
 namespace SONO {
 
@@ -59,4 +59,4 @@ namespace SONO {
 		_FORMAT_, __VA_ARGS__)
 }
 
-#endif // SONO_TYPE_H_
+#endif // SONO_MANAGER_TYPE_H_

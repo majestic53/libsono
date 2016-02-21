@@ -29,27 +29,27 @@ all: build archive
 archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
-	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)libsono.o $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o \
-		$(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o \
-		$(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
+	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o \
+		$(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_manager.o \
+		$(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: libsono.o sono.o sono_action.o sono_device.o sono_exception.o sono_http.o sono_service.o sono_socket.o sono_uid.o \
-	sono_xml.o
+build: sono.o sono_action.o sono_device.o sono_exception.o sono_http.o sono_manager.o sono_service.o \
+	sono_socket.o sono_uid.o sono_xml.o
 
 # LIB
 
-libsono.o: $(DIR_SRC)libsono.cpp $(DIR_ROOT)libsono.h
-	$(CC) $(CC_FLAGS) -c $(DIR_SRC)libsono.cpp -o $(DIR_BUILD)libsono.o
+sono.o: $(DIR_SRC)sono.cpp $(DIR_ROOT)sono.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono.cpp -o $(DIR_BUILD)sono.o
 
 # SONO
 
-sono.o: $(DIR_SRC)sono.cpp $(DIR_INC)sono.h
-	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono.cpp -o $(DIR_BUILD)sono.o
-
 sono_exception.o: $(DIR_SRC)sono_exception.cpp $(DIR_INC)sono_exception.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_exception.cpp -o $(DIR_BUILD)sono_exception.o
+
+sono_manager.o: $(DIR_SRC)sono_manager.cpp $(DIR_INC)sono_manager.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_manager.cpp -o $(DIR_BUILD)sono_manager.o
 
 # SONO::COMP
 

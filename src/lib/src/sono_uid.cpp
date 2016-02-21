@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../include/sono.h"
+#include "../include/sono_manager.h"
 #include "../include/sono_uid_type.h"
 
 namespace SONO {

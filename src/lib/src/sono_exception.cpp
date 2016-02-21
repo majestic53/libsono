@@ -18,7 +18,7 @@
  */
 
 #include <cstdarg>
-#include "../include/sono.h"
+#include "../include/sono_manager.h"
 
 namespace SONO {
 

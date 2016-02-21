@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBSONO_H_
-#define LIBSONO_H_
+#ifndef SONO_H_
+#define SONO_H_
 
 #include <stdint.h>
 
@@ -26,65 +26,101 @@
 extern "C" {
 #endif // __cplusplus
 
+// Argument name/value max length (in bytes)
+#define SONO_ARG_LEN 32
+
+// Device address max length (in bytes)
 #define SONO_DEV_ADDR_LEN 24
-#define SONO_PARAM_LEN 64
+
+/*
+ * Determine if call to library was successful
+ * @param _ERR_ Library error code return
+ * @return bool
+ */
 #define SONO_SUCCESS(_ERR_) ((_ERR_) == SONO_ERR_NONE)
 
+// Library error codes
 typedef enum {
-	SONO_ERR_NONE = 0,
-	SONO_ERR_FAILED,
-	SONO_ERR_INVALID,
+	SONO_ERR_NONE = 0,			// no error
+	SONO_ERR_FAILED,			// call failed
+	SONO_ERR_INVALID,			// user passed invalid arguments
 } sono_err_t;
 
+/*
+ * Device information structure
+ */
 typedef struct {
+
+	// device uid
 	uint8_t id;
+
+	// device address (as string)
 	char addr[SONO_DEV_ADDR_LEN];
+
+	// device port
 	uint16_t port;
 } sono_dev;
 
+/*
+ * Device action arguments structure
+ */
 typedef struct {
-	char name[SONO_PARAM_LEN];
-	char val[SONO_PARAM_LEN];
-} sono_dev_param;
 
+	// action argument name (as string)
+	char name[SONO_ARG_LEN];
+
+	// action argument value (as string)
+	char val[SONO_ARG_LEN];
+} sono_dev_arg;
+
+/*
+ * Device service event callback
+ * @param id Device uid
+ * @param svc Device service name
+ * @param act Device action name
+ * @param data Event data
+ */
 typedef void (*sono_evt_cb)(
-	/*__in*/ uint8_t dev_id,
+	/*__in*/ uint32_t id,
 	/*__in*/ const char *svc,
 	/*__in*/ const char *act,
 	/*__in*/ const char *data
 	);
 
+// TODO: complete documentation
 sono_err_t sono_init(
-	/*__in*/ sono_evt_cb evt_hdl
+	/*__in*/ sono_evt_cb hdl
 	);
 
 sono_err_t sono_dev_act(
 	/*__in*/ const sono_dev *dev,
-	/*__in*/ const char *dev_svc,
-	/*__in*/ const char *dev_act,
-	/*__in_opt*/ const sono_dev_param *param_in,
-	/*__in_opt*/ uint8_t param_in_cnt,
-	/*__inout_opt*/ sono_dev_param *param_out,
-	/*__inout_opt*/ uint8_t *param_out_cnt
+	/*__in*/ const char *svc,
+	/*__in*/ const char *act,
+	/*__in_opt*/ const sono_dev_arg *in,
+	/*__in_opt*/ uint8_t in_cnt,
+	/*__inout_opt*/ sono_dev_arg *out,
+	/*__inout_opt*/ uint8_t *out_cnt,
+	/*__in_opt*/ uint32_t tmout
 	);
 
 sono_err_t sono_dev_disc(
-	/*__out*/ uint8_t *dev_cnt
+	/*__out*/ uint8_t *cnt,
+	/*__in_opt*/ uint32_t tmout
 	);
 
 sono_err_t sono_dev_list(
-	/*__inout*/ sono_dev *dev_lst,
-	/*__inout*/ uint8_t *dev_cnt
+	/*__inout*/ sono_dev *lst,
+	/*__inout*/ uint8_t *cnt
 	);
 
 const char *sono_err(void);
 
 sono_err_t sono_uninit(void);
 
-const char *sono_version(void);
+const char *sono_ver(void);
 
 #ifdef __cplusplus
 }
 #endif // __cplusplus
 
-#endif // LIBSONO_H_
+#endif // SONO_H_

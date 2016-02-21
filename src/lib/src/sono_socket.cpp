@@ -23,7 +23,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include "../include/sono.h"
+#include "../include/sono_manager.h"
 #include "../include/sono_socket_type.h"
 
 namespace SONO {

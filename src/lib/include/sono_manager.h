@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SONO_H_
-#define SONO_H_
+#ifndef SONO_MANAGER_H_
+#define SONO_MANAGER_H_
 
 //#define NDEBUG
 
@@ -131,4 +131,4 @@ namespace SONO {
 	} sono_manager;
 }
 
-#endif // SONO_H_
+#endif // SONO_MANAGER_H_

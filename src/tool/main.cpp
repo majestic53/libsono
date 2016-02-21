@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../lib/include/sono.h"
+#include "../lib/include/sono_manager.h"
 
 void 
 event_handler(
@@ -65,14 +65,14 @@ main(
 		std::cout << std::endl << "Found " << dev_list.size() << " device(s)." << std::endl << "---";
 
 		for(dev_iter = dev_list.begin(); dev_iter != dev_list.end(); ++dev_iter) {
-			//std::cout << std::endl << "{" << SCALAR_AS_HEX(sono_uid_t, dev_iter->first) << "} (" << dev_iter->second.first
-			//	<< ") " << dev_iter->second.second.first << ":" << dev_iter->second.second.second;
+			std::cout << std::endl << "{" << SCALAR_AS_HEX(sono_uid_t, dev_iter->first) << "} (" << dev_iter->second.first
+				<< ") " << dev_iter->second.second.first << ":" << dev_iter->second.second.second;
 			sono_device &dev = instance->device(dev_iter->second.second.first, dev_iter->second.second.second);
 			svc_list = dev.service_discovery(SERVICE_DISCOVERY_TIMEOUT);
-			//std::cout << std::endl << "--- " << svc_list.size() << " service(s)." << std::endl << "----";
+			std::cout << std::endl << "--- " << svc_list.size() << " service(s)." << std::endl << "----";
 
 			for(svc_iter = svc_list.begin(); svc_iter != svc_list.end(); ++svc_iter) {
-				//std::cout << std::endl << "--- " << dev.service(*svc_iter).to_string(true);
+				std::cout << std::endl << "--- " << dev.service(*svc_iter).to_string(true);
 			}
 
 			std::cout << std::endl;

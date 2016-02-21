@@ -17,286 +17,244 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <regex>
-#include "../include/sono.h"
-#include "../include/sono_type.h"
+#include <cstring>
+#include "../sono.h"
+#include "../include/sono_manager.h"
 
-namespace SONO {
+#define SONO_INVALID_ARGUMENT "Invalid argument"
 
-	#define SONO_SOCKET_SSDP_ADDRESS "239.255.255.250"
-	#define SONO_SOCKET_SSDP_MESSAGE \
-		"M-SEARCH * HTTP/1.1\r\n" \
-		"HOST: " SONO_SOCKET_SSDP_ADDRESS ":" STRING_CONCAT(SONO_SOCKET_SSDP_MESSAGE) "\r\n" \
-		"MAN: \"ssdp:discover\"\r\n" \
-		"MX: 1\r\n" \
-		"ST: urn:schemas-upnp-org:device:ZonePlayer:1\r\n" \
-		"\r\n"
-	#define SONO_SOCKET_SSDP_PORT 1900
-	#define SONO_SOCKET_SSDP_REGEX_HOUSEHOLD ".*X-RINCON-HOUSEHOLD: (.*)"
-	#define SONO_SOCKET_SSDP_REGEX_LOCATION ".*LOCATION: .*//([.0-9]+):([0-9]+)(/.*)"
-	#define SONO_SOCKET_SSDP_REGEX_USN ".*USN: uuid:(RINCON_.*)::urn.*"
+static std::string g_err;
+static sono_evt_cb g_hdl = NULL;
 
-	enum {
-		SONO_SOCKET_SSDP_HOUSEHOLD_ROOT = 0,
-		SONO_SOCKET_SSDP_HOUSEHOLD_NAME,
-	};
+void 
+sono_evt_hdl(
+	__in sono_uid_t id,
+	__in const std::string &svc,
+	__in const std::string &act,
+	__in const std::string &data
+	)
+{
 
-	#define SONO_SOCKET_SSDP_HOUSEHOLD_MAX SONO_SOCKET_SSDP_HOUSEHOLD_NAME
+	if(g_hdl) {
+		g_hdl((uint8_t) id, svc.c_str(), act.c_str(), data.c_str());
+	}
+}
+
+sono_err_t 
+sono_init(
+	__in sono_evt_cb hdl
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	try {
+		sono_manager::acquire()->initialize(sono_evt_hdl);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+	if(hdl) {
+		g_hdl = hdl;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act(
+	__in const sono_dev *dev,
+	__in const char *svc,
+	__in const char *act,
+	__in_opt const sono_dev_arg *in,
+	__in_opt uint8_t in_cnt,
+	__inout_opt sono_dev_arg *out,
+	__inout_opt uint8_t *out_cnt,
+	/*__in_opt*/ uint32_t tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+	sono_action_argument input, output;
+
+	g_err.clear();
+
+	if(!dev || !svc || !act || (in && !in_cnt) || (!in && in_cnt) 
+			|| (out && (!out_cnt || !*out_cnt)) || (!out && out_cnt)) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+
+		// TODO: populate input map
+
+		output = sono_manager::acquire()->device(dev->addr, dev->port).service(svc).run(
+			act, input, tmout);
+
+		// TODO: populate outout map
+
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+
+	if(!SONO_SUCCESS(result) && out && out_cnt && *out_cnt) {
+		memset(out, 0, sizeof(sono_dev_arg) * *out_cnt);
+		*out_cnt = 0;
+	}
+
+	return result;
+}
+
+sono_err_t 
+sono_dev_disc(
+	__out uint8_t *cnt,
+	/*__in_opt*/ uint32_t tmout
+	)
+{
 	
+	sono_device_list dev_list;
+	sono_service_list svc_list;
+	sono_manager *instance = NULL;
+	sono_err_t result = SONO_ERR_NONE;
+	sono_device_list::iterator dev_iter;
 
-	enum {
-		SONO_SOCKET_SSDP_LOCATION_ROOT = 0,
-		SONO_SOCKET_SSDP_LOCATION_ADDRESS,
-		SONO_SOCKET_SSDP_LOCATION_PORT,
-		SONO_SOCKET_SSDP_LOCATION_CONFIGURATION,
-	};
+	g_err.clear();
 
-	#define SONO_SOCKET_SSDP_LOCATION_MAX SONO_SOCKET_SSDP_LOCATION_CONFIGURATION
-	
-
-	enum {
-		SONO_SOCKET_SSDP_USN_ROOT = 0,
-		SONO_SOCKET_SSDP_USN_UUID,
-	};
-
-	#define SONO_SOCKET_SSDP_USN_MAX SONO_SOCKET_SSDP_USN_UUID
-
-	sono_manager *sono_manager::m_instance = NULL;
-
-	_sono_manager::_sono_manager(void) :
-		m_factory_device(sono_device_factory::acquire()),
-		m_factory_socket(sono_socket_factory::acquire()),
-		m_factory_uid(sono_uid_factory::acquire()),
-		m_handler(NULL),
-		m_initialized(false)
-	{
-		std::atexit(sono_manager::_delete);
+	if(!cnt) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
 	}
 
-	_sono_manager::~_sono_manager(void)
-	{
+	try {
+		instance = sono_manager::acquire();
 
-		if(m_initialized) {
-			uninitialize();
+		dev_list = instance->device_discovery(tmout);
+		for(dev_iter = dev_list.begin(); dev_iter != dev_list.end(); ++dev_iter) {
+			instance->device(dev_iter->second.second.first, dev_iter->second.second.second)
+				.service_discovery(tmout);
 		}
+
+		*cnt = (uint8_t) dev_list.size();
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
 	}
 
-	void 
-	_sono_manager::_delete(void)
-	{
+exit:
+	return result;
+}
 
-		if(sono_manager::m_instance) {
-			delete sono_manager::m_instance;
-			sono_manager::m_instance = NULL;
-		}
+const char *
+sono_err(void)
+{
+	return g_err.c_str();
+}
+
+sono_err_t 
+sono_dev_list(
+	__inout sono_dev *lst,
+	__inout uint8_t *cnt
+	)
+{
+	uint8_t iter = 0;
+	sono_device_list dev_list;
+	sono_err_t result = SONO_ERR_NONE;
+	sono_device_list::iterator iter_dev;
+
+	g_err.clear();
+
+	if(!lst || !cnt || !*cnt) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
 	}
 
-	_sono_manager *
-	_sono_manager::acquire(void)
-	{
+	try {
+		dev_list = sono_manager::acquire()->device_list();
 
-		if(!sono_manager::m_instance) {
+		for(iter_dev = dev_list.begin(); iter_dev != dev_list.end(); ++iter_dev, ++iter) {
 
-			sono_manager::m_instance = new sono_manager;
-			if(!sono_manager::m_instance) {
-				THROW_SONO_EXCEPTION(SONO_EXCEPTION_ALLOCATED);
-			}
-		}
-
-		return sono_manager::m_instance;
-	}
-
-	sono_device &
-	_sono_manager::device(
-		__in sono_uid_t id
-		)
-	{
-
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		return m_factory_device->at(id);
-	}
-
-	sono_device &
-	_sono_manager::device(
-		__in const std::string &address,
-		__in uint16_t port
-		)
-	{
-
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		return m_factory_device->at(address, port);
-	}
-
-	size_t 
-	_sono_manager::device_count(void)
-	{
-
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		return m_factory_device->size();
-	}
-
-	sono_device_list 
-	_sono_manager::device_discovery(
-		__in_opt uint32_t timeout
-		)
-	{
-		std::match_results<const char *> match;
-		std::string address, fragment, config, house, output, port, uuid;
-
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		m_factory_device->clear();
-		sono_socket sock(SONO_SOCKET_SSDP, SONO_SOCKET_SSDP_ADDRESS, SONO_SOCKET_SSDP_PORT);
-		sock.connect(timeout);
-
-		for(;;) {
-
-			if(sock.write(SONO_SOCKET_SSDP_MESSAGE) == SONO_SOCKET_INVALID) {
-				THROW_SONO_EXCEPTION(SONO_EXCEPTION_DEVICE_DISCOVERY);
-			}
-
-			if(sock.read(output) <= 0) {
+			if(iter >= *cnt) {
 				break;
 			}
 
-			std::regex_search(output.c_str(), match, std::regex(SONO_SOCKET_SSDP_REGEX_HOUSEHOLD));
-			if(match.size() != (SONO_SOCKET_SSDP_HOUSEHOLD_MAX + 1)) {
-				THROW_SONO_EXCEPTION_FORMAT(SONO_EXCEPTION_DEVICE_MALFORMED,
-					"std::regex_search(household) found %lu entries (should be %lu)", match.size(),
-					SONO_SOCKET_SSDP_HOUSEHOLD_MAX + 1);
-			}
-
-			house = match[SONO_SOCKET_SSDP_HOUSEHOLD_NAME];
-
-			std::regex_search(output.c_str(), match, std::regex(SONO_SOCKET_SSDP_REGEX_LOCATION));
-			if(match.size() != (SONO_SOCKET_SSDP_LOCATION_MAX + 1)) {
-				THROW_SONO_EXCEPTION_FORMAT(SONO_EXCEPTION_DEVICE_MALFORMED,
-					"std::regex_search(location) found %lu entries (should be %lu)", match.size(),
-					SONO_SOCKET_SSDP_LOCATION_MAX + 1);
-			}
-			
-			address = match[SONO_SOCKET_SSDP_LOCATION_ADDRESS];
-			port = match[SONO_SOCKET_SSDP_LOCATION_PORT];
-			config = match[SONO_SOCKET_SSDP_LOCATION_CONFIGURATION];
-
-			std::regex_search(output.c_str(), match, std::regex(SONO_SOCKET_SSDP_REGEX_USN));
-			if(match.size() != (SONO_SOCKET_SSDP_USN_MAX + 1)) {
-				THROW_SONO_EXCEPTION_FORMAT(SONO_EXCEPTION_DEVICE_MALFORMED,
-					"std::regex_search(uuid) found %lu entries (should be %lu)", match.size(),
-					SONO_SOCKET_SSDP_USN_MAX + 1);
-			}
-
-			uuid = match[SONO_SOCKET_SSDP_USN_UUID];
-			m_factory_device->generate(uuid, house, config, address, std::atoi(port.c_str()));
+			memcpy(lst[iter].addr, (const char *) &iter_dev->second.second.first[0], 
+				iter_dev->second.second.first.size());
+			lst[iter].id = iter_dev->first;
+			lst[iter].port = iter_dev->second.second.second;
 		}
 
-		sock.disconnect();
-
-		return device_list();
+		*cnt = iter;
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
 	}
 
-	sono_device_list 
-	_sono_manager::device_list(void)
-	{
+exit:
 
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		return m_factory_device->list();
+	if(!SONO_SUCCESS(result) && lst && cnt) {
+		memset(lst, 0, sizeof(sono_dev) * *cnt);
+		*cnt = 0;
 	}
 
-	void 
-	_sono_manager::initialize(
-		__in sono_event_handler handler
-		)
-	{
+	return result;
+}
 
-		if(m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_INITIALIZED);
-		}
+sono_err_t 
+sono_uninit(void)
+{
+	sono_err_t result = SONO_ERR_NONE;
 
-		m_handler = handler;
-		m_factory_uid->initialize();
-		m_factory_socket->initialize();
-		m_factory_device->initialize();
-		m_initialized = true;
+	g_err.clear();
+
+	try {
+		sono_manager::acquire()->uninitialize();
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
 	}
 
-	bool 
-	_sono_manager::is_allocated(void)
-	{
-		return (sono_manager::m_instance != NULL);
-	}
+	g_hdl = NULL;
 
-	bool 
-	_sono_manager::is_initialized(void)
-	{
-		return m_initialized;
-	}
+exit:
+	return result;
+}
 
-	void 
-	_sono_manager::service_event(
-		__in sono_uid_t device,
-		__in const std::string &service,
-		__in const std::string &action,
-		__in const std::string &data
-		)
-	{
-
-		if(m_handler) {
-			m_handler(device, service, action, data);
-		}
-	}
-
-	std::string 
-	_sono_manager::to_string(
-		__in_opt bool verbose
-		)
-	{
-		std::stringstream result;
-
-		UNREF_PARAM(verbose);
-
-		result << SONO_HEADER << " -- " << (m_initialized ? "INIT" : "UNINIT")
-			<< ", PTR. 0x" << SCALAR_AS_HEX(sono_manager *, this);
-
-		if(m_initialized) {
-			result << ", HDL. 0x" << SCALAR_AS_HEX(sono_event_handler, m_handler);
-		}
-
-		return result.str();
-	}
-
-	void 
-	_sono_manager::uninitialize(void)
-	{
-
-		if(!m_initialized) {
-			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
-		}
-
-		m_factory_device->uninitialize();
-		m_factory_socket->uninitialize();
-		m_factory_uid->uninitialize();
-		m_handler = NULL;
-		m_initialized = false;
-	}
-
-	std::string 
-	_sono_manager::version(void)
-	{
-		return VERSION_STRING;
-	}
+const char *
+sono_ver(void)
+{
+	return sono_manager::version().c_str();
 }
