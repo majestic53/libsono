@@ -46,6 +46,10 @@ Changelog
 =========
 
 ###Version 0.1.1608
+*Updated: 2/21/2016*
+
+* Added c-style interface
+
 *Updated: 2/17/2016*
 
 * Modified device services to be indexed by string

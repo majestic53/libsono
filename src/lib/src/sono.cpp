@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <cstring>
 #include "../sono.h"
 #include "../include/sono_manager.h"
 
 #define SONO_INVALID_ARGUMENT "Invalid argument"
 
-static std::string g_err;
+static std::string g_err, g_ver;
 static sono_evt_cb g_hdl = NULL;
 
 void 
@@ -78,16 +79,18 @@ sono_dev_act(
 	__in_opt uint8_t in_cnt,
 	__inout_opt sono_dev_arg *out,
 	__inout_opt uint8_t *out_cnt,
-	/*__in_opt*/ uint32_t tmout
+	__in_opt uint32_t tmout
 	)
 {
+	uint8_t iter;
 	sono_err_t result = SONO_ERR_NONE;
 	sono_action_argument input, output;
+	sono_action_argument::iterator out_iter;
 
 	g_err.clear();
 
 	if(!dev || !svc || !act || (in && !in_cnt) || (!in && in_cnt) 
-			|| (out && (!out_cnt || !*out_cnt)) || (!out && out_cnt)) {
+			|| (out && (!out_cnt || !*out_cnt)) || (!out && *out_cnt)) {
 		g_err = SONO_INVALID_ARGUMENT;
 		result = SONO_ERR_INVALID;
 		goto exit;
@@ -95,12 +98,31 @@ sono_dev_act(
 
 	try {
 
-		// TODO: populate input map
+		for(iter = 0; iter < in_cnt; ++iter) {
+			input.insert(std::pair<std::string, std::string>(in[iter].name, in[iter].val));
+		}
 
 		output = sono_manager::acquire()->device(dev->addr, dev->port).service(svc).run(
 			act, input, tmout);
 
-		// TODO: populate outout map
+		for(out_iter = output.begin(), iter = 0; iter < *out_cnt; ++out_iter, ++iter) {
+
+			if((out_iter == output.end())
+					|| (iter >= output.size())) {
+				break;
+			}
+
+			std::memset(out[iter].name, 0, SONO_ARG_LEN);
+			std::memcpy(out[iter].name, out_iter->first.c_str(), 
+				std::min((uint32_t) out_iter->first.size(), (uint32_t) SONO_ARG_LEN - 1));
+			std::memset(out[iter].val, 0, SONO_ARG_LEN);
+			std::memcpy(out[iter].val, out_iter->second.c_str(), 
+				std::min((uint32_t) out_iter->second.size(), (uint32_t) SONO_ARG_LEN - 1));
+		}
+
+		if(iter < *out_cnt) {
+			*out_cnt = iter;
+		}
 
 	} catch(sono_exception &exc) {
 		g_err = exc.to_string(true);
@@ -125,7 +147,8 @@ exit:
 sono_err_t 
 sono_dev_disc(
 	__out uint8_t *cnt,
-	/*__in_opt*/ uint32_t tmout
+	__in_opt uint32_t disc_tmout,
+	__in_opt uint32_t svc_tmout
 	)
 {
 	
@@ -146,10 +169,10 @@ sono_dev_disc(
 	try {
 		instance = sono_manager::acquire();
 
-		dev_list = instance->device_discovery(tmout);
+		dev_list = instance->device_discovery(disc_tmout);
 		for(dev_iter = dev_list.begin(); dev_iter != dev_list.end(); ++dev_iter) {
 			instance->device(dev_iter->second.second.first, dev_iter->second.second.second)
-				.service_discovery(tmout);
+				.service_discovery(svc_tmout);
 		}
 
 		*cnt = (uint8_t) dev_list.size();
@@ -201,8 +224,10 @@ sono_dev_list(
 				break;
 			}
 
-			memcpy(lst[iter].addr, (const char *) &iter_dev->second.second.first[0], 
-				iter_dev->second.second.first.size());
+			std::memset(lst[iter].addr, 0, SONO_DEV_ADDR_LEN);
+			std::memcpy(lst[iter].addr, iter_dev->second.second.first.c_str(), 
+				std::min((uint32_t) iter_dev->second.second.first.size(), 
+				(uint32_t) SONO_DEV_ADDR_LEN - 1));
 			lst[iter].id = iter_dev->first;
 			lst[iter].port = iter_dev->second.second.second;
 		}
@@ -256,5 +281,10 @@ exit:
 const char *
 sono_ver(void)
 {
-	return sono_manager::version().c_str();
+
+	if(g_ver.empty()) {
+		g_ver = sono_manager::version();
+	}
+
+	return g_ver.c_str();
 }

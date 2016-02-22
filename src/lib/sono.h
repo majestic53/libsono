@@ -35,15 +35,15 @@ extern "C" {
 /*
  * Determine if call to library was successful
  * @param _ERR_ Library error code return
- * @return bool
+ * @return Boolean
  */
 #define SONO_SUCCESS(_ERR_) ((_ERR_) == SONO_ERR_NONE)
 
 // Library error codes
 typedef enum {
-	SONO_ERR_NONE = 0,			// no error
-	SONO_ERR_FAILED,			// call failed
-	SONO_ERR_INVALID,			// user passed invalid arguments
+	SONO_ERR_NONE = 0,	// no error
+	SONO_ERR_FAILED,	// call failed
+	SONO_ERR_INVALID,	// user passed invalid arguments
 } sono_err_t;
 
 /*
@@ -87,11 +87,28 @@ typedef void (*sono_evt_cb)(
 	/*__in*/ const char *data
 	);
 
-// TODO: complete documentation
+/*
+ * Initialize library
+ * (NOTE: This routine must be called prior to calling any other library routines)
+ * @param hdl Device service event callback
+ * @return Error code
+ */
 sono_err_t sono_init(
 	/*__in*/ sono_evt_cb hdl
 	);
 
+/*
+ * Perfom device service action
+ * @param dev Target device
+ * @param svc Target service name
+ * @param act Target action name
+ * @param in Input arguments
+ * @param in_cnt Input argument count
+ * @param out Output arguments
+ * @param out_cnt Output argument count
+ * @param tmout Timeout (in seconds)
+ * @return Error code
+ */
 sono_err_t sono_dev_act(
 	/*__in*/ const sono_dev *dev,
 	/*__in*/ const char *svc,
@@ -103,20 +120,47 @@ sono_err_t sono_dev_act(
 	/*__in_opt*/ uint32_t tmout
 	);
 
+/*
+ * Discover available devices
+ * @param cnt Device count
+ * @param disc_tmout Device discovery timeout (in seconds)
+ * @param svc_tmout Device service discovery timeout (in seconds)
+ * @return Error code
+ */
 sono_err_t sono_dev_disc(
 	/*__out*/ uint8_t *cnt,
-	/*__in_opt*/ uint32_t tmout
+	/*__in_opt*/ uint32_t disc_tmout,
+	/*__in_opt*/ uint32_t svc_tmout
 	);
 
+/*
+ * List available devices
+ * @param lst Device list
+ * @param cnt Device count
+ * @return Error code
+ */
 sono_err_t sono_dev_list(
 	/*__inout*/ sono_dev *lst,
 	/*__inout*/ uint8_t *cnt
 	);
 
+/*
+ * Library last error code
+ * @return Error code
+ */
 const char *sono_err(void);
 
+/*
+ * Uninitialize library
+ * (NOTE: This routine must be called after all other library routines)
+ * @return Error code
+ */
 sono_err_t sono_uninit(void);
 
+/*
+ * Library version
+ * @return version as a string
+ */
 const char *sono_ver(void);
 
 #ifdef __cplusplus
