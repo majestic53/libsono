@@ -24,11 +24,18 @@ DIR_SRC=./src/
 EXE=sonoctl
 LIB=libsono.a
 
-all: tool
+all: build tool
 
 tool:
 	@echo ''
 	@echo '--- BUILDING TOOL --------------------------' 
-	$(CC) $(CC_FLAGS) main.cpp $(DIR_BIN)$(LIB) -o $(DIR_BIN)$(EXE)
+	$(CC) $(CC_FLAGS) main.cpp $(DIR_BIN)$(LIB) $(DIR_BUILD)sono_loader.o -o $(DIR_BIN)$(EXE)
 	@echo '--- DONE -----------------------------------'
 	@echo ''
+
+build: sono_loader.o
+
+# SONO
+
+sono_loader.o: $(DIR_SRC)sono_loader.cpp $(DIR_INC)sono_loader.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_loader.cpp -o $(DIR_BUILD)sono_loader.o
