@@ -32,14 +32,14 @@ sonoctl [-h|-v][[-a args][-d args][-s args]][-l[[a|s] args]]
 ```
 
 ```
--a	--action	\<action\> \<key\>=\<value\>...	--- Specify target action/arguments
--d	--device	\<addr\>:\<port\>		--- Specify target device
--h	--help						--- Display help information
--l	--list 						--- List available devices
--la	--list-actions	\<addr\>:\<port\> \<service\>	--- List available device service actions
--ld	--list-services	\<addr\>:\<port\>		--- List available device services
--s	--service	\<service\>			--- Specify target service
--v	--version					--- Display version information
+-a    --action         <action> <key>=<value>...   --- Specify target action/arguments
+-d    --device         <addr>:<port>               --- Specify target device
+-h    --help                                       --- Display help information
+-l    --list                                       --- List available devices
+-la   --list-actions   <addr>:<port> <service>     --- List available device service actions
+-ls   --list-services  <addr>:<port>               --- List available device services
+-s    --service        <service>                   --- Specify target service
+-v    --version                                    --- Display version information
 ```
 
 ###Examples
