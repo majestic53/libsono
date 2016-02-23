@@ -22,9 +22,508 @@
 
 namespace SONO {
 
-	// TODO: flag enum/define/etc.
+	#define SONO_LOADER_COUNT_MIN 1
+	#define SONO_LOADER_DELIMETER '-'
+	#define SONO_LOADER_DELIMETER_INDEX_LONG 1
+	#define SONO_LOADER_DELIMETER_INDEX_SHORT 0
+	#define SONO_LOADER_HELP_COLUMN_0 20
+	#define SONO_LOADER_HELP_COLUMN_1 30
+	#define SONO_LOADER_STRING_COPYRIGHT \
+		"Copyright(C) 2016 David Jolly majestic53@gmail.com\
+		\nLicense: GPLv3+ GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\
+		\n\tThis is free software: you are free to change and redistribute it.\
+		\n\tThere is NO WARRANTY, to the extent permitted by law."
+	#define SONO_LOADER_STRING_EXAMPLE \
+		"\n\tsonoctl -d 192.168.1.2:1400 -s DeviceProperties -a SetLEDState DesiredLEDState=On\
+		\n\tsonoctl --list\
+		\n\tsonoctl --list-services 192.168.1.2:1400\
+		\n\tsonoctl --list-actions 192.168.1.2:1400 DeviceProperties"
+	#define SOON_LOADER_STRING_PRODUCT "sonoctl"
+	#define SONO_LOADER_STRING_REPORT \
+		"Report bugs to: majestic53@gmail.com\
+		\nHome page: <http://www.github.com/majestic53/libsono>"
+	#define SONO_LOADER_STRING_TITLE "Sono Controller"
+	#define SONO_LOADER_STRING_USAGE "[-h|-v][[-a args][-d args][-s args]][-l[[a|s] args]]"
+
+	static const std::string SONOCTL_ARGUMENT_STR[] = {
+		"<action> <key>=<value>...",
+		"<address>:<port>",
+		"",
+		"",
+		"<address>:<port> <service>",
+		"<address>:<port>",
+		"<service>",
+		"",
+		};
+
+	#define SONOCTL_ARGUMENT_STRING(_TYPE_) \
+		((_TYPE_) > SONOCTL_ARGUMENT_MAX ? STRING_UNKNOWN : \
+		SONOCTL_ARGUMENT_STR[_TYPE_])
+
+	static const std::string SONOCTL_ARGUMENT_DESCRIPTION_STR[] = {
+		"Specify target action/arguments",
+		"Specify target device",
+		"Display help information",
+		"List available devices",
+		"List available device service actions",
+		"List available device services",
+		"Specify target service",
+		"Display version information",
+		};
+
+	#define SONOCTL_ARGUMENT_DESCRIPTION_STRING(_TYPE_) \
+		((_TYPE_) > SONOCTL_ARGUMENT_MAX ? STRING_UNKNOWN : \
+		STRING_CHECK(SONOCTL_ARGUMENT_DESCRIPTION_STR[_TYPE_]))
+
+	static const std::string SONOCTL_ARGUMENT_LONG_STR[] = {
+		"action", "device", "help", "list", "list-actions", "list-services", 
+		"service", "version",
+		};
+
+	#define SONOCTL_ARGUMENT_LONG_STRING(_TYPE_) \
+		((_TYPE_) > SONOCTL_ARGUMENT_MAX ? STRING_UNKNOWN : \
+		STRING_CHECK(SONOCTL_ARGUMENT_LONG_STR[_TYPE_]))
+
+	static std::set<std::string> SONOCTL_ARGUMENT_LONG_SET = {
+		SONOCTL_ARGUMENT_LONG_STR,
+		SONOCTL_ARGUMENT_LONG_STR + (SONOCTL_ARGUMENT_MAX + 1)
+		};
+
+	#define IS_ARGUMENT_LONG(_STR_) \
+		(SONOCTL_ARGUMENT_LONG_SET.find(_STR_) != SONOCTL_ARGUMENT_LONG_SET.end())
+
+	static const std::string SONOCTL_ARGUMENT_SHORT_STR[] = {
+		"a", "d", "h", "l", "la", "ls", "s", "v",
+		};
+
+	#define SONOCTL_ARGUMENT_SHORT_STRING(_TYPE_) \
+		((_TYPE_) > SONOCTL_ARGUMENT_MAX ? STRING_UNKNOWN : \
+		STRING_CHECK(SONOCTL_ARGUMENT_SHORT_STR[_TYPE_]))
+
+	static std::set<std::string> SONOCTL_ARGUMENT_SHORT_SET = {
+		SONOCTL_ARGUMENT_SHORT_STR,
+		SONOCTL_ARGUMENT_SHORT_STR + (SONOCTL_ARGUMENT_MAX + 1)
+		};
+
+	#define IS_ARGUMENT_SHORT(_STR_) \
+		(SONOCTL_ARGUMENT_SHORT_SET.find(_STR_) != SONOCTL_ARGUMENT_SHORT_SET.end())
+
+	static const std::string SONOCTL_SECTION_STR[] = {
+		"Example", "Options", "", "Usage", "",
+		};
+
+	#define SONOCTL_SECTION_STRING(_TYPE_) \
+		((_TYPE_) > SONOCTL_SECTION_MAX ? STRING_UNKNOWN : \
+		STRING_CHECK(SONOCTL_SECTION_STR[_TYPE_]))
 
 	_sono_loader *_sono_loader::m_instance = NULL;
 
-	// TODO: loader routine implementation
+	_sono_loader::_sono_loader(void) :
+		m_initialized(false)
+	{
+		std::atexit(sono_loader::_delete);
+	}
+
+	_sono_loader::~_sono_loader(void)
+	{
+
+		if(m_initialized) {
+			uninitialize();
+		}
+	}
+
+	void 
+	_sono_loader::_delete(void)
+	{
+
+		if(sono_loader::m_instance) {
+			delete sono_loader::m_instance;
+			sono_loader::m_instance = NULL;
+		}
+	}
+
+	_sono_loader *
+	_sono_loader::acquire(void)
+	{
+
+		if(!sono_loader::m_instance) {
+
+			sono_loader::m_instance = new sono_loader;
+			if(!sono_loader::m_instance) {
+				THROW_SONO_LOADER_EXCEPTION(SONO_LOADER_EXCEPTION_ALLOCATED);
+			}
+		}
+
+		return sono_loader::m_instance;
+	}
+
+	const sono_argument_list &
+	_sono_loader::arguments(void)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_LOADER_EXCEPTION(SONO_LOADER_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_arguments;
+	}
+
+	sono_argument_t 
+	_sono_loader::determine_argument(
+		__in const std::string &argument
+		)
+	{
+		const std::string *arguments = NULL;
+		size_t result = SONOCTL_ARGUMENT_INVALID;
+
+		if(IS_ARGUMENT_LONG(argument)) {
+			arguments = SONOCTL_ARGUMENT_LONG_STR;
+		} else if(IS_ARGUMENT_SHORT(argument)) {
+			arguments = SONOCTL_ARGUMENT_SHORT_STR;
+		}
+
+		if(arguments) {
+
+			for(result = SONOCTL_ARGUMENT_MIN; result <= SONOCTL_ARGUMENT_MAX; 
+					++result) {
+
+				if(argument == arguments[result]) {
+					break;
+				}
+			}
+
+			if(result > SONOCTL_ARGUMENT_MAX) {
+				result = SONOCTL_ARGUMENT_INVALID;
+			}
+		}
+
+		return (sono_argument_t) result;
+	}
+
+	std::string 
+	_sono_loader::display_section(
+		__in sonoctl_section_t section
+		)
+	{
+		size_t iter = 0;
+		std::stringstream result;
+		std::string arg, arg_long, arg_short, desc;
+
+		switch(section) {
+			case SONOCTL_SECTION_EXAMPLE:
+				result << SONOCTL_SECTION_STRING(section) << ":" << std::endl << SONO_LOADER_STRING_EXAMPLE;
+				break;
+			case SONOCTL_SECTION_OPTIONS:
+				result << SONOCTL_SECTION_STRING(section) << ":";
+
+				for(; iter <= SONOCTL_ARGUMENT_MAX; ++iter) {
+					arg = SONOCTL_ARGUMENT_STRING(iter);
+					arg_long = SONOCTL_ARGUMENT_LONG_STRING(iter);
+					arg_short = SONOCTL_ARGUMENT_SHORT_STRING(iter);
+					desc = SONOCTL_ARGUMENT_DESCRIPTION_STRING(iter);
+					result << std::endl << "\t" << SONO_LOADER_DELIMETER << arg_short << "\t" << SONO_LOADER_DELIMETER 
+						<< SONO_LOADER_DELIMETER << std::left << std::setw(SONO_LOADER_HELP_COLUMN_0)
+						<< arg_long << std::left << std::setw(SONO_LOADER_HELP_COLUMN_1) << arg << desc;
+				}
+				break;
+			case SONOCTL_SECTION_REPORT:
+				result << SONO_LOADER_STRING_REPORT;
+				break;
+			case SONOCTL_SECTION_USAGE:
+				result << SONOCTL_SECTION_STRING(section) << ":" << std::endl << "\t" << SOON_LOADER_STRING_PRODUCT 
+					<< " " << SONO_LOADER_STRING_USAGE;
+				break;
+			case SONOCTL_SECTION_VERSION:
+				result << SONO_LOADER_STRING_TITLE << " " << sono_manager::version() << std::endl 
+					<< SONO_LOADER_STRING_COPYRIGHT;
+				break;
+			default:
+				break;
+		}
+
+		return result.str();
+	}
+
+	void 
+	_sono_loader::event_handler(
+		__in sono_uid_t device,
+		__in const std::string &service,
+		__in const std::string &action,
+		__in const std::string &data
+		)
+	{
+		UNREF_PARAM(action);
+		UNREF_PARAM(data);
+		UNREF_PARAM(device);
+		UNREF_PARAM(service);
+	}
+
+	void 
+	_sono_loader::initialize(
+		__in int count,
+		__in const char **arguments
+		)
+	{
+
+		if(m_initialized) {
+			THROW_SONO_LOADER_EXCEPTION(SONO_LOADER_EXCEPTION_INITIALIZED);
+		}
+
+		m_arguments.clear();
+
+		if(count > SONO_LOADER_COUNT_MIN) {
+			m_arguments = sono_argument_list(&arguments[SONO_LOADER_COUNT_MIN], 
+				&arguments[SONO_LOADER_COUNT_MIN] + (count - 1));
+		}
+
+		m_results.clear();
+		sono_manager::acquire()->initialize(sono_loader::event_handler);
+		m_initialized = true;
+	}
+
+	bool 
+	_sono_loader::is_allocated(void)
+	{
+		return (sono_loader::m_instance != NULL);
+	}
+
+	bool 
+	_sono_loader::is_initialized(void)
+	{
+		return m_initialized;
+	}
+
+	const sono_action_argument &
+	_sono_loader::result(void)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_LOADER_EXCEPTION(SONO_LOADER_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_results;
+	}
+
+	const sono_action_argument &
+	_sono_loader::run(
+		__in_opt const sono_argument_list &arguments,
+		__in_opt uint32_t device_timeout,
+		__in_opt uint32_t service_timeout,
+		__in_opt uint32_t action_timeout
+		)
+	{
+		size_t count = 0;
+		uint16_t port = 0;
+		sono_argument_t type;
+		std::stringstream result;
+		std::string addr, flag, svc;
+		sono_action_list list_action;
+		sono_device_list list_device;
+		sono_manager *instance = NULL;
+		sono_service_list list_service;
+		sono_argument_list::iterator iter;
+		sono_action_list::iterator iter_action;
+		sono_device_list::iterator iter_device;
+		sono_service_list::iterator iter_service;
+
+		if(!m_initialized) {
+			THROW_SONO_LOADER_EXCEPTION(SONO_LOADER_EXCEPTION_UNINITIALIZED);
+		}
+
+		m_results.clear();
+
+		if(!arguments.empty()) {
+			m_arguments = arguments;
+		}
+
+		if(m_arguments.size() >= SONO_LOADER_COUNT_MIN) {
+			instance = sono_manager::acquire();
+
+			for(iter = m_arguments.begin(); iter != m_arguments.end(); ++iter) {
+				flag = *iter;
+
+				if((flag.at(SONO_LOADER_DELIMETER_INDEX_SHORT) != SONO_LOADER_DELIMETER)
+						|| (flag.size() < (SONO_LOADER_DELIMETER_INDEX_SHORT + 1))) {
+					std::cout << "Invalid argument: " << flag << std::endl << std::endl 
+						<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+						<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+					break;
+				}
+
+				if((flag.size() >= (SONO_LOADER_DELIMETER_INDEX_LONG + 1)) && 
+						flag.at(SONO_LOADER_DELIMETER_INDEX_LONG) == SONO_LOADER_DELIMETER) {
+					flag = flag.substr(SONO_LOADER_DELIMETER_INDEX_LONG + 1, flag.size());
+				} else {
+					flag = flag.substr(SONO_LOADER_DELIMETER_INDEX_SHORT + 1, flag.size());
+				}
+
+				type = sono_loader::determine_argument(flag);
+				switch(type) {
+					case SONOCTL_ARGUMENT_ACTION:
+
+						// TODO: <action> [<key>=<value>]*
+
+						break;
+					case SONOCTL_ARGUMENT_DEVICE:
+
+						// TODO: <address>:<port>
+
+						break;
+					case SONOCTL_ARGUMENT_HELP:
+						std::cout << sono_loader::display_section(SONOCTL_SECTION_VERSION) << std::endl << std::endl
+							<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl
+							<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl << std::endl
+							<< sono_loader::display_section(SONOCTL_SECTION_EXAMPLE) << std::endl << std::endl
+							<< sono_loader::display_section(SONOCTL_SECTION_REPORT) << std::endl;
+						goto complete;
+					case SONOCTL_ARGUMENT_LIST:
+
+						if(!instance->device_count()) {
+							list_device = instance->device_discovery(device_timeout);
+						} else {
+							list_device = instance->device_list();
+						}
+
+						std::cout << "Found " << list_device.size() << " device(s)" << std::endl << "---";
+
+						for(count = 0, iter_device = list_device.begin(); iter_device != list_device.end(); 
+								++count, ++iter_device) {
+							std::cout << std::endl << "[" << count << "] " << iter_device->second.first
+								<< " (" << iter_device->second.second.first << ":" 
+								<< iter_device->second.second.second << ")";
+						}
+
+						std::cout << std::endl;
+						goto complete;
+					case SONOCTL_ARGUMENT_LIST_ACTIONS: {
+
+							// TODO: <address>:<port> <service>
+
+							sono_device &dev = instance->device(addr, port);
+							if(!dev.size()) {
+								dev.service_discovery(service_timeout);
+							}
+
+							list_action = dev.service(svc).action_list();
+							std::cout << "Found " << list_action.size() << " actions(s) at " << addr << ":" 
+								<< port << ":" << svc << std::endl << "---";
+
+							for(count = 0, iter_action = list_action.begin(); iter_action != list_action.end(); 
+									++count, ++iter_action) {
+								std::cout << std::endl << "[" << count << "] " << *iter_action;
+							}
+
+							std::cout << std::endl;
+						} goto complete;
+					case SONOCTL_ARGUMENT_LIST_SERVICES: {
+
+							// TODO: <address>:<port>
+
+							sono_device &dev = instance->device(addr, port);
+							if(!dev.size()) {
+								list_service = dev.service_discovery(service_timeout);
+							} else {
+								list_service = dev.service_list();
+							}
+
+							std::cout << "Found " << list_service.size() << " services(s) at " << addr << ":" 
+								<< port << std::endl << "---";
+
+							for(count = 0, iter_service = list_service.begin(); iter_service != list_service.end(); 
+									++count, ++iter_service) {
+								std::cout << std::endl << "[" << count << "] " << *iter_service;
+							}
+
+							std::cout << std::endl;
+						} goto complete;
+					case SONOCTL_ARGUMENT_SERVICE:
+
+						// TODO: <service>
+
+						break;
+					case SONOCTL_ARGUMENT_VERSION:
+						std::cout << sono_loader::display_section(SONOCTL_SECTION_VERSION) << std::endl;
+						goto complete;
+					default:
+						std::cout << "Unknown argument: " << flag << std::endl << std::endl 
+							<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+							<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+						goto complete;
+				}
+			}
+
+			// TODO: perform action
+		} else {
+			std::cout << sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+				<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+		}
+
+complete:
+		return m_results;
+	}
+
+	size_t 
+	_sono_loader::size(void)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_LOADER_EXCEPTION(SONO_LOADER_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_results.size();
+	}
+
+	std::string 
+	_sono_loader::to_string(
+		__in_opt bool verbose
+		)
+	{
+		size_t count;
+		std::stringstream result;
+		sono_argument_list::iterator iter_arg;
+		sono_action_argument::iterator iter_res;
+
+		UNREF_PARAM(verbose);
+
+		result << SONO_LOADER_HEADER << " -- " << (m_initialized ? "INIT" : "UNINIT");
+
+		if(m_initialized) {
+			result << ", PTR. 0x" << SCALAR_AS_HEX(sono_loader *, this) << ", ARGS. " << m_arguments.size() 
+				<< ", RES. " << size();
+
+			for(count = 0, iter_arg = m_arguments.begin(); iter_arg != m_arguments.end(); 
+					++count, ++iter_arg) {
+				result << std::endl << "--- ARG[" << count << "] " << *iter_arg;
+			}
+
+			for(count = 0, iter_res = m_results.begin(); iter_res != m_results.end(); 
+					++count, ++iter_res) {
+				result << std::endl << "--- RES[" << count << "] " << STRING_CHECK(iter_res->first) 
+					<< ": " << STRING_CHECK(iter_res->second);
+			}
+		}
+
+		return result.str();
+	}
+
+	void 
+	_sono_loader::uninitialize(void)
+	{
+		sono_manager *instance = NULL;
+
+		if(!m_initialized) {
+			THROW_SONO_LOADER_EXCEPTION(SONO_LOADER_EXCEPTION_UNINITIALIZED);
+		}
+
+		if(sono_manager::is_allocated()) {
+
+			instance = sono_manager::acquire();
+			if(instance && instance->is_initialized()) {
+				instance->uninitialize();
+			}
+		}
+		m_arguments.clear();
+		m_results.clear();
+		m_initialized = false;
+	}
 }

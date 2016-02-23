@@ -18,6 +18,11 @@
  */
 
 #define DEVICE_DISCOVERY_TIMEOUT 1 // sec
+#define SERVICE_ACTION_TIMEOUT 2 // sec
+#define SERVICE_DISCOVERY_TIMEOUT 2 // sec
+
+//#define TEST_MODE
+#ifdef TEST_MODE
 #define SERVICE_ACTION_PROPERTIES_LED_OFF "Off"
 #define SERVICE_ACTION_PROPERTIES_LED_ON "On"
 #define SERVICE_ACTION_PROPERTIES_LED_STATE_CURRENT "CurrentLEDState"
@@ -25,10 +30,7 @@
 #define SERVICE_ACTION_PROPERTIES_LED_STATE_GET "GetLEDState"
 #define SERVICE_ACTION_PROPERTIES_LED_STATE_SET "SetLEDState"
 #define SERVICE_DEVICE_PROPERTIES "DeviceProperties"
-#define SERVICE_ACTION_TIMEOUT 2 // sec
-#define SERVICE_DISCOVERY_TIMEOUT 2 // sec
-
-#define C_INTERFACE
+//#define C_INTERFACE
 #ifdef C_INTERFACE
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,7 +45,7 @@ event_handler(
 	/*__in*/ const char *data
 	)
 {
-	size_t length;
+	uint32_t length;
 
 	length = strlen(data);
 	fprintf(stdout, "{0x%x} -- SVC. %s, ACT. %s, DATA[%lu]", id, svc, act, length);
@@ -80,7 +82,7 @@ main(
 		goto exit_uninit;
 	}
 
-	fprintf(stdout, "Found %lu device(s).\n---\n", (size_t) dev_count);
+	fprintf(stdout, "Found %lu device(s).\n---\n", (uint32_t) dev_count);
 
 	dev_lst = (sono_dev *) malloc(sizeof(sono_dev) * dev_count);
 	if(!dev_lst) {
@@ -95,10 +97,10 @@ main(
 		goto exit_uninit;
 	}
 
-	fprintf(stdout, "Listing %lu device(s).\n---\n", (size_t) dev_count);
+	fprintf(stdout, "Listing %lu device(s).\n---\n", (uint32_t) dev_count);
 
 	for(; dev_iter < dev_count; ++dev_iter) {
-		fprintf(stdout, "\n--- [%lu] {0x%x} %s:%u", (size_t) dev_iter, dev_lst[dev_iter].id,
+		fprintf(stdout, "\n--- [%lu] {0x%x} %s:%u", (uint32_t) dev_iter, dev_lst[dev_iter].id,
 			dev_lst[dev_iter].addr, dev_lst[dev_iter].port);
 	}
 
@@ -304,4 +306,34 @@ main(
 
 	return result;
 }
+
 #endif // C_INTERFACE
+#else
+#include "./include/sono_loader.h"
+
+int 
+main(
+	__in int argc,
+	__in const char **argv
+	)
+{
+	int result = 0;
+	sono_loader *instance = NULL;
+
+	try {
+		instance = sono_loader::acquire();
+		instance->initialize(argc, argv);
+		instance->run(sono_argument_list(), DEVICE_DISCOVERY_TIMEOUT, SERVICE_DISCOVERY_TIMEOUT, SERVICE_ACTION_TIMEOUT);
+		instance->uninitialize();
+	} catch(sono_exception &exc) {
+		std::cerr << exc.to_string(true) << std::endl;
+		result = SCALAR_INVALID(int);
+	} catch(std::exception &exc) {
+		std::cerr << exc.what() << std::endl;
+		result = SCALAR_INVALID(int);
+	}
+
+	return result;
+}
+
+#endif // TEST_MODE

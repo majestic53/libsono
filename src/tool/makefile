@@ -29,7 +29,7 @@ all: build tool
 tool:
 	@echo ''
 	@echo '--- BUILDING TOOL --------------------------' 
-	$(CC) $(CC_FLAGS) main.cpp $(DIR_BIN)$(LIB) $(DIR_BUILD)sono_loader.o -o $(DIR_BIN)$(EXE)
+	$(CC) $(CC_FLAGS) main.cpp $(DIR_BUILD)sono_loader.o $(DIR_BIN)$(LIB) -o $(DIR_BIN)$(EXE)
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 

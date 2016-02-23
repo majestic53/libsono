@@ -28,22 +28,48 @@ sonoctl is a CLI application, which can be invoked using the interface below:
 ###SONOCTL
 
 ```
-sonoctl [-h|-v][-l]
+sonoctl [-h|-v][[-a args][-d args][-s args]][-l[[a|s] args]]
 ```
 
-* _-h | --help_			--- Display help information
-* _-l | --list_			--- Display a list of accessible Sono devices
-* _-v | --version_ 		--- Display version information
+* _-a | --action_ <action> <key>=<value>...		--- Specify target action/arguments
+* _-d | --device_ <addr>:<port>				--- Specify target device
+* _-h | --help_						--- Display help information
+* _-l | --list_						--- List available devices
+* _-la | --list-actions_ <addr>:<port> <service>	--- List available device service actions
+* _-ld | --list-services_ <addr>:<port>			--- List available device services
+* _-s | --service_ <service>				--- Specify target service
+* _-v | --version_					--- Display version information
 
 ###Examples
 
-* sonoctl --help
-* sonoctl --list
+* Set a target device's LED state
+```
+sonoctl -d 192.168.1.2:1400 -s DeviceProperties -a SetLEDState DesiredLEDState=On
+```
 
-*More to come...*
+* List all available devices
+```
+sonoctl --list
+```
+
+* List all available services advertised by a target device
+```
+sonoctl --list-services 192.168.1.2:1400
+```
+
+* List all available actions advertiesed by a target device's service
+```
+sonoctl --list-actions 192.168.1.2:1400 DeviceProperties
+```
 
 Changelog
 =========
+
+###Version 0.1.1609
+*Updated: 2/22/2016*
+
+* Added sonoctl interface (incomplete)
+* Updated documentation
 
 ###Version 0.1.1608
 *Updated: 2/21/2016*
@@ -62,34 +88,6 @@ Changelog
 *Updated: 2/15/2016*
 
 * Added device service actions
-
-###Version 0.1.1607
-*Updated: 2/14/2016*
-
-* Added device service action discovery support (incomplete)
-
-*Updated: 2/13/2016*
-
-* Added device service discovery support
-* Added http chunked parsing support
-
-*Updated: 2/11/2016*
-
-* Added device service discovery support (incomplete)
-
-*Updated: 2/10/2016*
-
-* Finished SSDP discovery/list routines
-
-*Updated: 2/9/2016*
-
-* Added socket classes
-* Added xml class (incomplete)
-* Added discovery/list routines (incomplete)
-
-*Updated: 2/8/2016*
-
-* Initial commit
 
 *Changelog truncated (see file history for full log)*
 
