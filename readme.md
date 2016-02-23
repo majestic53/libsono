@@ -31,14 +31,14 @@ sonoctl is a CLI application, which can be invoked using the interface below:
 sonoctl [-h|-v][[-a args][-d args][-s args]][-l[[a|s] args]]
 ```
 
-* _-a | --action_ \<action\> \<key\>=\<value\>...	--- Specify target action/arguments
-* _-d | --device_ \<addr\>:\<port\>			--- Specify target device
-* _-h | --help_						--- Display help information
-* _-l | --list_						--- List available devices
-* _-la | --list-actions_ \<addr\>:\<port\> \<service\>	--- List available device service actions
-* _-ld | --list-services_ \<addr\>:\<port\>		--- List available device services
-* _-s | --service_ \<service\>				--- Specify target service
-* _-v | --version_					--- Display version information
+* __-a | --action__ _\<action\> \<key\>=\<value\>..._ --- Specify target action/arguments
+* __-d | --device__ _\<addr\>:\<port\>_ --- Specify target device
+* __-h | --help__ --- Display help information
+* __-l | --list__ --- List available devices
+* __-la | --list-actions__ _\<addr\>:\<port\> \<service\>_ --- List available device service actions
+* __-ld | --list-services__ _\<addr\>:\<port\>_ --- List available device services
+* __-s | --service__ _\<service\>_ --- Specify target service
+* __-v | --version__ --- Display version information
 
 ###Examples
 
