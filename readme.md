@@ -45,11 +45,6 @@ sonoctl [-h|-v][[[-b][[-a args][-d args][-s args]]][-l[[a|s] args]]]
 
 ###Examples
 
-* Set a target device's LED state
-```
-sonoctl -d 192.168.1.2:1400 -s DeviceProperties -a SetLEDState DesiredLEDState=On
-```
-
 * List all available devices
 ```
 sonoctl --list
@@ -63,6 +58,11 @@ sonoctl --list-services 192.168.1.2:1400
 * List all available actions advertiesed by a target device's service
 ```
 sonoctl --list-actions 192.168.1.2:1400 DeviceProperties
+```
+
+* Set a target device's LED state
+```
+sonoctl -d 192.168.1.2:1400 -s DeviceProperties -a SetLEDState DesiredLEDState=On
 ```
 
 Changelog
