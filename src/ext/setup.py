@@ -22,7 +22,7 @@ from distutils.core import setup, Extension
 setup(
 	name='sonopkg', 
 	version='0.1', 
-	description='a lightwight library used to control Sono devices', 
+	description='a lightweight library used to control Sono devices', 
 	author='David Jolly',
 	author_email='majestic53@gmail.com',
 	url='https://github.com/majestic53/libsono',
