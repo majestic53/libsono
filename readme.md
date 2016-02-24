@@ -28,7 +28,7 @@ sonoctl is a CLI application, which can be invoked using the interface below:
 ###SONOCTL
 
 ```
-sonoctl [-h|-v][[-a args][-d args][-s args]][-l[[a|s] args]]
+sonoctl [-h|-v][[[-b][[-a args][-d args][-s args]]][-l[[a|s] args]]]
 ```
 
 ```
