@@ -38,18 +38,15 @@ sono_init_func(
 	sono_evt_cb handler = NULL;
 	sono_err_t status = SONO_ERR_NONE;
 	
-	if(!PyArg_ParseTuple(args, "w#", &handler, &length)) {
-		status = SONO_ERR_INVALID;
-		goto exit;
-	}
-	
-	if(length != sizeof(sono_evt_cb)) {
+	if(!PyArg_ParseTuple(args, "w#", &handler, &length)
+			|| (length != sizeof(sono_evt_cb))) {
 		status = SONO_ERR_INVALID;
 		goto exit;
 	}
 	
 	status = sono_init(handle);
 	
+exit:
 	return Py_BuildValue("I", status);
 }
 
