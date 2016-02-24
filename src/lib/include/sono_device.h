@@ -123,6 +123,11 @@ namespace SONO {
 					__in sono_uid_t id
 					);
 
+				bool contains(
+					__in const std::string &address,
+					__in uint16_t port
+					);
+
 				size_t decrement_reference(
 					__in sono_uid_t id
 					);

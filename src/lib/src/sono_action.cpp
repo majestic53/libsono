@@ -53,8 +53,8 @@ namespace SONO {
 		_sono_action::_sono_action(
 			__in const std::string &type,
 			__in const std::string &name,
-			__in_opt const std::vector<std::string> &input,
-			__in_opt const std::vector<std::string> &output
+			__in_opt const sono_action_arguments &input,
+			__in_opt const sono_action_arguments &output
 			)
 		{
 			set(type, name, input, output);
@@ -92,7 +92,7 @@ namespace SONO {
 			return *this;
 		}
 
-		const std::vector<std::string> &
+		const sono_action_arguments &
 		_sono_action::input(void)
 		{
 			return m_input;
@@ -104,7 +104,7 @@ namespace SONO {
 			return m_name;
 		}
 
-		const std::vector<std::string> &
+		const sono_action_arguments &
 		_sono_action::output(void)
 		{
 			return m_output;
@@ -118,7 +118,7 @@ namespace SONO {
 			std::stringstream search;
 			sono_action_argument result;
 			std::match_results<const char *> match;
-			std::vector<std::string>::iterator iter;
+			sono_action_arguments::iterator iter;
 
 			for(iter = m_output.begin(); iter != m_output.end(); ++iter) {
 				search << SONO_ACTION_WILDCARD << SONO_ACTION_OPEN_BRACKET << *iter 
@@ -179,7 +179,7 @@ namespace SONO {
 			code = sono_http::parse_header(response);
 			if(code != SONO_HTTP_SUCCESS) {
 				THROW_SONO_ACTION_EXCEPTION_FORMAT(SONO_ACTION_EXCEPTION_POST_RESPONSE,
-					"%s --> %u", STRING_CHECK(m_name), code);
+					"%s, %u", STRING_CHECK(m_name), code);
 			}
 
 			return parse_response(sono_http::remove_header(response));
@@ -189,8 +189,8 @@ namespace SONO {
 		_sono_action::set(
 			__in const std::string &type,
 			__in const std::string &name,
-			__in_opt const std::vector<std::string> &input,
-			__in_opt const std::vector<std::string> &output
+			__in_opt const sono_action_arguments &input,
+			__in_opt const sono_action_arguments &output
 			)
 		{
 
@@ -210,7 +210,7 @@ namespace SONO {
 			)
 		{
 			std::stringstream result;
-			std::vector<std::string>::iterator iter;
+			sono_action_arguments::iterator iter;
 
 			result << SONO_ACTION_HEADER << ", \", ACT. \"" << m_name << "\", IN[" << m_input.size() << "]";
 

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <regex>
 #include "../include/sono_loader.h"
 #include "../include/sono_loader_type.h"
 
@@ -43,7 +44,7 @@ namespace SONO {
 		"Report bugs to: majestic53@gmail.com\
 		\nHome page: <http://www.github.com/majestic53/libsono>"
 	#define SONO_LOADER_STRING_TITLE "Sono Controller"
-	#define SONO_LOADER_STRING_USAGE "[-h|-v][[-a args][-d args][-s args]][-l[[a|s] args]]"
+	#define SONO_LOADER_STRING_USAGE "[-h|-v][[-b][[-a args][-d args][-s args]]][-l[[a|s] args]]"
 
 	static const std::string SONOCTL_ARGUMENT_STR[] = {
 		"<action> <key>=<value>...",
@@ -53,6 +54,7 @@ namespace SONO {
 		"<address>:<port> <service>",
 		"<address>:<port>",
 		"<service>",
+		"",
 		"",
 		};
 
@@ -68,6 +70,7 @@ namespace SONO {
 		"List available device service actions",
 		"List available device services",
 		"Specify target service",
+		"Display verbose information",
 		"Display version information",
 		};
 
@@ -77,7 +80,7 @@ namespace SONO {
 
 	static const std::string SONOCTL_ARGUMENT_LONG_STR[] = {
 		"action", "device", "help", "list", "list-actions", "list-services", 
-		"service", "version",
+		"service", "verbose", "version",
 		};
 
 	#define SONOCTL_ARGUMENT_LONG_STRING(_TYPE_) \
@@ -93,7 +96,7 @@ namespace SONO {
 		(SONOCTL_ARGUMENT_LONG_SET.find(_STR_) != SONOCTL_ARGUMENT_LONG_SET.end())
 
 	static const std::string SONOCTL_ARGUMENT_SHORT_STR[] = {
-		"a", "d", "h", "l", "la", "ls", "s", "v",
+		"a", "d", "h", "l", "la", "ls", "s", "b", "v",
 		};
 
 	#define SONOCTL_ARGUMENT_SHORT_STRING(_TYPE_) \
@@ -115,6 +118,16 @@ namespace SONO {
 	#define SONOCTL_SECTION_STRING(_TYPE_) \
 		((_TYPE_) > SONOCTL_SECTION_MAX ? STRING_UNKNOWN : \
 		STRING_CHECK(SONOCTL_SECTION_STR[_TYPE_]))
+
+	enum {
+		SONOCTL_ARGUMENT_DEVICE_ROOT = 0,
+		SONOCTL_ARGUMENT_DEVICE_LEFT,
+		SONOCTL_ARGUMENT_DEVICE_RIGHT,
+	};
+
+	#define SONOCTL_ARGUMENT_DEVICE_MAX SONOCTL_ARGUMENT_DEVICE_RIGHT
+	#define SONOCTL_ARGUMENT_DEVICE_ADDRESS_REGEX "(.*):(.*)"
+	#define SONOCTL_ARGUMENT_DEVICE_KEY_VALUE_REGEX "(.*)=(.*)"
 
 	_sono_loader *_sono_loader::m_instance = NULL;
 
@@ -312,19 +325,25 @@ namespace SONO {
 		__in_opt uint32_t action_timeout
 		)
 	{
-		size_t count = 0;
-		uint16_t port = 0;
+		size_t count;
+		uint16_t port;
 		sono_argument_t type;
-		std::stringstream result;
-		std::string addr, flag, svc;
+		uint32_t mask = 0, offset;
+		sono_action_argument input;
+		sono_action_arguments args;
 		sono_action_list list_action;
 		sono_device_list list_device;
 		sono_manager *instance = NULL;
 		sono_service_list list_service;
+		std::stringstream result, stream;
 		sono_argument_list::iterator iter;
+		std::string act, addr, arg, flag, svc;
 		sono_action_list::iterator iter_action;
 		sono_device_list::iterator iter_device;
+		std::match_results<const char *> match;
+		sono_action_argument::iterator iter_arg;
 		sono_service_list::iterator iter_service;
+		sono_action_arguments::iterator iter_args;
 
 		if(!m_initialized) {
 			THROW_SONO_LOADER_EXCEPTION(SONO_LOADER_EXCEPTION_UNINITIALIZED);
@@ -344,7 +363,7 @@ namespace SONO {
 
 				if((flag.at(SONO_LOADER_DELIMETER_INDEX_SHORT) != SONO_LOADER_DELIMETER)
 						|| (flag.size() < (SONO_LOADER_DELIMETER_INDEX_SHORT + 1))) {
-					std::cout << "Invalid argument: " << flag << std::endl << std::endl 
+					std::cout << "Invalid argument: \'" << flag << "\'" << std::endl << std::endl 
 						<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
 						<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
 					break;
@@ -361,13 +380,75 @@ namespace SONO {
 				switch(type) {
 					case SONOCTL_ARGUMENT_ACTION:
 
-						// TODO: <action> [<key>=<value>]*
+						++iter;
+						if(iter == m_arguments.end()) {
+							std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+							goto complete;
+						}
 
+						act = *iter;
+
+						if(act.empty()) {
+							std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+							goto complete;
+						}
+
+						++iter;
+
+						for(; iter != m_arguments.end(); ++iter) {
+
+							arg = *iter;
+							if(arg.at(SONO_LOADER_DELIMETER_INDEX_SHORT) == SONO_LOADER_DELIMETER) {
+								--iter;
+								break;
+							}
+
+							std::regex_search(arg.c_str(), match, std::regex(SONOCTL_ARGUMENT_DEVICE_KEY_VALUE_REGEX));
+							if(match.size() != (SONOCTL_ARGUMENT_DEVICE_MAX + 1)) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
+
+							input.insert(std::pair<std::string, std::string>(match[SONOCTL_ARGUMENT_DEVICE_LEFT],
+								match[SONOCTL_ARGUMENT_DEVICE_RIGHT]));
+						}
 						break;
 					case SONOCTL_ARGUMENT_DEVICE:
 
-						// TODO: <address>:<port>
+						++iter;
+						if(iter == m_arguments.end()) {
+							std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+							goto complete;
+						}
 
+						addr = *iter;
+
+						std::regex_search(addr.c_str(), match, std::regex(SONOCTL_ARGUMENT_DEVICE_ADDRESS_REGEX));
+						if(match.size() != (SONOCTL_ARGUMENT_DEVICE_MAX + 1)) {
+							std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+							goto complete;
+						}
+
+						stream << match[SONOCTL_ARGUMENT_DEVICE_RIGHT];
+						stream >> port;
+						addr = match[SONOCTL_ARGUMENT_DEVICE_LEFT];
+
+						if(addr.empty()) {
+							std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+							goto complete;
+						}
 						break;
 					case SONOCTL_ARGUMENT_HELP:
 						std::cout << sono_loader::display_section(SONOCTL_SECTION_VERSION) << std::endl << std::endl
@@ -397,29 +478,119 @@ namespace SONO {
 						goto complete;
 					case SONOCTL_ARGUMENT_LIST_ACTIONS: {
 
-							// TODO: <address>:<port> <service>
+							++iter;
+							if(iter == m_arguments.end()) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
 
-							sono_device &dev = instance->device(addr, port);
+							addr = *iter;
+
+							std::regex_search(addr.c_str(), match, std::regex(SONOCTL_ARGUMENT_DEVICE_ADDRESS_REGEX));
+							if(match.size() != (SONOCTL_ARGUMENT_DEVICE_MAX + 1)) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
+
+							stream << match[SONOCTL_ARGUMENT_DEVICE_RIGHT];
+							stream >> port;
+							addr = match[SONOCTL_ARGUMENT_DEVICE_LEFT];
+
+							if(addr.empty()) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
+
+							sono_device &dev = instance->device(addr, port, true);
 							if(!dev.size()) {
 								dev.service_discovery(service_timeout);
 							}
 
-							list_action = dev.service(svc).action_list();
+							++iter;
+							if(iter == m_arguments.end()) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
+
+							svc = *iter;
+							if(svc.empty()) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
+
+							sono_service &serv = dev.service(svc);
+							list_action = serv.action_list();
 							std::cout << "Found " << list_action.size() << " actions(s) at " << addr << ":" 
 								<< port << ":" << svc << std::endl << "---";
 
 							for(count = 0, iter_action = list_action.begin(); iter_action != list_action.end(); 
 									++count, ++iter_action) {
-								std::cout << std::endl << "[" << count << "] " << *iter_action;
+								std::cout << std::endl << "[" << count << "] " << *iter_action << " {";
+
+								args = serv.action(*iter_action).input();
+								for(iter_args = args.begin(); iter_args != args.end(); ++iter_args) {
+
+									if(iter_args != args.begin()) {
+										std::cout << ", ";
+									}
+
+									std::cout << *iter_args;
+								}
+
+								std::cout << "}";
 							}
 
 							std::cout << std::endl;
 						} goto complete;
 					case SONOCTL_ARGUMENT_LIST_SERVICES: {
 
-							// TODO: <address>:<port>
+							++iter;
+							if(iter == m_arguments.end()) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
 
-							sono_device &dev = instance->device(addr, port);
+							addr = *iter;
+
+							std::regex_search(addr.c_str(), match, std::regex(SONOCTL_ARGUMENT_DEVICE_ADDRESS_REGEX));
+							if(match.size() != (SONOCTL_ARGUMENT_DEVICE_MAX + 1)) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
+
+							stream << match[SONOCTL_ARGUMENT_DEVICE_RIGHT];
+							stream >> port;
+							addr = match[SONOCTL_ARGUMENT_DEVICE_LEFT];
+
+							if(addr.empty()) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
+
+							if(addr.empty()) {
+								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+								goto complete;
+							}
+
+							sono_device &dev = instance->device(addr, port, true);
 							if(!dev.size()) {
 								list_service = dev.service_discovery(service_timeout);
 							} else {
@@ -438,21 +609,80 @@ namespace SONO {
 						} goto complete;
 					case SONOCTL_ARGUMENT_SERVICE:
 
-						// TODO: <service>
+						++iter;
+						if(iter == m_arguments.end()) {
+							std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+								<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+							goto complete;
+						}
 
+						svc = *iter;
+						break;
+					case SONOCTL_ARGUMENT_VERBOSE:
 						break;
 					case SONOCTL_ARGUMENT_VERSION:
 						std::cout << sono_loader::display_section(SONOCTL_SECTION_VERSION) << std::endl;
 						goto complete;
 					default:
-						std::cout << "Unknown argument: " << flag << std::endl << std::endl 
+						std::cout << "Unknown argument: \'" << flag << "\'" << std::endl << std::endl 
 							<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
 							<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
 						goto complete;
 				}
+
+				offset = (1 << type);
+				if(mask & offset) {
+					std::cout << "Duplicate argument: \'" << flag << "\'" << std::endl << std::endl 
+						<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
+						<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+					break;
+				}
+
+				mask |= offset;
+
+				if(iter == m_arguments.end()) {
+					break;
+				}
 			}
 
-			// TODO: perform action
+			if(!(mask & (1 << SONOCTL_ARGUMENT_ACTION))) {
+				std::cout << "Missing argument: \'" << SONOCTL_ARGUMENT_SHORT_STRING(SONOCTL_ARGUMENT_ACTION) << "\'" 
+					<< std::endl << std::endl << sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl 
+					<< std::endl << sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+				goto complete;
+			}
+
+			if(!(mask & (1 << SONOCTL_ARGUMENT_DEVICE))) {
+				std::cout << "Missing argument: \'" << SONOCTL_ARGUMENT_SHORT_STRING(SONOCTL_ARGUMENT_DEVICE) << "\'" 
+					<< std::endl << std::endl << sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl 
+					<< std::endl << sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+				goto complete;
+			}
+
+			if(!(mask & (1 << SONOCTL_ARGUMENT_SERVICE))) {
+				std::cout << "Missing argument: \'" << SONOCTL_ARGUMENT_SHORT_STRING(SONOCTL_ARGUMENT_SERVICE) << "\'" 
+					<< std::endl << std::endl << sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl 
+					<< std::endl << sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
+				goto complete;
+			}
+
+			sono_device &dev = instance->device(addr, port, true);
+			if(!dev.size()) {
+				dev.service_discovery(service_timeout);
+			}
+
+			m_results = dev.service(svc).run(act, input, action_timeout);
+
+			if(mask & (1 << SONOCTL_ARGUMENT_VERBOSE)) {
+				std::cout << "Result: " << m_results.size() << " entries(s)." << std::endl << "---";
+
+				for(count = 0, iter_arg = m_results.begin(); iter_arg != m_results.end(); ++count, ++iter_arg) {
+					std::cout << std::endl << "[" << count << "] " << iter_arg->first << ": " << iter_arg->second;
+				}
+
+				std::cout << std::endl;
+			}
 		} else {
 			std::cout << sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
 				<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;

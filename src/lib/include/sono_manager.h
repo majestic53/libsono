@@ -20,7 +20,7 @@
 #ifndef SONO_MANAGER_H_
 #define SONO_MANAGER_H_
 
-//#define NDEBUG
+#define NDEBUG
 
 #ifndef SONO
 #define SONO sono
@@ -68,7 +68,8 @@ namespace SONO {
 
 			sono_device &device(
 				__in const std::string &address,
-				__in uint16_t port
+				__in uint16_t port,
+				__in_opt bool create = false
 				);
 
 			size_t device_count(void);

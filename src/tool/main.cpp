@@ -236,8 +236,9 @@ main(
 		std::cout << std::endl << "Found " << dev_list.size() << " device(s)." << std::endl << "---";
 
 		for(dev_iter = dev_list.begin(); dev_iter != dev_list.end(); ++dev_iter) {
-			std::cout << std::endl << "{" << SCALAR_AS_HEX(sono_uid_t, dev_iter->first) << "} (" << dev_iter->second.first
-				<< ") " << dev_iter->second.second.first << ":" << dev_iter->second.second.second;
+			std::cout << std::endl << "{" << SCALAR_AS_HEX(sono_uid_t, dev_iter->first) << "} (" 
+				<< dev_iter->second.first << ") " << dev_iter->second.second.first << ":" 
+				<< dev_iter->second.second.second;
 			sono_device &dev = instance->device(dev_iter->second.second.first, dev_iter->second.second.second);
 			svc_list = dev.service_discovery(SERVICE_DISCOVERY_TIMEOUT);
 			std::cout << std::endl << "--- " << svc_list.size() << " service(s)." << std::endl << "----";
@@ -255,12 +256,13 @@ main(
 		sono_service &svc = dev.service(SERVICE_DEVICE_PROPERTIES);
 
 		// LED OFF
-		input.insert(std::pair<std::string, std::string>(SERVICE_ACTION_PROPERTIES_LED_STATE_DESIRE, SERVICE_ACTION_PROPERTIES_LED_OFF));
+		input.insert(std::pair<std::string, std::string>(SERVICE_ACTION_PROPERTIES_LED_STATE_DESIRE, 
+			SERVICE_ACTION_PROPERTIES_LED_OFF));
 		output = svc.run(SERVICE_ACTION_PROPERTIES_LED_STATE_SET, input, SERVICE_ACTION_TIMEOUT);
 		std::cout << SERVICE_ACTION_PROPERTIES_LED_STATE_SET << "[" << output.size() << "]";
 
 		for(iter_out = output.begin(); iter_out != output.end(); ++iter_out) {
-			std::cout << std::endl << iter_out->first << " --> " << iter_out->second;
+			std::cout << std::endl << iter_out->first << ": " << iter_out->second;
 		}
 
 		std::cout << std::endl;
@@ -269,7 +271,7 @@ main(
 		std::cout << SERVICE_ACTION_PROPERTIES_LED_STATE_GET << "[" << output.size() << "]";
 
 		for(iter_out = output.begin(); iter_out != output.end(); ++iter_out) {
-			std::cout << std::endl << iter_out->first << " --> " << iter_out->second;
+			std::cout << std::endl << iter_out->first << ": " << iter_out->second;
 		}
 
 		std::cout << std::endl;
@@ -277,12 +279,13 @@ main(
 
 		// LED ON
 		input.clear();
-		input.insert(std::pair<std::string, std::string>(SERVICE_ACTION_PROPERTIES_LED_STATE_DESIRE, SERVICE_ACTION_PROPERTIES_LED_ON));
+		input.insert(std::pair<std::string, std::string>(SERVICE_ACTION_PROPERTIES_LED_STATE_DESIRE, 
+			SERVICE_ACTION_PROPERTIES_LED_ON));
 		output = svc.run(SERVICE_ACTION_PROPERTIES_LED_STATE_SET, input, SERVICE_ACTION_TIMEOUT);
 		std::cout << SERVICE_ACTION_PROPERTIES_LED_STATE_SET << "[" << output.size() << "]";
 
 		for(iter_out = output.begin(); iter_out != output.end(); ++iter_out) {
-			std::cout << std::endl << iter_out->first << " --> " << iter_out->second;
+			std::cout << std::endl << iter_out->first << ": " << iter_out->second;
 		}
 
 		std::cout << std::endl;
@@ -291,7 +294,7 @@ main(
 		std::cout << SERVICE_ACTION_PROPERTIES_LED_STATE_GET << "[" << output.size() << "]";
 
 		for(iter_out = output.begin(); iter_out != output.end(); ++iter_out) {
-			std::cout << std::endl << iter_out->first << " --> " << iter_out->second;
+			std::cout << std::endl << iter_out->first << ": " << iter_out->second;
 		}
 
 		std::cout << std::endl;
@@ -323,10 +326,11 @@ main(
 	try {
 		instance = sono_loader::acquire();
 		instance->initialize(argc, argv);
-		instance->run(sono_argument_list(), DEVICE_DISCOVERY_TIMEOUT, SERVICE_DISCOVERY_TIMEOUT, SERVICE_ACTION_TIMEOUT);
+		instance->run(sono_argument_list(), DEVICE_DISCOVERY_TIMEOUT, SERVICE_DISCOVERY_TIMEOUT, 
+			SERVICE_ACTION_TIMEOUT);
 		instance->uninitialize();
 	} catch(sono_exception &exc) {
-		std::cerr << exc.to_string(true) << std::endl;
+		std::cerr << exc.to_string() << std::endl;
 		result = SCALAR_INVALID(int);
 	} catch(std::exception &exc) {
 		std::cerr << exc.what() << std::endl;

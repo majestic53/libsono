@@ -74,7 +74,7 @@ namespace SONO {
 
 			if(sock.write(STRING_CHECK(request.str())) == SONO_SOCKET_INVALID) {
 				THROW_SONO_HTTP_EXCEPTION_FORMAT(SONO_HTTP_EXCEPTION_GET,
-					"%s:%u --> %s", STRING_CHECK(address), port, STRING_CHECK(path));
+					"%s:%u, %s", STRING_CHECK(address), port, STRING_CHECK(path));
 			}
 
 			for(;;) {
@@ -246,7 +246,7 @@ namespace SONO {
 
 			if(sock.write(STRING_CHECK(request.str())) == SONO_SOCKET_INVALID) {
 				THROW_SONO_HTTP_EXCEPTION_FORMAT(SONO_HTTP_EXCEPTION_POST,
-					"%s:%u --> %s", STRING_CHECK(address), port, STRING_CHECK(path));
+					"%s:%u, %s", STRING_CHECK(address), port, STRING_CHECK(path));
 			}
 
 			for(;;) {

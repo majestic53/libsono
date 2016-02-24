@@ -117,7 +117,7 @@ namespace SONO {
 			)
 		{
 			std::string dir_arg, name_arg;
-			std::vector<std::string> input, output;
+			sono_action_arguments input, output;
 			std::map<std::string, sono_action>::iterator iter;
 			boost::property_tree::ptree::const_iterator iter_arg;
 
@@ -213,10 +213,10 @@ namespace SONO {
 				}
 			} catch(sono_exception &exc) {
 				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_SERVICE_DISCOVERY,
-					"%s:%u --> %s", STRING_CHECK(m_data.address), m_data.port, STRING_CHECK(exc.to_string()));
+					"%s:%u, %s", STRING_CHECK(m_data.address), m_data.port, STRING_CHECK(exc.to_string()));
 			} catch(std::exception &exc) {
 				THROW_SONO_SERVICE_EXCEPTION_FORMAT(SONO_SERVICE_EXCEPTION_SERVICE_DISCOVERY,
-					"%s:%u --> %s", STRING_CHECK(m_data.address), m_data.port, exc.what());
+					"%s:%u, %s", STRING_CHECK(m_data.address), m_data.port, exc.what());
 			}
 		}
 

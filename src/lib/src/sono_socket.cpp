@@ -152,7 +152,7 @@ namespace SONO {
 			m_socket = socket(domain, type, protocol);
 			if(m_socket == SONO_SOCKET_INVALID) {
 				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-					"[%s] %s:%u --> socket failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+					"[%s] %s:%u, socket failed: 0x%x", SONO_SOCKET_STRING(m_type), 
 					STRING_CHECK(m_address), m_port, errno);
 			}
 
@@ -161,7 +161,7 @@ namespace SONO {
 
 				if(setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, &tm, sizeof(tm)) == SONO_SOCKET_INVALID) {
 					THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-						"[%s] %s:%u --> setsockopt(timeout) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+						"[%s] %s:%u, setsockopt(timeout) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
 						STRING_CHECK(m_address), m_port, errno);
 				}
 			}
@@ -177,14 +177,14 @@ namespace SONO {
 						if(setsockopt(m_socket, IPPROTO_IP, IP_MULTICAST_IF, &inter, sizeof(inter)) 
 								== SONO_SOCKET_INVALID) {
 							THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-								"[%s] %s:%u --> setsockopt(multicast_if) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+								"[%s] %s:%u, setsockopt(multicast_if) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
 								STRING_CHECK(m_address), m_port, errno);
 						}
 					}
 
 					if(setsockopt(m_socket, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) == SONO_SOCKET_INVALID) {
 						THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-							"[%s] %s:%u --> setsockopt(multicast_ttl) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+							"[%s] %s:%u, setsockopt(multicast_ttl) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
 							STRING_CHECK(m_address), m_port, errno);
 					}
 					break;
@@ -200,7 +200,7 @@ namespace SONO {
 
 			if(!inet_aton(STRING_CHECK(m_address), &m_socket_address.sin_addr)) {
 				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-					"[%s] %s:%u --> inet_aton(remote) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+					"[%s] %s:%u, inet_aton(remote) failed: 0x%x", SONO_SOCKET_STRING(m_type), 
 					STRING_CHECK(m_address), m_port, errno);
 			}
 
@@ -210,7 +210,7 @@ namespace SONO {
 					if(::connect(m_socket, (struct sockaddr *) &m_socket_address, sizeof(m_socket_address)) 
 							== SONO_SOCKET_INVALID) {
 						THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-							"[%s] %s:%u --> connect failed: 0x%x", SONO_SOCKET_STRING(m_type), 
+							"[%s] %s:%u, connect failed: 0x%x", SONO_SOCKET_STRING(m_type), 
 							STRING_CHECK(m_address), m_port, errno);
 					}
 					break;
@@ -235,7 +235,7 @@ namespace SONO {
 
 			if(m_socket && (close(m_socket) == SONO_SOCKET_INVALID)) {
 				THROW_SONO_SOCKET_EXCEPTION_FORMAT(SONO_SOCKET_EXCEPTION_INTERNAL,
-					"[%s] %s:%u --> close failed: 0x%x", SONO_SOCKET_STRING(m_type), STRING_CHECK(m_address),
+					"[%s] %s:%u, close failed: 0x%x", SONO_SOCKET_STRING(m_type), STRING_CHECK(m_address),
 					m_port, errno);
 			}
 

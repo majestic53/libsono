@@ -23,6 +23,7 @@
 
 namespace SONO {
 
+	#define SONO_DEVICE_CONFIG "/xml/device_description.xml"
 	#define SONO_SOCKET_SSDP_ADDRESS "239.255.255.250"
 	#define SONO_SOCKET_SSDP_MESSAGE \
 		"M-SEARCH * HTTP/1.1\r\n" \
@@ -122,7 +123,8 @@ namespace SONO {
 	sono_device &
 	_sono_manager::device(
 		__in const std::string &address,
-		__in uint16_t port
+		__in uint16_t port,
+		__in_opt bool create
 		)
 	{
 
@@ -130,7 +132,9 @@ namespace SONO {
 			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
 		}
 
-		return m_factory_device->at(address, port);
+		return (create && !m_factory_device->contains(address, port)) ? 
+			m_factory_device->generate(std::string(), std::string(), SONO_DEVICE_CONFIG, address, port) :
+			m_factory_device->at(address, port);
 	}
 
 	size_t 

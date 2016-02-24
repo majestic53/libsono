@@ -1,10 +1,11 @@
-sonoctl [-h|-v][[-a args][-d args][-s args]][-l[[a|s] args]]
+sonoctl [-h|-v][[-b][[-a args][-d args][-s args]]][-l[[a|s] args]]
 
--a | --action <action> <key>=<value>...		Specify target action/arguments
--d | --device <address>:<port>			Specify target device
--h | --help					Display help information
--l | --list					List available devices
--la | --list-actions <address>:<port> <service>	List available device service actions
--ld | --list-services <address>:<port>		List available device services
--s | --service <service>			Specify target service
--v | --version					Display version information
+-a | --action		<action> <key>=<value>...	Specify target action/arguments
+-d | --device		<address>:<port>		Specify target device
+-h | --help						Display help information
+-l | --list						List available devices
+-la | --list-actions 	<address>:<port> <service>	List available device service actions
+-ld | --list-services 	<address>:<port>		List available device services
+-s | --service		<service>			Specify target service
+-b | --verbose						Display verbose information						
+-v | --version						Display version information

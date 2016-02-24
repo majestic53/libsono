@@ -39,6 +39,7 @@ sonoctl [-h|-v][[-a args][-d args][-s args]][-l[[a|s] args]]
 -la   --list-actions   <addr>:<port> <service>     --- List available device service actions
 -ls   --list-services  <addr>:<port>               --- List available device services
 -s    --service        <service>                   --- Specify target service
+-b    --verbose                                    --- Display verbose information
 -v    --version                                    --- Display version information
 ```
 
@@ -68,6 +69,10 @@ Changelog
 =========
 
 ###Version 0.1.1609
+*Updated: 2/23/2016*
+
+* Completed sonoctl interface
+
 *Updated: 2/22/2016*
 
 * Added sonoctl interface (incomplete)

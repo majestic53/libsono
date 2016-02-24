@@ -145,7 +145,8 @@ namespace SONO {
 			result = m_service_map.find(type);
 			if(result == m_service_map.end()) {
 				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_NOT_FOUND, 
-					"%s --> service: %s", STRING_CHECK(sono_socket_base::to_string()), STRING_CHECK(type));
+					"%s:%u, %s", STRING_CHECK(sono_socket_base::socket().address()), sono_socket_base::socket().port(), 
+						STRING_CHECK(type));
 			}
 
 			return result;
@@ -255,10 +256,12 @@ namespace SONO {
 				}
 			} catch(sono_exception &exc) {
 				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_DISCOVERY,
-					"%s --> %s", STRING_CHECK(sono_socket_base::to_string()), STRING_CHECK(exc.to_string()));
+					"%s:%u, %s", STRING_CHECK(sono_socket_base::socket().address()), sono_socket_base::socket().port(), 
+						STRING_CHECK(exc.to_string()));
 			} catch(std::exception &exc) {
 				THROW_SONO_DEVICE_EXCEPTION_FORMAT(SONO_DEVICE_EXCEPTION_SERVICE_DISCOVERY,
-					"%s --> %s", STRING_CHECK(sono_socket_base::to_string()), exc.what());
+					"%s:%u, %s", STRING_CHECK(sono_socket_base::socket().address()), sono_socket_base::socket().port(), 
+						exc.what());
 			}
 
 			return service_list();
@@ -411,6 +414,29 @@ namespace SONO {
 			}
 
 			return (m_map.find(id) != m_map.end());
+		}
+
+		bool 
+		_sono_device_factory::contains(
+			__in const std::string &address,
+			__in uint16_t port
+			)
+		{
+			std::map<sono_uid_t, std::pair<sono_device, size_t>>::iterator iter;
+
+			if(!m_initialized) {
+				THROW_SONO_DEVICE_EXCEPTION(SONO_DEVICE_EXCEPTION_UNINITIALIZED);
+			}
+
+			for(iter = m_map.begin(); iter != m_map.end(); ++iter) {
+
+				if((iter->second.first.socket().address() == address)
+						&& (iter->second.first.socket().port() == port)) {
+					break;
+				}
+			}
+
+			return (iter != m_map.end());
 		}
 
 		size_t 

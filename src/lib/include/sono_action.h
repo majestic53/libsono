@@ -25,6 +25,7 @@ namespace SONO {
 	namespace COMP {
 
 		typedef std::map<std::string, std::string> sono_action_argument;
+		typedef std::vector<std::string> sono_action_arguments;
 		typedef std::set<std::string> sono_action_list;
 
 		typedef class _sono_action {
@@ -34,8 +35,8 @@ namespace SONO {
 				_sono_action(
 					__in const std::string &type,
 					__in const std::string &name,
-					__in_opt const std::vector<std::string> &input = std::vector<std::string>(),
-					__in_opt const std::vector<std::string> &output = std::vector<std::string>()
+					__in_opt const sono_action_arguments &input = sono_action_arguments(),
+					__in_opt const sono_action_arguments &output = sono_action_arguments()
 					);
 
 				_sono_action(
@@ -48,11 +49,11 @@ namespace SONO {
 					__in const _sono_action &other
 					);
 
-				const std::vector<std::string> &input(void);
+				const sono_action_arguments &input(void);
 
 				const std::string &name(void);
 
-				const std::vector<std::string> &output(void);
+				const sono_action_arguments &output(void);
 
 				sono_action_argument run(
 					__in const std::string &path,
@@ -65,8 +66,8 @@ namespace SONO {
 				void set(
 					__in const std::string &type,
 					__in const std::string &name,
-					__in_opt const std::vector<std::string> &input = std::vector<std::string>(),
-					__in_opt const std::vector<std::string> &output = std::vector<std::string>()
+					__in_opt const sono_action_arguments &input = sono_action_arguments(),
+					__in_opt const sono_action_arguments &output = sono_action_arguments()
 					);
 
 				virtual std::string to_string(
@@ -81,11 +82,11 @@ namespace SONO {
 					__in const std::string &response
 					);
 
-				std::vector<std::string> m_input;
+				sono_action_arguments m_input;
 
 				std::string m_name;
 
-				std::vector<std::string> m_output;
+				sono_action_arguments m_output;
 
 				std::string m_type;
 
