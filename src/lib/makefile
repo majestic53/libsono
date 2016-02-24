@@ -16,22 +16,30 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 CC=clang++
-CC_FLAGS=-march=native -pthread -std=gnu++11 -O3 -Wall -Werror
+CC_FLAGS=-march=native -std=gnu++11 -fPIC -pthread -O3 -Wall -Werror
 DIR_BIN=./../../bin/
 DIR_BUILD=./../../build/
 DIR_INC=include/
 DIR_ROOT=./
 DIR_SRC=src/
-LIB=libsono.a
+LIB=libsono
+LIB_VER=1
 
 all: build archive
 
 archive:
 	@echo ''
-	@echo '--- BUILDING LIBRARY -----------------------'
-	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o \
+	@echo '--- BUILDING STATIC LIBRARY ----------------'
+	ar rcs $(DIR_BIN)$(LIB).a $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o \
 		$(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_manager.o \
 		$(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
+	@echo '--- DONE -----------------------------------'
+	@echo ''
+	@echo '--- BUILDING SHARED LIBRARY ----------------'
+	$(CC) -shared -Wl,-soname,$(LIB).so.$(LIB_VER) -o $(DIR_BIN)$(LIB).so \
+		$(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o $(DIR_BUILD)sono_exception.o \
+		$(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_manager.o $(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o \
+		$(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 

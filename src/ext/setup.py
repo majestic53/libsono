@@ -15,27 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CC=clang++
-CC_FLAGS=-march=native -std=gnu++11 -fPIC -pthread -O3 -Wall -Werror
-DIR_BIN=./../../bin/
-DIR_BUILD=./../../build/
-DIR_INC=./include/
-DIR_SRC=./src/
-EXE=sonoctl
-LIB=libsono
+from distutils.core import setup, Extension
 
-all: build tool
+# Module information
 
-tool:
-	@echo ''
-	@echo '--- BUILDING TOOL --------------------------' 
-	$(CC) $(CC_FLAGS) main.cpp $(DIR_BUILD)sono_loader.o $(DIR_BIN)$(LIB).a -o $(DIR_BIN)$(EXE)
-	@echo '--- DONE -----------------------------------'
-	@echo ''
-
-build: sono_loader.o
-
-# TOOL
-
-sono_loader.o: $(DIR_SRC)sono_loader.cpp $(DIR_INC)sono_loader.h
-	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_loader.cpp -o $(DIR_BUILD)sono_loader.o
+setup(
+	name='sonopkg', 
+	version='0.1', 
+	description='a lightwight library used to control Sono devices', 
+	author='David Jolly',
+	author_email='majestic53@gmail.com',
+	url='https://github.com/majestic53/libsono',
+	ext_modules=[Extension('sono_py', sources=['./src/sono_py.c'])],
+	)

@@ -18,6 +18,7 @@
 JOB_SLOTS=4
 DIR_BIN=./bin/
 DIR_BUILD=./build/
+DIR_EXT=./src/ext/
 DIR_LIB=./src/lib/
 DIR_LOG=./log/
 DIR_SRC=./src/
@@ -29,12 +30,19 @@ LOG_CLOC=cloc_stat.log
 
 all: build
 
-build: clean _init _lib _tool
+build: clean _init _lib _tool _ext
 
 clean:
 	rm -rf $(DIR_BIN)
 	rm -rf $(DIR_BUILD)
 	rm -rf $(DIR_LOG)
+
+_ext:
+	@echo ''
+	@echo '============================================'
+	@echo 'BUILDING EXTERNALS'
+	@echo '============================================'
+	cd $(DIR_EXT) && make ##all
 
 _init:
 	mkdir $(DIR_BIN)

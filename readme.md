@@ -72,6 +72,7 @@ Changelog
 *Updated: 2/23/2016*
 
 * Completed sonoctl interface
+* Added Python binding (incomplete)
 
 *Updated: 2/22/2016*
 

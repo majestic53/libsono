@@ -15,27 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CC=clang++
-CC_FLAGS=-march=native -std=gnu++11 -fPIC -pthread -O3 -Wall -Werror
 DIR_BIN=./../../bin/
 DIR_BUILD=./../../build/
-DIR_INC=./include/
 DIR_SRC=./src/
-EXE=sonoctl
-LIB=libsono
 
-all: build tool
+all: build ext
 
-tool:
+ext:
 	@echo ''
-	@echo '--- BUILDING TOOL --------------------------' 
-	$(CC) $(CC_FLAGS) main.cpp $(DIR_BUILD)sono_loader.o $(DIR_BIN)$(LIB).a -o $(DIR_BIN)$(EXE)
+	@echo '--- BUILDING PYTHON MODULE -----------------'
+	## TODO
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: sono_loader.o
+build:
 
-# TOOL
+# MODULE
 
-sono_loader.o: $(DIR_SRC)sono_loader.cpp $(DIR_INC)sono_loader.h
-	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_loader.cpp -o $(DIR_BUILD)sono_loader.o
+## TODO
