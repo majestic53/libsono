@@ -40,9 +40,7 @@ Sonoctl is a CLI application, which can be invoked using the interface below:
 
 ```
 sonoctl [-h|-v][[[-b][[-a args][-d args][-s args]]][-l[[a|s] args]]]
-```
 
-```
 -a    --action         <action> <key>=<value>...   --- Specify target action/arguments
 -d    --device         <addr>:<port>               --- Specify target device
 -h    --help                                       --- Display help information
@@ -56,22 +54,26 @@ sonoctl [-h|-v][[[-b][[-a args][-d args][-s args]]][-l[[a|s] args]]]
 
 ###Examples
 
-* List all available devices
+List all available devices:
+
 ```
 sonoctl --list
 ```
 
-* List all available services advertised by a target device
+List all available services advertised by a target device:
+
 ```
 sonoctl --list-services 192.168.1.2:1400
 ```
 
-* List all available actions advertiesed by a target device's service
+List all available actions advertiesed by a target device's service:
+
 ```
 sonoctl --list-actions 192.168.1.2:1400 DeviceProperties
 ```
 
-* Set a target device's LED state
+Set a target device's LED state:
+
 ```
 sonoctl -d 192.168.1.2:1400 -s DeviceProperties -a SetLEDState DesiredLEDState=On
 ```
