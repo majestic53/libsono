@@ -17,10 +17,16 @@ Usage
 
 __Prereq__: Building this project requires the GNU and/or Clang c++ compilers (g++/clang++) and the Boost library.
 
-To build the entire project, simply run the command below in the projects root directory.
+To build the project, simply run the command below in the projects root directory.
 
 ```
-make
+make all               --- Build libraries and sonoctl
+make clean             --- Clean build
+make lib               --- Build libraries
+make py                --- Build libraries and python module
+make shared            --- Build shared library
+make static            --- Build static library
+make tool              --- Build libraries and sonoctl
 ```
 
 sonoctl is a CLI application, which can be invoked using the interface below:
@@ -69,6 +75,10 @@ Changelog
 =========
 
 ###Version 0.1.1609
+*Updated: 2/24/2016*
+
+* Added python binding to makefile
+
 *Updated: 2/23/2016*
 
 * Completed sonoctl interface

@@ -25,16 +25,16 @@ DIR_SRC=src/
 LIB=libsono
 LIB_VER=1
 
-all: build archive
+all: build _shared _static
 
-archive:
-	@echo ''
-	@echo '--- BUILDING STATIC LIBRARY ----------------'
-	ar rcs $(DIR_BIN)$(LIB).a $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o \
-		$(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_manager.o \
-		$(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
-	@echo '--- DONE -----------------------------------'
-	@echo ''
+build: sono.o sono_action.o sono_device.o sono_exception.o sono_http.o sono_manager.o sono_service.o \
+	sono_socket.o sono_uid.o sono_xml.o
+
+shared: build _shared
+
+static: build _static
+
+_shared:
 	@echo '--- BUILDING SHARED LIBRARY ----------------'
 	$(CC) -shared -Wl,-soname,$(LIB).so.$(LIB_VER) -o $(DIR_BIN)$(LIB).so \
 		$(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o $(DIR_BUILD)sono_exception.o \
@@ -43,8 +43,14 @@ archive:
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: sono.o sono_action.o sono_device.o sono_exception.o sono_http.o sono_manager.o sono_service.o \
-	sono_socket.o sono_uid.o sono_xml.o
+_static:
+	@echo ''
+	@echo '--- BUILDING STATIC LIBRARY ----------------'
+	ar rcs $(DIR_BIN)$(LIB).a $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o \
+		$(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_manager.o \
+		$(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
+	@echo '--- DONE -----------------------------------'
+	@echo ''
 
 # LIB
 

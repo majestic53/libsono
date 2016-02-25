@@ -28,21 +28,24 @@ LOG_MEM=val_err.log
 LOG_STAT=stat_err.log
 LOG_CLOC=cloc_stat.log
 
-all: build
-
-build: clean _init _lib _tool _ext
+all: tool
 
 clean:
 	rm -rf $(DIR_BIN)
 	rm -rf $(DIR_BUILD)
 	rm -rf $(DIR_LOG)
 
-_ext:
-	@echo ''
-	@echo '============================================'
-	@echo 'BUILDING EXTERNALS'
-	@echo '============================================'
-	cd $(DIR_EXT) && make ##all
+init: clean _init
+
+lib: init _lib
+
+py: init _lib _py
+
+shared: init _lib_shared
+
+static: init _lib_static
+
+tool: init _lib _tool
 
 _init:
 	mkdir $(DIR_BIN)
@@ -55,7 +58,31 @@ _lib:
 	@echo 'BUILDING LIBRARIES'
 	@echo '============================================'
 	cd $(DIR_LIB) && make build -j $(JOB_SLOTS)
-	cd $(DIR_LIB) && make archive
+	cd $(DIR_LIB) && make _shared
+	cd $(DIR_LIB) && make _static
+
+_lib_shared: 
+	@echo ''
+	@echo '============================================'
+	@echo 'BUILDING LIBRARIES'
+	@echo '============================================'
+	cd $(DIR_LIB) && make build -j $(JOB_SLOTS)
+	cd $(DIR_LIB) && make _shared
+
+_lib_static: 
+	@echo ''
+	@echo '============================================'
+	@echo 'BUILDING LIBRARIES'
+	@echo '============================================'
+	cd $(DIR_LIB) && make build -j $(JOB_SLOTS)
+	cd $(DIR_LIB) && make _static
+
+_py:
+	@echo ''
+	@echo '============================================'
+	@echo 'BUILDING EXTERNALS'
+	@echo '============================================'
+	cd $(DIR_EXT) && make ##all
 
 _tool:
 	@echo ''

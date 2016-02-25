@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <python.h>
+#include <python2.7/Python.h>
 #include "../../lib/sono.h"
 
 /*
@@ -34,7 +34,6 @@ sono_init_func(
 	)
 {
 	size_t length;
-	PyObject *result = NULL;
 	sono_evt_cb handler = NULL;
 	sono_err_t status = SONO_ERR_NONE;
 	
@@ -44,7 +43,7 @@ sono_init_func(
 		goto exit;
 	}
 	
-	status = sono_init(handle);
+	status = sono_init(handler);
 	
 exit:
 	return Py_BuildValue("I", status);
