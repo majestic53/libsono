@@ -45,7 +45,7 @@ shared: init _lib_shared
 
 static: init _lib_static
 
-tool: init _lib _tool
+tool: init _lib_static _tool
 
 _init:
 	mkdir $(DIR_BIN)

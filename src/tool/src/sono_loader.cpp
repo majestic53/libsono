@@ -127,7 +127,7 @@ namespace SONO {
 
 	#define SONOCTL_ARGUMENT_DEVICE_MAX SONOCTL_ARGUMENT_DEVICE_RIGHT
 	#define SONOCTL_ARGUMENT_DEVICE_ADDRESS_REGEX "(.*):(.*)"
-	#define SONOCTL_ARGUMENT_DEVICE_KEY_VALUE_REGEX "(.*)=(.*)"
+	#define SONOCTL_ARGUMENT_DEVICE_KEY_VALUE_DELIMITER "="
 
 	_sono_loader *_sono_loader::m_instance = NULL;
 
@@ -325,9 +325,9 @@ namespace SONO {
 		__in_opt uint32_t action_timeout
 		)
 	{
-		size_t count;
-		uint16_t port;
+		uint16_t port;		
 		sono_argument_t type;
+		size_t count, position_ch;
 		uint32_t mask = 0, offset;
 		sono_action_argument input;
 		sono_action_arguments args;
@@ -407,16 +407,16 @@ namespace SONO {
 								break;
 							}
 
-							std::regex_search(arg.c_str(), match, std::regex(SONOCTL_ARGUMENT_DEVICE_KEY_VALUE_REGEX));
-							if(match.size() != (SONOCTL_ARGUMENT_DEVICE_MAX + 1)) {
+							position_ch = arg.find_first_of(SONOCTL_ARGUMENT_DEVICE_KEY_VALUE_DELIMITER, 0);
+							if(position_ch == std::string::npos) {
 								std::cout << "Missing argument: \'" << flag << "\'" << std::endl << std::endl 
 									<< sono_loader::display_section(SONOCTL_SECTION_USAGE) << std::endl << std::endl 
 									<< sono_loader::display_section(SONOCTL_SECTION_OPTIONS) << std::endl;
 								goto complete;
 							}
 
-							input.insert(std::pair<std::string, std::string>(match[SONOCTL_ARGUMENT_DEVICE_LEFT],
-								match[SONOCTL_ARGUMENT_DEVICE_RIGHT]));
+							input.insert(std::pair<std::string, std::string>(arg.substr(0, position_ch),
+								arg.substr(position_ch + 1, arg.size())));
 						}
 						break;
 					case SONOCTL_ARGUMENT_DEVICE:
@@ -672,10 +672,20 @@ namespace SONO {
 				dev.service_discovery(service_timeout);
 			}
 
+			if(mask & (1 << SONOCTL_ARGUMENT_VERBOSE)) {
+				std::cout << "Input: " << input.size() << " entries(s)." << std::endl << "---";
+
+				for(count = 0, iter_arg = input.begin(); iter_arg != input.end(); ++count, ++iter_arg) {
+					std::cout << std::endl << "[" << count << "] " << iter_arg->first << ": " << iter_arg->second;
+				}
+
+				std::cout << std::endl << std::endl;
+			}
+
 			m_results = dev.service(svc).run(act, input, action_timeout);
 
 			if(mask & (1 << SONOCTL_ARGUMENT_VERBOSE)) {
-				std::cout << "Result: " << m_results.size() << " entries(s)." << std::endl << "---";
+				std::cout << "Output: " << m_results.size() << " entries(s)." << std::endl << "---";
 
 				for(count = 0, iter_arg = m_results.begin(); iter_arg != m_results.end(); ++count, ++iter_arg) {
 					std::cout << std::endl << "[" << count << "] " << iter_arg->first << ": " << iter_arg->second;
