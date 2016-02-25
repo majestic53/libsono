@@ -1,7 +1,7 @@
 LIBSONO
 =======
 
-LIBSONO is a lightwight library used to control Sono devices, written in C++.
+LIBSONO is a lightweight library used to control Sono devices, written in C++.
 
 Table of Contents
 ===============
