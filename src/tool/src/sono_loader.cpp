@@ -673,22 +673,30 @@ namespace SONO {
 			}
 
 			if(mask & (1 << SONOCTL_ARGUMENT_VERBOSE)) {
-				std::cout << "Input: " << input.size() << " entries(s)." << std::endl << "---";
+				std::cout << "Input: " << input.size() << " entries(s).";
 
-				for(count = 0, iter_arg = input.begin(); iter_arg != input.end(); ++count, ++iter_arg) {
-					std::cout << std::endl << "[" << count << "] " << iter_arg->first << ": " << iter_arg->second;
+				if(!input.empty()) {
+					std::cout << std::endl << "---";
+
+					for(count = 0, iter_arg = input.begin(); iter_arg != input.end(); ++count, ++iter_arg) {
+						std::cout << std::endl << "[" << count << "] " << iter_arg->first << ": " << iter_arg->second;
+					}
 				}
 
-				std::cout << std::endl << std::endl;
+				std::cout << std::endl;
 			}
 
 			m_results = dev.service(svc).run(act, input, action_timeout);
 
 			if(mask & (1 << SONOCTL_ARGUMENT_VERBOSE)) {
-				std::cout << "Output: " << m_results.size() << " entries(s)." << std::endl << "---";
+				std::cout << "Output: " << m_results.size() << " entries(s).";
 
-				for(count = 0, iter_arg = m_results.begin(); iter_arg != m_results.end(); ++count, ++iter_arg) {
-					std::cout << std::endl << "[" << count << "] " << iter_arg->first << ": " << iter_arg->second;
+				if(!m_results.empty()) {
+					std::cout << std::endl << "---";
+
+					for(count = 0, iter_arg = m_results.begin(); iter_arg != m_results.end(); ++count, ++iter_arg) {
+						std::cout << std::endl << "[" << count << "] " << iter_arg->first << ": " << iter_arg->second;
+					}
 				}
 
 				std::cout << std::endl;
