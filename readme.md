@@ -7,7 +7,12 @@ Table of Contents
 ===============
 
 1. [Usage](https://github.com/majestic53/libsono#usage)
+	1. [Build](https://github.com/majestic53/libsono#build)
+	2. [Sonoctl](https://github.com/majestic53/libsono#sonoctl)
+	2. [Examples](https://github.com/majestic53/libsono#examples)
 2. [Changelog](https://github.com/majestic53/libsono#changelog)
+	1. [Version 0.1.1609](https://github.com/majestic53/libsono#version-011609)
+	1. [Version 0.1.1608](https://github.com/majestic53/libsono#version-011608)
 3. [License](https://github.com/majestic53/libsono#license)
 
 Usage
@@ -17,7 +22,7 @@ Usage
 
 __Prereq__: Building this project requires GNU and/or Clang compilers, Boost library, and Python headers.
 
-To build the project, simply run the command below in the projects root directory.
+To build the project, simply run the commands below in the projects root directory:
 
 ```
 make all               --- Build libraries and sonoctl
@@ -29,9 +34,9 @@ make static            --- Build static library
 make tool              --- Build libraries and sonoctl
 ```
 
-sonoctl is a CLI application, which can be invoked using the interface below:
+###Sonoctl
 
-###SONOCTL
+Sonoctl is a CLI application, which can be invoked using the interface below:
 
 ```
 sonoctl [-h|-v][[[-b][[-a args][-d args][-s args]]][-l[[a|s] args]]]
