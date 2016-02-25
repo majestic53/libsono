@@ -15,7 +15,7 @@ Usage
 
 ###Build
 
-__Prereq__: Building this project requires the GNU and/or Clang c++ compilers (g++/clang++) and the Boost library.
+__Prereq__: Building this project requires GNU and/or Clang compilers, Boost library, and Python headers.
 
 To build the project, simply run the command below in the projects root directory.
 
