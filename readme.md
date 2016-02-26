@@ -82,6 +82,10 @@ Changelog
 =========
 
 ###Version 0.1.1609
+*Updated: 2/25/2016*
+
+* Added av controller class (incomplete)
+
 *Updated: 2/24/2016*
 
 * Added python binding to makefile

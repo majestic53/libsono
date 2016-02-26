@@ -65,6 +65,7 @@ namespace SONO {
 	sono_manager *sono_manager::m_instance = NULL;
 
 	_sono_manager::_sono_manager(void) :
+		m_controller(sono_controller::acquire()),
 		m_factory_device(sono_device_factory::acquire()),
 		m_factory_socket(sono_socket_factory::acquire()),
 		m_factory_uid(sono_uid_factory::acquire()),
@@ -105,6 +106,17 @@ namespace SONO {
 		}
 
 		return sono_manager::m_instance;
+	}
+
+	const sono_controller *
+	_sono_manager::control(void)
+	{
+
+		if(!m_initialized) {
+			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_controller;
 	}
 
 	sono_device &
@@ -235,6 +247,7 @@ namespace SONO {
 		m_factory_uid->initialize();
 		m_factory_socket->initialize();
 		m_factory_device->initialize();
+		m_controller->initialize();
 		m_initialized = true;
 	}
 
@@ -291,6 +304,7 @@ namespace SONO {
 			THROW_SONO_EXCEPTION(SONO_EXCEPTION_UNINITIALIZED);
 		}
 
+		m_controller->uninitialize();
 		m_factory_device->uninitialize();
 		m_factory_socket->uninitialize();
 		m_factory_uid->uninitialize();

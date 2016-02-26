@@ -42,6 +42,7 @@ using namespace SONO;
 #include "sono_xml.h"
 #include "sono_service.h"
 #include "sono_device.h"
+#include "sono_controller.h"
 
 using namespace SONO::COMP;
 
@@ -61,6 +62,8 @@ namespace SONO {
 			~_sono_manager(void);
 
 			static _sono_manager *acquire(void);
+
+			const sono_controller *control(void);
 
 			sono_device &device(
 				__in sono_uid_t id
@@ -116,6 +119,8 @@ namespace SONO {
 				);
 
 			static void _delete(void);
+
+			sono_controller *m_controller;
 
 			sono_device_factory *m_factory_device;
 

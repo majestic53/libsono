@@ -27,7 +27,7 @@ LIB_VER=1
 
 all: build _shared _static
 
-build: sono.o sono_action.o sono_device.o sono_exception.o sono_http.o sono_manager.o sono_service.o \
+build: sono.o sono_action.o sono_controller.o sono_device.o sono_exception.o sono_http.o sono_manager.o sono_service.o \
 	sono_socket.o sono_uid.o sono_xml.o
 
 shared: build _shared
@@ -37,18 +37,19 @@ static: build _static
 _shared:
 	@echo '--- BUILDING SHARED LIBRARY ----------------'
 	$(CC) -shared -Wl,-soname,$(LIB).so.$(LIB_VER) -o $(DIR_BIN)$(LIB).so \
-		$(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o $(DIR_BUILD)sono_exception.o \
-		$(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_manager.o $(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o \
-		$(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
+		$(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_controller.o $(DIR_BUILD)sono_device.o \
+		$(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_manager.o $(DIR_BUILD)sono_service.o \
+		$(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
 _static:
 	@echo ''
 	@echo '--- BUILDING STATIC LIBRARY ----------------'
-	ar rcs $(DIR_BIN)$(LIB).a $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_device.o \
-		$(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o $(DIR_BUILD)sono_manager.o \
-		$(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o $(DIR_BUILD)sono_xml.o
+	ar rcs $(DIR_BIN)$(LIB).a $(DIR_BUILD)sono.o $(DIR_BUILD)sono_action.o $(DIR_BUILD)sono_controller.o \
+		$(DIR_BUILD)sono_device.o $(DIR_BUILD)sono_exception.o $(DIR_BUILD)sono_http.o \
+		$(DIR_BUILD)sono_manager.o $(DIR_BUILD)sono_service.o $(DIR_BUILD)sono_socket.o $(DIR_BUILD)sono_uid.o \
+		$(DIR_BUILD)sono_xml.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
@@ -69,6 +70,9 @@ sono_manager.o: $(DIR_SRC)sono_manager.cpp $(DIR_INC)sono_manager.h
 
 sono_action.o: $(DIR_SRC)sono_action.cpp $(DIR_INC)sono_action.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_action.cpp -o $(DIR_BUILD)sono_action.o
+
+sono_controller.o: $(DIR_SRC)sono_controller.cpp $(DIR_INC)sono_controller.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_controller.cpp -o $(DIR_BUILD)sono_controller.o
 
 sono_device.o: $(DIR_SRC)sono_device.cpp $(DIR_INC)sono_device.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)sono_device.cpp -o $(DIR_BUILD)sono_device.o
