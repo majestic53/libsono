@@ -90,30 +90,42 @@ namespace SONO {
 			__in const std::string &uri,
 			__in const std::string &metadata,
 			__in_opt uint32_t position,
-			__in_opt uint32_t next
+			__in_opt uint32_t next,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: AVTransport::AddURIToQueue
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_ADD_URI_TO_QUEUE, input, 
+				service_timeout, action_timeout);
+			// ---
 		}
 
 		void 
 		_sono_controller::clear(
 			__in const std::string &address,
 			__in uint16_t port,
-			__in uint32_t instance
+			__in uint32_t instance,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: AVTransport::RemoveAllTracksFromQueue
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_REMOVE_ALL_TRACKS_FROM_QUEUE, input, 
+				service_timeout, action_timeout);
+			// ---
 		}
 
 		void 
@@ -124,6 +136,7 @@ namespace SONO {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_INITIALIZED);
 			}
 
+			m_result.clear();
 			m_initialized = true;
 		}
 
@@ -144,16 +157,22 @@ namespace SONO {
 			__in const std::string &address,
 			__in uint16_t port,
 			__in uint32_t instance,
-			__in_opt const std::string &channel
+			__in_opt const std::string &channel,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
 			bool result;
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: RenderingControl::GetMute
+			run(address, port, SONO_SERVICE_RENDING_CONTROL, SONO_ACTION_GET_MUTE, input, 
+				service_timeout, action_timeout);
+			// ---
 			result = false;
 			// ---
 
@@ -164,52 +183,95 @@ namespace SONO {
 		_sono_controller::next(
 			__in const std::string &address,
 			__in uint16_t port,
-			__in uint32_t instance
+			__in uint32_t instance,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: AVTransport::Next
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_NEXT, input, 
+				service_timeout, action_timeout);
+			// ---
 		}
 
 		void 
 		_sono_controller::pause(
 			__in const std::string &address,
 			__in uint16_t port,
-			__in uint32_t instance
+			__in uint32_t instance,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: AVTransport::Pause
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_PAUSE, input, 
+				service_timeout, action_timeout);
+			// ---
 		}
 
 		void 
 		_sono_controller::play(
 			__in const std::string &address,
 			__in uint16_t port,
-			__in uint32_t instance
+			__in uint32_t instance,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: AVTransport::Play
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_PLAY, input, 
+				service_timeout, action_timeout);
+			// ---
 		}
 
 		void 
 		_sono_controller::previous(
 			__in const std::string &address,
 			__in uint16_t port,
-			__in uint32_t instance
+			__in uint32_t instance,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
+			)
+		{
+			sono_action_argument input;
+
+			if(!m_initialized) {
+				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
+			}
+
+			// TODO: AVTransport::Previous
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_PREVIOUS, input, 
+				service_timeout, action_timeout);
+			// ---
+		}
+
+		void 
+		_sono_controller::run(
+			__in const std::string &address,
+			__in uint16_t port,
+			__in const std::string &service,
+			__in const std::string &action,
+			__in const sono_action_argument &input,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
 
@@ -217,7 +279,12 @@ namespace SONO {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
-			// TODO: AVTransport::Previous
+			sono_device &dev = sono_manager::acquire()->device(address, port, true);
+			if(!dev.size()) {
+				dev.service_discovery(service_timeout);
+			}
+
+			m_result = dev.service(service).run(action, input, action_timeout);
 		}
 
 		void 
@@ -226,15 +293,21 @@ namespace SONO {
 			__in uint16_t port,
 			__in uint32_t instance,
 			__in bool value,
-			__in_opt const std::string &channel
+			__in_opt const std::string &channel,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: RenderingControl::SetMute
+			run(address, port, SONO_SERVICE_RENDING_CONTROL, SONO_ACTION_SET_MUTE, input, 
+				service_timeout, action_timeout);
+			// ---
 		}
 
 		void 
@@ -243,31 +316,43 @@ namespace SONO {
 			__in uint16_t port,
 			__in uint32_t instance,
 			__in uint32_t value,
-			__in_opt const std::string &channel
+			__in_opt const std::string &channel,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: RenderingControl::SetVolume
+			run(address, port, SONO_SERVICE_RENDING_CONTROL, SONO_ACTION_SET_VOLUME, input, 
+				service_timeout, action_timeout);
+			// ---
 		}
 
 		std::string 
 		_sono_controller::state(
 			__in const std::string &address,
 			__in uint16_t port,
-			__in uint32_t instance
+			__in uint32_t instance,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
 			std::string result;
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: AVTransport::GetTransportInfo
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_GET_TRANSPORT_INFO, input, 
+				service_timeout, action_timeout);
+			// ---
 
 			return result;
 		}
@@ -276,15 +361,21 @@ namespace SONO {
 		_sono_controller::stop(
 			__in const std::string &address,
 			__in uint16_t port,
-			__in uint32_t instance
+			__in uint32_t instance,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: AVTransport::Stop
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_STOP, input, 
+				service_timeout, action_timeout);
+			// ---
 		}
 
 		std::string 
@@ -307,16 +398,22 @@ namespace SONO {
 		_sono_controller::track_current(
 			__in const std::string &address,
 			__in uint16_t port,
-			__in uint32_t instance
+			__in uint32_t instance,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
 			uint32_t result;
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: AVTransport::GetPositionInfo
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_GET_POSITION_INFO, input, 
+				service_timeout, action_timeout);
+			// ---
 			result = 0;
 			// ---
 
@@ -327,16 +424,22 @@ namespace SONO {
 		_sono_controller::track_total(
 			__in const std::string &address,
 			__in uint16_t port,
-			__in uint32_t instance
+			__in uint32_t instance,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
 			uint32_t result;
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: AVTransport::GetMediaInfo
+			run(address, port, SONO_SERVICE_AVTRANSPORT, SONO_ACTION_GET_MEDIA_INFO, input, 
+				service_timeout, action_timeout);
+			// ---
 			result = 0;
 			// ---
 
@@ -351,6 +454,7 @@ namespace SONO {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
+			m_result.clear();
 			m_initialized = false;
 		}
 
@@ -359,16 +463,22 @@ namespace SONO {
 			__in const std::string &address,
 			__in uint16_t port,
 			__in uint32_t instance,
-			__in_opt const std::string &channel
+			__in_opt const std::string &channel,
+			__in_opt uint32_t service_timeout,
+			__in_opt uint32_t action_timeout
 			)
 		{
 			uint32_t result;
+			sono_action_argument input;
 
 			if(!m_initialized) {
 				THROW_SONO_CONTROLLER_EXCEPTION(SONO_CONTROLLER_EXCEPTION_UNINITIALIZED);
 			}
 
 			// TODO: RenderingControl::GetVolume
+			run(address, port, SONO_SERVICE_RENDING_CONTROL, SONO_ACTION_GET_VOLUME, input, 
+				service_timeout, action_timeout);
+			// ---
 			result = 0;
 			// ---
 
