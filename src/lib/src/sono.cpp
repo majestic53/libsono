@@ -42,6 +42,491 @@ sono_evt_hdl(
 }
 
 sono_err_t 
+sono_dev_act_add(
+	__in const sono_dev *dev,
+	__in const char *path,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev || !path) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->add_to_queue(dev->addr, dev->port, path, 
+			svc_tmout, act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_clear(
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->clear_queue(dev->addr, dev->port, svc_tmout, 
+			act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_get_mute(
+	__out uint8_t *mute,
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev || !mute) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		*mute = sono_manager::acquire()->control()->get_mute(dev->addr, dev->port, 
+			svc_tmout, act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_get_playback_state(
+	__out uint32_t *state,
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev || !state) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		*state = sono_manager::acquire()->control()->get_playback_state(dev->addr, dev->port, 
+			svc_tmout, act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_get_volume(
+	__out uint32_t *volume,
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev || !volume) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		*volume = sono_manager::acquire()->control()->get_volume(dev->addr, dev->port, 
+			svc_tmout, act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_next(
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->next(dev->addr, dev->port, svc_tmout, 
+			act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_pause(
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->pause(dev->addr, dev->port, svc_tmout, 
+			act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_play(
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->play(dev->addr, dev->port, svc_tmout, 
+			act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_previous(
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->previous(dev->addr, dev->port, svc_tmout, 
+			act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_restart(
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->restart(dev->addr, dev->port, svc_tmout, 
+			act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_seek(
+	__in uint32_t hour,
+	__in uint32_t minute,
+	__in uint32_t second,
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->seek(dev->addr, dev->port, hour, minute,
+			second, svc_tmout, act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_set_mute(
+	__in uint8_t mute,
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->set_mute(dev->addr, dev->port, mute, 
+			svc_tmout, act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_set_volume(
+	__in uint32_t volume,
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->set_volume(dev->addr, dev->port, volume, 
+			svc_tmout, act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
+sono_dev_act_stop(
+	__in const sono_dev *dev,
+	__in_opt uint32_t svc_tmout,
+	__in_opt uint32_t act_tmout
+	)
+{
+	sono_err_t result = SONO_ERR_NONE;
+
+	g_err.clear();
+
+	if(!dev) {
+		g_err = SONO_INVALID_ARGUMENT;
+		result = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	try {
+		sono_manager::acquire()->control()->stop(dev->addr, dev->port, svc_tmout, 
+			act_tmout);
+	} catch(sono_exception &exc) {
+		g_err = exc.to_string(true);
+		result = SONO_ERR_FAILED;
+		goto exit;
+	} catch(std::exception &exc) {
+		g_err = exc.what();
+		result = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+exit:
+	return result;
+}
+
+sono_err_t 
 sono_init(
 	__in sono_evt_cb hdl
 	)

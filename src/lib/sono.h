@@ -88,6 +88,206 @@ typedef void (*sono_evt_cb)(
 	);
 
 /*
+ * Perform add to queue device action
+ * @param dev Target device
+ * @param path Target track file
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_add(
+	/*__in*/ const sono_dev *dev,
+	/*__in*/ const char *path,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform clear queue device action
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_clear(
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform get mute device action
+ * @param mute Target device current mute
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_get_mute(
+	/*__out*/ uint8_t *mute,
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform get playback state device action
+ * @param state Target device current playback state
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_get_playback_state(
+	/*__out*/ uint32_t *state,
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform get volume device action
+ * @param volume Target device current volume
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_get_volume(
+	/*__out*/ uint32_t *volume,
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform next track device action
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_next(
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform pause track device action
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_pause(
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform play track device action
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_play(
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform previous track device action
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_previous(
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform restart track device action
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_restart(
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform seek within track device action
+ * @param hour Target track hour
+ * @param minute Target track minute
+ * @param second Target track second
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_seek(
+	/*__in*/ uint32_t hour,
+	/*__in*/ uint32_t minute,
+	/*__in*/ uint32_t second,
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform set mute device action
+ * @param mute Target mute value
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_set_mute(
+	/*__in*/ uint8_t mute,
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform set volume device action
+ * @param volume Target volume value
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_set_volume(
+	/*__in*/ uint32_t volume,
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
+ * Perform stop track device action
+ * @param dev Target device
+ * @param svc_tmout Service timeout (in seconds)
+ * @param act_tmout Action timeout (in seconds)
+ * @return Error code
+ */
+sono_err_t sono_dev_act_stop(
+	/*__in*/ const sono_dev *dev,
+	/*__in_opt*/ uint32_t svc_tmout,
+	/*__in_opt*/ uint32_t act_tmout
+	);
+
+/*
  * Initialize library
  * (NOTE: This routine must be called prior to calling any other library routines)
  * @param hdl Device service event callback
