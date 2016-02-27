@@ -108,7 +108,7 @@ namespace SONO {
 		return sono_manager::m_instance;
 	}
 
-	const sono_controller *
+	sono_controller *
 	_sono_manager::control(void)
 	{
 

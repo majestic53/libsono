@@ -24,7 +24,14 @@ namespace SONO {
 
 	namespace COMP {
 
-		#define SONO_CHANNEL_MASTER "Master"
+		typedef enum {
+			SONO_STATE_PLAYING = 0,
+			SONO_STATE_PAUSED,
+			SONO_STATE_STOPPED,
+		} sono_state_t;
+
+		#define SONO_STATE_INVALID SCALAR_INVALID(sono_state_t)
+		#define SONO_STATE_MAX SONO_STATE_STOPPED
 
 		typedef class _sono_controller {
 
@@ -34,22 +41,38 @@ namespace SONO {
 
 				static _sono_controller *acquire(void);
 
-				void add(
+				void add_to_queue(
 					__in const std::string &address,
 					__in uint16_t port,
-					__in uint32_t instance,
-					__in const std::string &uri,
-					__in const std::string &metadata,
-					__in_opt uint32_t position = 0,
-					__in_opt uint32_t next = 0,
+					__in const std::string &path,
 					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
 					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
 					);
 
-				void clear(
+				void clear_queue(
 					__in const std::string &address,
 					__in uint16_t port,
-					__in uint32_t instance,
+					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
+					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				bool get_mute(
+					__in const std::string &address,
+					__in uint16_t port,
+					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
+					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				sono_state_t get_playback_state(
+					__in const std::string &address,
+					__in uint16_t port,
+					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
+					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				uint32_t get_volume(
+					__in const std::string &address,
+					__in uint16_t port,
 					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
 					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
 					);
@@ -60,19 +83,9 @@ namespace SONO {
 
 				bool is_initialized(void);
 
-				bool is_muted(
-					__in const std::string &address,
-					__in uint16_t port,
-					__in uint32_t instance,
-					__in_opt const std::string &channel = SONO_CHANNEL_MASTER,
-					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
-					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
 				void next(
 					__in const std::string &address,
 					__in uint16_t port,
-					__in uint32_t instance,
 					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
 					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
 					);
@@ -80,7 +93,6 @@ namespace SONO {
 				void pause(
 					__in const std::string &address,
 					__in uint16_t port,
-					__in uint32_t instance,
 					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
 					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
 					);
@@ -88,7 +100,6 @@ namespace SONO {
 				void play(
 					__in const std::string &address,
 					__in uint16_t port,
-					__in uint32_t instance,
 					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
 					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
 					);
@@ -96,7 +107,23 @@ namespace SONO {
 				void previous(
 					__in const std::string &address,
 					__in uint16_t port,
-					__in uint32_t instance,
+					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
+					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				void restart(
+					__in const std::string &address,
+					__in uint16_t port,
+					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
+					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
+					);
+
+				void seek(
+					__in const std::string &address,
+					__in uint16_t port,
+					__in uint32_t hour,
+					__in uint32_t minute,
+					__in uint32_t second,
 					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
 					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
 					);
@@ -104,9 +131,7 @@ namespace SONO {
 				void set_mute(
 					__in const std::string &address,
 					__in uint16_t port,
-					__in uint32_t instance,
-					__in bool value,
-					__in_opt const std::string &channel = SONO_CHANNEL_MASTER,
+					__in bool mute,
 					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
 					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
 					);
@@ -114,17 +139,7 @@ namespace SONO {
 				void set_volume(
 					__in const std::string &address,
 					__in uint16_t port,
-					__in uint32_t instance,
-					__in uint32_t value,
-					__in_opt const std::string &channel = SONO_CHANNEL_MASTER,
-					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
-					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				std::string state(
-					__in const std::string &address,
-					__in uint16_t port,
-					__in uint32_t instance,
+					__in uint32_t volume,
 					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
 					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
 					);
@@ -132,7 +147,6 @@ namespace SONO {
 				void stop(
 					__in const std::string &address,
 					__in uint16_t port,
-					__in uint32_t instance,
 					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
 					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
 					);
@@ -141,32 +155,7 @@ namespace SONO {
 					__in_opt bool verbose = false
 					);
 
-				uint32_t track_current(
-					__in const std::string &address,
-					__in uint16_t port,
-					__in uint32_t instance,
-					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
-					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
-				uint32_t track_total(
-					__in const std::string &address,
-					__in uint16_t port,
-					__in uint32_t instance,
-					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
-					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
-					);
-
 				void uninitialize(void);
-
-				uint32_t volume(
-					__in const std::string &address,
-					__in uint16_t port,
-					__in uint32_t instance,
-					__in_opt const std::string &channel = SONO_CHANNEL_MASTER,
-					__in_opt uint32_t service_timeout = SONO_SOCKET_NO_TIMEOUT,
-					__in_opt uint32_t action_timeout = SONO_SOCKET_NO_TIMEOUT
-					);
 
 			protected:
 
@@ -196,7 +185,7 @@ namespace SONO {
 
 				static _sono_controller *m_instance;
 
-				sono_action_argument m_result;
+				sono_action_argument m_results;
 
 		} sono_controller;
 	}

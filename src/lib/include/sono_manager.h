@@ -63,7 +63,7 @@ namespace SONO {
 
 			static _sono_manager *acquire(void);
 
-			const sono_controller *control(void);
+			sono_controller *control(void);
 
 			sono_device &device(
 				__in sono_uid_t id
