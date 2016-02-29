@@ -17,10 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include <python2.7/Python.h>
 #include "../../lib/sono.h"
 
 #define DEVICE_DISCOVERY_TIMEOUT 1 // sec
+#define DEVICE_DISCOVERY_TUPLE_COUNT 1
 #define SERVICE_ACTION_TIMEOUT 2 // sec
 #define SERVICE_DISCOVERY_TIMEOUT 2 // sec
 
@@ -549,11 +551,10 @@ sono_dev_disc_func(
 	/*__in*/ PyObject *args
 	)
 {
-	sono_err_t status = SONO_ERR_NONE;
-	
-	// TODO
-	
-	return Py_BuildValue("l", status);
+	uint8_t count = 0;
+
+	return Py_BuildValue("lb", sono_dev_disc(&count, DEVICE_DISCOVERY_TIMEOUT, 
+		SERVICE_DISCOVERY_TIMEOUT), count);
 }
 
 /*
@@ -568,11 +569,77 @@ sono_dev_list_func(
 	/*__in*/ PyObject *args
 	)
 {
+	sono_dev *list = NULL;
+	uint8_t count, iter = 0;
 	sono_err_t status = SONO_ERR_NONE;
+	PyObject *key = NULL, *map = NULL, *result = NULL, *value = NULL;
+
+	if(!PyArg_ParseTuple(args, "b", &count)
+			|| !count) {
+		status = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	list = (sono_dev *) malloc(sizeof(sono_dev) * count);
+	if(!list) {
+		status = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+	status = sono_dev_list(list, &count);
+	if(!SONO_SUCCESS(status)) {
+		status = SONO_ERR_INVALID;
+		goto exit;
+	}
+
+	map = PyDict_New();
+	if(!map
+			|| !PyDict_Check(map)) {
+		status = SONO_ERR_FAILED;
+		goto exit;
+	}
+
+	for(; iter < count; ++iter) {
+		key = Py_BuildValue("i", list[iter].id);
+		value = Py_BuildValue("si", (char *) list[iter].addr, list[iter].port);
+		PyDict_SetItem(map, key, value);
+
+		if(key) {
+			Py_DECREF(key);
+			key = NULL;
+		}
+
+		if(value) {
+			Py_DECREF(value);
+			value = NULL;
+		}
+	}
 	
-	// TODO
-	
-	return Py_BuildValue("l", status);
+	result = Py_BuildValue("lO", status, map);
+
+exit:
+
+	if(key) {
+		Py_DECREF(key);
+		key = NULL;
+	}
+
+	if(value) {
+		Py_DECREF(value);
+		value = NULL;
+	}
+
+	if(map) {
+		Py_DECREF(map);
+		map = NULL;
+	}
+
+	if(list) {
+		free(list);
+		list = NULL;
+	}
+
+	return result;
 }
 
 /*
@@ -648,7 +715,7 @@ static PyMethodDef sonoMethods[] = {
 	{ "sono_act_set_mute_func", (PyCFunction) sono_act_set_mute_func, METH_VARARGS, "perform set mute device action" },
 	{ "sono_act_set_volume_func", (PyCFunction) sono_act_set_volume_func, METH_VARARGS, "perform set volume device action" },
 	{ "sono_act_stop_func", (PyCFunction) sono_act_stop_func, METH_VARARGS, "perform stop track device action" },
-	{ "sono_dev_disc_func", (PyCFunction) sono_dev_disc_func, METH_VARARGS, "discover sono devices" },
+	{ "sono_dev_disc_func", (PyCFunction) sono_dev_disc_func, METH_NOARGS, "discover sono devices" },
 	{ "sono_dev_list_func", (PyCFunction) sono_dev_list_func, METH_VARARGS, "retrieve a list of sono devices" },
 	{ "sono_err_func", (PyCFunction) sono_err_func, METH_NOARGS, "sono library error string" },
 	{ "sono_init_func", (PyCFunction) sono_init_func, METH_NOARGS, "initialize sono library" },
