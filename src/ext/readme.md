@@ -5,10 +5,13 @@ LIBSONO is a lightweight library used to control Sono devices, written in C++.
 Table of Contents
 ===============
 
-1. [Usage](https://github.com/majestic53/libsono/src/ext#usage)
-2. [Device Discovery](https://github.com/majestic53/libsono/src/ext#device-discovery)
-3. [Error Handling](https://github.com/majestic53/libsono/src/ext#error-handling)
-4. [API](https://github.com/majestic53/libsono/src/ext#api)
+1. [Usage](https://github.com/majestic53/libsono/tree/master/src/ext#usage)
+2. [Device Discovery](https://github.com/majestic53/libsono/tree/master/src/ext#device-discovery)
+3. [Error Handling](https://github.com/majestic53/libsono/tree/master/src/ext#error-handling)
+4. [API](https://github.com/majestic53/libsono/tree/master/src/ext#api)
+	1. [Library Routines](https://github.com/majestic53/libsono/tree/master/src/ext#library-routines)
+	2. [Device Routines](https://github.com/majestic53/libsono/tree/master/src/ext#device-routines)
+	3. [Action Routines](https://github.com/majestic53/libsono/tree/master/src/ext#action-routines)
 
 Usage
 =======
@@ -41,9 +44,9 @@ API
 =======
 The following commands are supported:
 
-###LIBRARY
+###Library Routines
 
-1. sono_init_func
+####sono_init_func
 Initialize the library
 
 ```
@@ -53,7 +56,7 @@ Output:
 	[err]                 -- Error code
 ```
 
-2. sono_uninit_func
+####sono_uninit_func
 Uninitialize the library
 
 ```
@@ -63,7 +66,7 @@ Output:
 	[err]                 -- Error code
 ```
 
-3. sono_err_func
+####sono_err_func
 Retrieve the last error as a string
 
 ```
@@ -73,7 +76,7 @@ Output:
 	[err]                 -- Last error as string
 ```
 
-4. sono_ver_func
+####sono_ver_func
 Retrieve the library version as a string
 
 ```
@@ -83,9 +86,9 @@ Output:
 	[ver]                 -- Version as string
 ```
 
-###DEVICE
+###Device Routines
 
-1. sono_dev_disc_func
+####sono_dev_disc_func
 Discover avaliable devices
 
 ```
@@ -96,7 +99,7 @@ Output:
 	[cnt]                 -- Device count
 ```
 
-2. sono_dev_list_func
+####sono_dev_list_func
 Retrieve a list of discovered devices
 
 ```
@@ -107,9 +110,9 @@ Output:
 	dict{id, [addr, port]}-- Device id, addr:port dictionary
 ```
 
-###ACTION
+###Action Routines
 
-1. sono_act_add_func
+####sono_act_add_func
 Add a file to a target device's queue
 
 ```
@@ -124,7 +127,7 @@ Input:
 	path                  -- File path
 ```
 
-2. sono_act_clear_func
+####sono_act_clear_func
 Clear a target device's queue
 
 ```
@@ -138,7 +141,7 @@ Input:
 	port                  -- Device port
 ```
 
-3. sono_act_get_mute_func
+####sono_act_get_mute_func
 Retrieve a target device's current mute setting
 
 ```
@@ -153,7 +156,7 @@ Input:
 	port                  -- Device port
 ```
 
-4. sono_act_get_playback_state_func
+####sono_act_get_playback_state_func
 Retrieve a target device's current playback state
 
 ```
@@ -168,7 +171,7 @@ Input:
 	port                  -- Device port
 ```
 
-5. sono_act_get_volume_func
+####sono_act_get_volume_func
 Retrieve a target device's current volume
 
 ```
@@ -183,7 +186,7 @@ Input:
 	port                  -- Device port
 ```
 
-6. sono_act_next_func
+####sono_act_next_func
 Move to a target device's next track
 
 ```
@@ -197,7 +200,7 @@ Input:
 	port                  -- Device port
 ```
 
-7. sono_act_pause_func
+####sono_act_pause_func
 Pause playback on a target device
 
 ```
@@ -211,7 +214,7 @@ Input:
 	port                  -- Device port
 ```
 
-8. sono_act_play_func
+####sono_act_play_func
 Continue playback on a target device
 
 ```
@@ -225,7 +228,7 @@ Input:
 	port                  -- Device port
 ```
 
-9. sono_act_previous_func
+####sono_act_previous_func
 Move to a target device's previous track
 
 ```
@@ -239,7 +242,7 @@ Input:
 	port                  -- Device port
 ```
 
-10. sono_act_restart_func
+####sono_act_restart_func
 Restart playback on a target device
 
 ```
@@ -253,7 +256,7 @@ Input:
 	port                  -- Device port
 ```
 
-11. sono_act_seek_func
+####sono_act_seek_func
 Seek playback on a target device
 
 ```
@@ -270,7 +273,7 @@ Input:
 	sec                   -- Track seconds
 ```
 
-12. sono_act_set_mute_func
+####sono_act_set_mute_func
 Mute/unmute a target device
 
 ```
@@ -285,7 +288,7 @@ Input:
 	mute                  -- Desired mute
 ```
 
-13. sono_act_set_volume_func
+####sono_act_set_volume_func
 Set a target device's volume
 
 ```
@@ -300,7 +303,7 @@ Input:
 	vol                   -- Desired volume
 ```
 
-14. sono_act_stop_func
+####sono_act_stop_func
 Stop playback on a target device
 
 ```
