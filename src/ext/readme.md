@@ -10,8 +10,28 @@ Table of Contents
 3. [Error Handling](https://github.com/majestic53/libsono/tree/master/src/ext#error-handling)
 4. [API](https://github.com/majestic53/libsono/tree/master/src/ext#api)
 	1. [Library Routines](https://github.com/majestic53/libsono/tree/master/src/ext#library-routines)
+		1. [sono_init_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_init_func)
+		2. [sono_uninit_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_uninit_func)
+		3. [sono_err_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_err_func)
+		4. [sono_ver_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_ver_func)
 	2. [Device Routines](https://github.com/majestic53/libsono/tree/master/src/ext#device-routines)
+		1. [sono_dev_desc_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_dev_desc_func)
+		2. [sono_dev_list_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_dev_list_func)
 	3. [Action Routines](https://github.com/majestic53/libsono/tree/master/src/ext#action-routines)
+		1. [sono_act_add_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_add_func)
+		2. [sono_act_clear_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_clear_func)
+		3. [sono_act_get_mute_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_get_mute_func)
+		4. [sono_act_get_playback_state_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_get_playback_state_func)
+		5. [sono_act_get_volume_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_get_volume_func)
+		6. [sono_act_next_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_next_func)
+		7. [sono_act_pause_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_pause_func)
+		8. [sono_act_play_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_play_func)
+		9. [sono_act_previous_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_previous_func)
+		10. [sono_act_restart_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_restart_func)
+		11. [sono_act_seek_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_seek_func)
+		12. [sono_act_set_mute_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_set_mute_func)
+		13. [sono_act_set_volume_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_set_volume_func)
+		14. [sono_act_stop_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_stop_func)
 
 Usage
 =======
@@ -88,11 +108,11 @@ Output:
 
 ###Device Routines
 
-####sono_dev_disc_func
+####sono_dev_desc_func
 Discover avaliable devices
 
 ```
-[err, cnt] sono_dev_disc_func(void)
+[err, cnt] sono_dev_desc_func(void)
 
 Output:
 	[err]                 -- Error code
