@@ -43,7 +43,7 @@ To build the project, simply run the commands below in the projects root directo
 make py                --- Build libraries and python module
 ```
 
-Upon completion, a python module (a dynamic/shared library) can be found at ```./bin/sono.py(.dll/.so)```
+Upon completion, a python module (a dynamic/shared library) can be found at ```./bin/sono_py(.dll/.so)```
 
 Usage
 =======
