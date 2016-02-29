@@ -9,10 +9,10 @@ Table of Contents
 1. [Usage](https://github.com/majestic53/libsono#usage)
 	1. [Build](https://github.com/majestic53/libsono#build)
 	2. [Sonoctl](https://github.com/majestic53/libsono#sonoctl)
-	2. [Examples](https://github.com/majestic53/libsono#examples)
+	3. [Examples](https://github.com/majestic53/libsono#examples)
 2. [Changelog](https://github.com/majestic53/libsono#changelog)
 	1. [Version 0.1.1609](https://github.com/majestic53/libsono#version-011609)
-	1. [Version 0.1.1608](https://github.com/majestic53/libsono#version-011608)
+	2. [Version 0.1.1608](https://github.com/majestic53/libsono#version-011608)
 3. [License](https://github.com/majestic53/libsono#license)
 
 Usage
