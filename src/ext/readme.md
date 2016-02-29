@@ -1,14 +1,14 @@
 LIBSONO PYTHON MODULE
 =======
-LIBSONO is a lightweight library used to control Sono devices, written in C++.
+LIBSONO is made avaliable to python through a C python extension. See the Build/Usage section below for details.
 
 Table of Contents
 ===============
-
-1. [Usage](https://github.com/majestic53/libsono/tree/master/src/ext#usage)
-2. [Device Discovery](https://github.com/majestic53/libsono/tree/master/src/ext#device-discovery)
-3. [Error Handling](https://github.com/majestic53/libsono/tree/master/src/ext#error-handling)
-4. [API](https://github.com/majestic53/libsono/tree/master/src/ext#api)
+1. [Build](https://github.com/majestic53/libsono/tree/master/src/ext#build)
+2. [Usage](https://github.com/majestic53/libsono/tree/master/src/ext#usage)
+3. [Device Discovery](https://github.com/majestic53/libsono/tree/master/src/ext#device-discovery)
+4. [Error Handling](https://github.com/majestic53/libsono/tree/master/src/ext#error-handling)
+5. [API Reference](https://github.com/majestic53/libsono/tree/master/src/ext#api-reference)
 	1. [Library Routines](https://github.com/majestic53/libsono/tree/master/src/ext#library-routines)
 		1. [sono_init_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_init_func)
 		2. [sono_uninit_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_uninit_func)
@@ -33,6 +33,18 @@ Table of Contents
 		13. [sono_act_set_volume_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_set_volume_func)
 		14. [sono_act_stop_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_stop_func)
 
+Build
+=======
+__Prereq__: Building this project requires GNU and/or Clang compilers, Boost library, and Python headers.
+
+To build the project, simply run the commands below in the projects root directory:
+
+```
+make py                --- Build libraries and python module
+```
+
+Upon completion, a python module (a dynamic/shared library) can be found at ```./bin/sono.py(.dll/.so)```
+
 Usage
 =======
 The following steps must be taken in-order to use the library:
@@ -56,11 +68,11 @@ Error Handling
 =======
 To handle errors, follow the steps below:
 
-1. Check all returns against __SONO_ERR_NONE__(0) to confirm that no error has occured
+1. Check all returns against __SONO_ERR_NONE__ (0) to confirm that no error has occured
 2. If an error has occurred, retrieve additional information by calling ```sono_err_func()```
 
 
-API
+API Reference
 =======
 The following commands are supported:
 
