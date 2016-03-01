@@ -76,7 +76,7 @@ The following commands are supported:
 
 ###Library Routines
 
-Routines used to setup/teardown the library:
+Routines used to setup/teardown the library
 
 ####Initialize
 Initialize the library
@@ -120,7 +120,7 @@ Output:
 
 ###Device Routines
 
-Routines used to query device information:
+Routines used to query device information
 
 ####Discover
 Discover avaliable devices
