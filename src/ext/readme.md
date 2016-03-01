@@ -177,7 +177,7 @@ Input:
 	port                  -- Device port
 ```
 
-####Get_Mute
+####Get Mute
 Retrieve a target device's current mute setting
 
 ```
@@ -192,7 +192,7 @@ Input:
 	port                  -- Device port
 ```
 
-####Get_Playback_State
+####Get Playback State
 Retrieve a target device's current playback state
 
 ```
@@ -207,7 +207,7 @@ Input:
 	port                  -- Device port
 ```
 
-####Get_Volume
+####Get Volume
 Retrieve a target device's current volume
 
 ```
@@ -309,7 +309,7 @@ Input:
 	sec                   -- Track seconds
 ```
 
-####Set_Mute
+####Set Mute
 Mute/unmute a target device
 
 ```
@@ -324,7 +324,7 @@ Input:
 	mute                  -- Desired mute
 ```
 
-####Set_Volume
+####Set Volume
 Set a target device's volume
 
 ```
