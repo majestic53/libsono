@@ -50,9 +50,9 @@ Usage
 The following steps must be taken in-order to use the library:
 
 1. Import libsono into your python project
-2. Call ```sonopy.initialize()``` to initialize the library (__NOTE__: This step must occur prior to any other library calls)
+2. Call ```sonopy.initialize()``` to initialize the library (__Note__: This step must occur prior to any other library calls)
 3. Call any of the avaliable ```sonopy.Xxx()``` routines
-4. Call ```sonopy.uninitialize()``` to uninitialize the library (__NOTE__: This step mst occur after any other library calls)
+4. Call ```sonopy.uninitialize()``` to uninitialize the library (__Note__: This step mst occur after any other library calls)
 
 Device Discovery
 =======
@@ -66,7 +66,7 @@ Error Handling
 =======
 To handle errors, follow the steps below:
 
-1. Check all returns against _SONO_ERR_NONE_ to confirm that no error has occured
+1. Check all returns against __SONO_ERR_NONE__ to confirm that no error has occured
 2. If an error has occurred, retrieve additional information by calling ```sonopy.error()```
 
 
