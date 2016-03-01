@@ -18,8 +18,10 @@
  */
 
 #include <stdlib.h>
-#include <python2.7/Python.h>
 #include "../../lib/sono.h"
+
+#define BUILD_PYTHON_3 // python version 3.x
+#include <Python.h>
 
 #define DEVICE_DISCOVERY_TIMEOUT 1 // sec
 #define DEVICE_DISCOVERY_TUPLE_COUNT 1
@@ -700,13 +702,13 @@ sono_ver_func(
 }
 
 // Library method table
-static PyMethodDef sonoMethods[] = {
+static PyMethodDef sonopyMethods[] = {
 	{ "add", (PyCFunction) sono_act_add_func, METH_VARARGS, "perform add to queue device action" },
 	{ "clear", (PyCFunction) sono_act_clear_func, METH_VARARGS, "perform clear queue device action" },
-	{ "discover", (PyCFunction) sono_dev_disc_func, METH_NOARGS, "discover sono devices" },
-	{ "error", (PyCFunction) sono_err_func, METH_NOARGS, "sono library error string" },
+	{ "discover", (PyCFunction) sono_dev_disc_func, METH_NOARGS, "discover devices" },
+	{ "error", (PyCFunction) sono_err_func, METH_NOARGS, "error string" },
 	{ "get_mute", (PyCFunction) sono_act_get_mute_func, METH_VARARGS, "perform get mute device action" },
-	{ "get_list", (PyCFunction) sono_dev_list_func, METH_VARARGS, "retrieve a list of sono devices" },
+	{ "get_list", (PyCFunction) sono_dev_list_func, METH_VARARGS, "retrieve a list of devices" },
 	{ "get_playback_state", (PyCFunction) sono_act_get_playback_state_func, METH_VARARGS, "perform get playback state device action" },
 	{ "get_volume", (PyCFunction) sono_act_get_volume_func, METH_VARARGS, "perform get volume device action" },
 	{ "initialize", (PyCFunction) sono_init_func, METH_NOARGS, "initialize sono library" },
@@ -720,13 +722,28 @@ static PyMethodDef sonoMethods[] = {
 	{ "set_volume", (PyCFunction) sono_act_set_volume_func, METH_VARARGS, "perform set volume device action" },
 	{ "stop", (PyCFunction) sono_act_stop_func, METH_VARARGS, "perform stop track device action" },
 	{ "uninitialize", (PyCFunction) sono_uninit_func, METH_NOARGS, "uninitialize sono library" },
-	{ "version", (PyCFunction) sono_ver_func, METH_NOARGS, "sono library version string" },
+	{ "version", (PyCFunction) sono_ver_func, METH_NOARGS, "version string" },
 	{ NULL, NULL, 0, NULL },
 	};
+
+#ifdef BUILD_PYTHON_3
+// library definition table
+static struct PyModuleDef sonopyDef = {
+	PyModuleDef_HEAD_INIT,
+	"sonopy",
+	"a lightweight library used to control Sono devices",
+	-1,
+	sonopyMethods
+	};
+#endif // BUILD_PYTHON_3
 
 // Module initialization routine
 PyMODINIT_FUNC
 initsono_module(void)
 {
-	(void) Py_InitModule("sonopy", sonoMethods);
+#ifdef BUILD_PYTHON_3
+	return PyModule_Create(&sonopyDef);
+#else
+	(void) Py_InitModule("sonopy", sonopyMethods);
+#endif // BUILD_PYTHON_3
 }
