@@ -10,28 +10,28 @@ Table of Contents
 4. [Error Handling](https://github.com/majestic53/libsono/tree/master/src/ext#error-handling)
 5. [API Reference](https://github.com/majestic53/libsono/tree/master/src/ext#api-reference)
 	1. [Library Routines](https://github.com/majestic53/libsono/tree/master/src/ext#library-routines)
-		1. [sono_init_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_init_func)
-		2. [sono_uninit_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_uninit_func)
-		3. [sono_err_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_err_func)
-		4. [sono_ver_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_ver_func)
+		1. [Initialize](https://github.com/majestic53/libsono/tree/master/src/ext#initialize)
+		2. [Uninitialize](https://github.com/majestic53/libsono/tree/master/src/ext#uninitialize)
+		3. [Error](https://github.com/majestic53/libsono/tree/master/src/ext#error)
+		4. [Version](https://github.com/majestic53/libsono/tree/master/src/ext#version)
 	2. [Device Routines](https://github.com/majestic53/libsono/tree/master/src/ext#device-routines)
-		1. [sono_dev_desc_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_dev_desc_func)
-		2. [sono_dev_list_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_dev_list_func)
+		1. [Discover](https://github.com/majestic53/libsono/tree/master/src/ext#discover)
+		2. [List](https://github.com/majestic53/libsono/tree/master/src/ext#list)
 	3. [Action Routines](https://github.com/majestic53/libsono/tree/master/src/ext#action-routines)
-		1. [sono_act_add_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_add_func)
-		2. [sono_act_clear_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_clear_func)
-		3. [sono_act_get_mute_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_get_mute_func)
-		4. [sono_act_get_playback_state_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_get_playback_state_func)
-		5. [sono_act_get_volume_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_get_volume_func)
-		6. [sono_act_next_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_next_func)
-		7. [sono_act_pause_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_pause_func)
-		8. [sono_act_play_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_play_func)
-		9. [sono_act_previous_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_previous_func)
-		10. [sono_act_restart_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_restart_func)
-		11. [sono_act_seek_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_seek_func)
-		12. [sono_act_set_mute_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_set_mute_func)
-		13. [sono_act_set_volume_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_set_volume_func)
-		14. [sono_act_stop_func](https://github.com/majestic53/libsono/tree/master/src/ext#sono_act_stop_func)
+		1. [Add](https://github.com/majestic53/libsono/tree/master/src/ext#add)
+		2. [Clear](https://github.com/majestic53/libsono/tree/master/src/ext#clear)
+		3. [Get Mute](https://github.com/majestic53/libsono/tree/master/src/ext#get-mute)
+		4. [Get Playback State](https://github.com/majestic53/libsono/tree/master/src/ext#get-playback-state)
+		5. [Get Volume](https://github.com/majestic53/libsono/tree/master/src/ext#get-volume)
+		6. [Next](https://github.com/majestic53/libsono/tree/master/src/ext#next)
+		7. [Pause](https://github.com/majestic53/libsono/tree/master/src/ext#pause)
+		8. [Play](https://github.com/majestic53/libsono/tree/master/src/ext#play)
+		9. [Previous](https://github.com/majestic53/libsono/tree/master/src/ext#previous)
+		10. [Restart](https://github.com/majestic53/libsono/tree/master/src/ext#restart)
+		11. [Seek](https://github.com/majestic53/libsono/tree/master/src/ext#seek)
+		12. [Set Mute](https://github.com/majestic53/libsono/tree/master/src/ext#set-mute)
+		13. [Set Volume](https://github.com/majestic53/libsono/tree/master/src/ext#set-volume)
+		14. [Stop](https://github.com/majestic53/libsono/tree/master/src/ext#stop)
 
 Build
 =======
@@ -43,25 +43,25 @@ To build the project, simply run the commands below in the projects root directo
 make py                --- Build libraries and python module
 ```
 
-Upon completion, a python module (a dynamic/shared library) can be found at ```./bin/sono_py(.dll/.so)```
+Upon completion, a python module (a dynamic/shared library) can be found at ```./bin/sonopy(.dll/.so)```
 
 Usage
 =======
 The following steps must be taken in-order to use the library:
 
 1. Import libsono into your python project
-2. Call ```sono_init_func()``` to initialize the library
-	1. This step must occur prior to any other library calls
-3. Call any of the avaliable ```sono_act_Xxx()``` routines
-4. Call ```sono_uninit_funct()``` to uninitialize the library
-	1. This step mst occur after any other library calls
+2. Call ```sonopy.initialize()``` to initialize the library
+	1. __NOTE__: This step must occur prior to any other library calls
+3. Call any of the avaliable ```sonopy.Xxx()``` routines
+4. Call ```sonopy.uninitialize()``` to uninitialize the library
+	1. __NOTE__: This step mst occur after any other library calls
 
 Device Discovery
 =======
 To discover avaliable devices:
 
-1. Call ```sono_dev_disc_func()``` to retrieve the number of devices found
-2. Call ```sono_dev_list_func()``` to retrieve the device information
+1. Call ```sonopy.discover()``` to retrieve the number of devices found
+2. Call ```sonopy.list()``` to retrieve the device information
 
 
 Error Handling
@@ -69,7 +69,7 @@ Error Handling
 To handle errors, follow the steps below:
 
 1. Check all returns against __SONO_ERR_NONE__ (0) to confirm that no error has occured
-2. If an error has occurred, retrieve additional information by calling ```sono_err_func()```
+2. If an error has occurred, retrieve additional information by calling ```sonopy.error()```
 
 
 API Reference
@@ -78,41 +78,41 @@ The following commands are supported:
 
 ###Library Routines
 
-####sono_init_func
+####Initialize
 Initialize the library
 
 ```
-[err] sono_init_func(void)
+[err] sonopy.initialize(void)
 
 Output:
 	[err]                 -- Error code
 ```
 
-####sono_uninit_func
+####Uninitialize
 Uninitialize the library
 
 ```
-[err] sono_uninit_func(void)
+[err] sonopy.uninitialize(void)
 
 Output:
 	[err]                 -- Error code
 ```
 
-####sono_err_func
+####Error
 Retrieve the last error as a string
 
 ```
-[err] sono_err_func(void)
+[err] sonopy.error(void)
 
 Output:
 	[err]                 -- Last error as string
 ```
 
-####sono_ver_func
+####Version
 Retrieve the library version as a string
 
 ```
-[ver] sono_ver_func(void)
+[ver] sonopy.version(void)
 
 Output:
 	[ver]                 -- Version as string
@@ -120,22 +120,22 @@ Output:
 
 ###Device Routines
 
-####sono_dev_desc_func
+####Discover
 Discover avaliable devices
 
 ```
-[err, cnt] sono_dev_desc_func(void)
+[err, cnt] sonopy.discover(void)
 
 Output:
 	[err]                 -- Error code
 	[cnt]                 -- Device count
 ```
 
-####sono_dev_list_func
+####List
 Retrieve a list of discovered devices
 
 ```
-[err, dict{id, [addr, port]}] sono_dev_list_func(void)
+[err, dict{id, [addr, port]}] sonopy.list(void)
 
 Output:
 	[err]                 -- Error code
@@ -144,11 +144,11 @@ Output:
 
 ###Action Routines
 
-####sono_act_add_func
+####Add
 Add a file to a target device's queue
 
 ```
-[err] sono_act_add_func(addr, port, path)
+[err] sonopy.add(addr, port, path)
 
 Output:
 	[err]                 -- Error code
@@ -159,11 +159,11 @@ Input:
 	path                  -- File path
 ```
 
-####sono_act_clear_func
+####Clear
 Clear a target device's queue
 
 ```
-[err] sono_act_clear_func(addr, port)
+[err] sonopy.clear(addr, port)
 
 Output:
 	[err]                 -- Error code
@@ -173,11 +173,11 @@ Input:
 	port                  -- Device port
 ```
 
-####sono_act_get_mute_func
+####Get_Mute
 Retrieve a target device's current mute setting
 
 ```
-[err, mute] sono_act_get_mute_func(addr, port)
+[err, mute] sonopy.get_mute(addr, port)
 
 Output:
 	[err]                 -- Error code
@@ -188,11 +188,11 @@ Input:
 	port                  -- Device port
 ```
 
-####sono_act_get_playback_state_func
+####Get_Playback_State
 Retrieve a target device's current playback state
 
 ```
-[err, state] sono_act_get_playback_state_func(addr, port)
+[err, state] sonopy.get_playback_state(addr, port)
 
 Output:
 	[err]                 -- Error code
@@ -203,11 +203,11 @@ Input:
 	port                  -- Device port
 ```
 
-####sono_act_get_volume_func
+####Get_Volume
 Retrieve a target device's current volume
 
 ```
-[err, vol] sono_act_get_volume_func(addr, port)
+[err, vol] sonopy.get_volume(addr, port)
 
 Output:
 	[err]                 -- Error code
@@ -218,11 +218,11 @@ Input:
 	port                  -- Device port
 ```
 
-####sono_act_next_func
+####Next
 Move to a target device's next track
 
 ```
-[err] sono_act_next_func(addr, port)
+[err] sonopy.next(addr, port)
 
 Output:
 	[err]                 -- Error code
@@ -232,11 +232,11 @@ Input:
 	port                  -- Device port
 ```
 
-####sono_act_pause_func
+####Pause
 Pause playback on a target device
 
 ```
-[err] sono_act_pause_func(addr, port)
+[err] sonopy.pause(addr, port)
 
 Output:
 	[err]                 -- Error code
@@ -246,11 +246,11 @@ Input:
 	port                  -- Device port
 ```
 
-####sono_act_play_func
+####Play
 Continue playback on a target device
 
 ```
-[err] sono_act_play_func(addr, port)
+[err] sonopy.play(addr, port)
 
 Output:
 	[err]                 -- Error code
@@ -260,11 +260,11 @@ Input:
 	port                  -- Device port
 ```
 
-####sono_act_previous_func
+####Previous
 Move to a target device's previous track
 
 ```
-[err] sono_act_previous_func(addr, port)
+[err] sonopy.previous(addr, port)
 
 Output:
 	[err]                 -- Error code
@@ -274,11 +274,11 @@ Input:
 	port                  -- Device port
 ```
 
-####sono_act_restart_func
+####Restart
 Restart playback on a target device
 
 ```
-[err] sono_act_restart_func(addr, port)
+[err] sonopy.restart(addr, port)
 
 Output:
 	[err]                 -- Error code
@@ -288,11 +288,11 @@ Input:
 	port                  -- Device port
 ```
 
-####sono_act_seek_func
+####Seek
 Seek playback on a target device
 
 ```
-[err] sono_act_seek_func(addr, port, hour, min, sec)
+[err] sonopy.seek(addr, port, hour, min, sec)
 
 Output:
 	[err]                 -- Error code
@@ -305,11 +305,11 @@ Input:
 	sec                   -- Track seconds
 ```
 
-####sono_act_set_mute_func
+####Set_Mute
 Mute/unmute a target device
 
 ```
-[err] sono_act_set_mute_func(addr, port, mute)
+[err] sonopy.set_mute(addr, port, mute)
 
 Output:
 	[err]                 -- Error code
@@ -320,11 +320,11 @@ Input:
 	mute                  -- Desired mute
 ```
 
-####sono_act_set_volume_func
+####Set_Volume
 Set a target device's volume
 
 ```
-[err] sono_act_set_volume_func(addr, port, vol)
+[err] sonopy.set_volume(addr, port, vol)
 
 Output:
 	[err]                 -- Error code
@@ -335,11 +335,11 @@ Input:
 	vol                   -- Desired volume
 ```
 
-####sono_act_stop_func
+####Stop
 Stop playback on a target device
 
 ```
-[err] sono_act_stop_func(addr, port)
+[err] sonopy.stop(addr, port)
 
 Output:
 	[err]                 -- Error code

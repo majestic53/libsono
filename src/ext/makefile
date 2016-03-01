@@ -23,20 +23,20 @@ CC_LIB_1=/usr/lib -lpython3.5m
 DIR_BIN=./../../bin/
 DIR_BUILD=./../../build/
 DIR_SRC=./src/
-LIB=libsono_py
+LIB=sonopy
 
 all: build ext
 
 ext:
 	@echo ''
 	@echo '--- BUILDING PYTHON MODULE -----------------'
-	$(CC) $(CC_FLAGS_1) $(DIR_BUILD)sono_py.o -L$(CC_LIB_1) -o $(DIR_BIN)sono_py.so
+	$(CC) $(CC_FLAGS_1) $(DIR_BUILD)sonopy.o -L$(CC_LIB_1) -o $(DIR_BIN)sonopy.so
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: sono_py.o
+build: sonopy.o
 
 # MODULE
 
-sono_py.o: $(DIR_SRC)sono_py.c
-	$(CC) $(CC_FLAGS_0) -I$(CC_LIB_0) -c $(DIR_SRC)sono_py.c -o $(DIR_BUILD)sono_py.o
+sonopy.o: $(DIR_SRC)sonopy.c
+	$(CC) $(CC_FLAGS_0) -I$(CC_LIB_0) -c $(DIR_SRC)sonopy.c -o $(DIR_BUILD)sonopy.o

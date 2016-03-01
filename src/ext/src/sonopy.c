@@ -701,26 +701,26 @@ sono_ver_func(
 
 // Library method table
 static PyMethodDef sonoMethods[] = {
-	{ "sono_act_add_func", (PyCFunction) sono_act_add_func, METH_VARARGS, "perform add to queue device action" },
-	{ "sono_act_clear_func", (PyCFunction) sono_act_clear_func, METH_VARARGS, "perform clear queue device action" },
-	{ "sono_act_get_mute_func", (PyCFunction) sono_act_get_mute_func, METH_VARARGS, "perform get mute device action" },
-	{ "sono_act_get_playback_state_func", (PyCFunction) sono_act_get_playback_state_func, METH_VARARGS, "perform get playback state device action" },
-	{ "sono_act_get_volume_func", (PyCFunction) sono_act_get_volume_func, METH_VARARGS, "perform get volume device action" },
-	{ "sono_act_next_func", (PyCFunction) sono_act_next_func, METH_VARARGS, "perform next track device action" },
-	{ "sono_act_pause_func", (PyCFunction) sono_act_pause_func, METH_VARARGS, "perform pause track device action" },
-	{ "sono_act_play_func", (PyCFunction) sono_act_play_func, METH_VARARGS, "perform play track device action" },
-	{ "sono_act_previous_func", (PyCFunction) sono_act_previous_func, METH_VARARGS, "perform previous track device action" },
-	{ "sono_act_restart_func", (PyCFunction) sono_act_restart_func, METH_VARARGS, "perform restart track device action" },
-	{ "sono_act_seek_func", (PyCFunction) sono_act_seek_func, METH_VARARGS, "perform seek within track device action" },
-	{ "sono_act_set_mute_func", (PyCFunction) sono_act_set_mute_func, METH_VARARGS, "perform set mute device action" },
-	{ "sono_act_set_volume_func", (PyCFunction) sono_act_set_volume_func, METH_VARARGS, "perform set volume device action" },
-	{ "sono_act_stop_func", (PyCFunction) sono_act_stop_func, METH_VARARGS, "perform stop track device action" },
-	{ "sono_dev_disc_func", (PyCFunction) sono_dev_disc_func, METH_NOARGS, "discover sono devices" },
-	{ "sono_dev_list_func", (PyCFunction) sono_dev_list_func, METH_VARARGS, "retrieve a list of sono devices" },
-	{ "sono_err_func", (PyCFunction) sono_err_func, METH_NOARGS, "sono library error string" },
-	{ "sono_init_func", (PyCFunction) sono_init_func, METH_NOARGS, "initialize sono library" },
-	{ "sono_uninit_func", (PyCFunction) sono_uninit_func, METH_NOARGS, "uninitialize sono library" },
-	{ "sono_ver_func", (PyCFunction) sono_ver_func, METH_NOARGS, "sono library version string" },
+	{ "add", (PyCFunction) sono_act_add_func, METH_VARARGS, "perform add to queue device action" },
+	{ "clear", (PyCFunction) sono_act_clear_func, METH_VARARGS, "perform clear queue device action" },
+	{ "discover", (PyCFunction) sono_dev_disc_func, METH_NOARGS, "discover sono devices" },
+	{ "error", (PyCFunction) sono_err_func, METH_NOARGS, "sono library error string" },
+	{ "get_mute", (PyCFunction) sono_act_get_mute_func, METH_VARARGS, "perform get mute device action" },
+	{ "get_list", (PyCFunction) sono_dev_list_func, METH_VARARGS, "retrieve a list of sono devices" },
+	{ "get_playback_state", (PyCFunction) sono_act_get_playback_state_func, METH_VARARGS, "perform get playback state device action" },
+	{ "get_volume", (PyCFunction) sono_act_get_volume_func, METH_VARARGS, "perform get volume device action" },
+	{ "initialize", (PyCFunction) sono_init_func, METH_NOARGS, "initialize sono library" },
+	{ "next", (PyCFunction) sono_act_next_func, METH_VARARGS, "perform next track device action" },
+	{ "pause", (PyCFunction) sono_act_pause_func, METH_VARARGS, "perform pause track device action" },
+	{ "play", (PyCFunction) sono_act_play_func, METH_VARARGS, "perform play track device action" },
+	{ "previous", (PyCFunction) sono_act_previous_func, METH_VARARGS, "perform previous track device action" },
+	{ "restart", (PyCFunction) sono_act_restart_func, METH_VARARGS, "perform restart track device action" },
+	{ "seek", (PyCFunction) sono_act_seek_func, METH_VARARGS, "perform seek within track device action" },
+	{ "mute", (PyCFunction) sono_act_set_mute_func, METH_VARARGS, "perform set mute device action" },
+	{ "set_volume", (PyCFunction) sono_act_set_volume_func, METH_VARARGS, "perform set volume device action" },
+	{ "stop", (PyCFunction) sono_act_stop_func, METH_VARARGS, "perform stop track device action" },
+	{ "uninitialize", (PyCFunction) sono_uninit_func, METH_NOARGS, "uninitialize sono library" },
+	{ "version", (PyCFunction) sono_ver_func, METH_NOARGS, "sono library version string" },
 	{ NULL, NULL, 0, NULL },
 	};
 
@@ -728,5 +728,5 @@ static PyMethodDef sonoMethods[] = {
 PyMODINIT_FUNC
 initsono_module(void)
 {
-	(void) Py_InitModule("sono_py", sonoMethods);
+	(void) Py_InitModule("sonopy", sonoMethods);
 }

@@ -26,5 +26,5 @@ setup(
 	author='David Jolly',
 	author_email='majestic53@gmail.com',
 	url='https://github.com/majestic53/libsono',
-	ext_modules=[Extension('sono_py', sources=['./src/sono_py.c'])],
+	ext_modules=[Extension('sonopy', sources=['./src/sonopy.c'])],
 	)

@@ -78,8 +78,17 @@ Set a target device's LED state:
 sonoctl -d 192.168.1.2:1400 -s DeviceProperties -a SetLEDState DesiredLEDState=On
 ```
 
+###Python Module
+
+See the [Libsono Python Module](https://github.com/majestic53/libsono/tree/master/src/ext) section for build, usage, and references.
+
 Changelog
 =========
+
+###Version 0.1.1610
+*Updated: 2/29/2016*
+
+* Finalized basic python api
 
 ###Version 0.1.1609
 *Updated: 2/26/2016*
@@ -103,24 +112,6 @@ Changelog
 
 * Added sonoctl interface (incomplete)
 * Updated documentation
-
-###Version 0.1.1608
-*Updated: 2/21/2016*
-
-* Added c-style interface
-
-*Updated: 2/17/2016*
-
-* Modified device services to be indexed by string
-* Added c-style header
-
-*Updated: 2/16/2016*
-
-* Modified actions to be indexed by string
-
-*Updated: 2/15/2016*
-
-* Added device service actions
 
 *Changelog truncated (see file history for full log)*
 
